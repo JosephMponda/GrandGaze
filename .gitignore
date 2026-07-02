@@ -1,0 +1,138 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+/media
+/staticfiles
+instance/
+.webassets-cache
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+.project
+.pydevproject
+.settings/
+
+# OS
+Thumbs.db
+.DS_Store
+*.pem
+
+# Testing
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+htmlcov/
+
+# Node (safety net — we don't use npm but prevent accidental adds)
+node_modules/
+package-lock.json
+package.json
+
+# Tailwind (build output only — source input.css IS committed)
+# Note: tailwindcss.exe binary is NOT committed (downloaded at setup)
+# But app.css IS committed so offline dev works without rebuild
+# Uncomment if you want to rebuild dynamically:
+# /static/css/app.css
+
+# Database backups
+*.dump
+*.sql
+
+# Celery
+celerybeat-schedule
+
+# System / Temp
+*.tmp
+*.bak
+*.swp
+*~
+
+# Demo/Test data
+/seed_data/
+/fixtures/temp/
+
+# Secrets & API keys
+secrets.json
+.aws/
+.credentials
+
+# macOS
+.AppleDouble
+.LSOverride
+._*
+.apdisk
+
+# Linux
+.Xauthority
+.Xvfb-run
+
+# Docker (if using local fallback)
+*.sock
+
+# Custom project-specific (MUST–GSL EMR)
+# Keep these committed:
+# - static/js/*.min.js (vendored HTMX, Alpine, idb, Chart.js)
+# - static/css/app.css (Tailwind build output for offline dev)
+# - requirements.txt (hash-pinned dependencies)
+# - requirements.in (source of truth for deps)
+
+# Ignore only:
+# - .venv/ (above)
+# - Local environment overrides (above)
+# - Temporary seed/fixture files
+/docs/temp/
+/scripts/temp/

@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom component classes */
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-blue-600 text-white rounded font-medium hover:bg-blue-700 transition;
+  }
+  .btn-secondary {
+    @apply px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded font-medium hover:bg-gray-50 transition;
+  }
+  .btn-destructive {
+    @apply px-4 py-2 bg-red-600 text-white rounded font-medium hover:bg-red-700 transition;
+  }
+}
