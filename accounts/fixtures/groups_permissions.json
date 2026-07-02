@@ -1,0 +1,10 @@
+[
+  {"model": "auth.group", "pk": 1, "fields": {"name": "Nurse", "permissions": []}},
+  {"model": "auth.group", "pk": 2, "fields": {"name": "Clinician", "permissions": []}},
+  {"model": "auth.group", "pk": 3, "fields": {"name": "Pharmacist", "permissions": []}},
+  {"model": "auth.group", "pk": 4, "fields": {"name": "LabTech", "permissions": []}},
+  {"model": "auth.group", "pk": 5, "fields": {"name": "Radiographer", "permissions": []}},
+  {"model": "auth.group", "pk": 6, "fields": {"name": "BillingOfficer", "permissions": []}},
+  {"model": "auth.group", "pk": 7, "fields": {"name": "Admin", "permissions": []}},
+  {"model": "auth.group", "pk": 8, "fields": {"name": "ICT", "permissions": []}}
+]
