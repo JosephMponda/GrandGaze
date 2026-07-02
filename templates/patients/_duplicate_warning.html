@@ -1,25 +1,69 @@
 {% extends "base.html" %}
-{% block content %}
-<h1>Possible duplicate patient</h1>
-<p>The details you entered are similar to {{ candidates|length }} existing record(s). Confirm this is a
-   <strong>different person</strong> before creating a new record, or open the existing record instead.</p>
-{# NOTE: re-posting hidden fields is the MVP-simple approach; checkbox fields need explicit
-   checked-state handling if this becomes the shipped version - flag for Engineer A follow-up. #}
+{% block title %}Duplicate Warning - MUST EMR{% endblock %}
 
-<ul>
-    {% for c in candidates %}
-        <li>
-            <a href="{% url 'patients:profile' c.pk %}" target="_blank">{{ c.patient_number }} - {{ c.full_name }}</a>
-            (DOB: {{ c.date_of_birth|default:"unknown" }})
-            <form method="post" style="display:inline">
-                {% csrf_token %}
-                {% for field in form %}
-                    <input type="hidden" name="{{ field.html_name }}" value="{{ field.value|default_if_none:'' }}">
-                {% endfor %}
-                <input type="hidden" name="confirmed_not_duplicate_of" value="{{ c.pk }}">
-                <button type="submit">This is a different person</button>
-            </form>
-        </li>
-    {% endfor %}
-</ul>
+{% block content %}
+<div class="max-w-3xl mx-auto py-6">
+    <!-- Warning Alert Banner -->
+    <div class="mb-8">
+        {% include "components/_alert_banner.html" with message="Potential Duplicate Patient Records Found" severity="warning" %}
+    </div>
+
+    <!-- Main Message Card -->
+    <div class="bg-white border border-gray-200/80 rounded-xl shadow-xs p-6 space-y-6">
+        <div>
+            <h2 class="text-lg font-bold text-gray-900">Verify Patient Identity</h2>
+            <p class="text-sm text-gray-600 mt-1">
+                The details you entered match {{ candidates|length }} existing patient record(s) in the system. 
+                Please review the candidates below carefully before proceeding to avoid creating duplicate files.
+            </p>
+        </div>
+
+        <div class="space-y-4">
+            {% for c in candidates %}
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border border-gray-200/70 rounded-lg hover:bg-gray-50/50 transition-colors gap-4">
+                    <div>
+                        <h4 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                            <span class="text-xs font-mono bg-gray-100 border border-gray-200 px-2 py-0.5 rounded text-gray-700 font-normal">
+                                {{ c.patient_number }}
+                            </span>
+                            {{ c.full_name }}
+                        </h4>
+                        <p class="text-xs text-gray-500 mt-1">
+                            Sex: {{ c.get_sex_display }} | 
+                            DOB: {{ c.date_of_birth|default:"unknown" }} | 
+                            District: {{ c.district|default:"Not specified" }} |
+                            Category: {{ c.get_patient_category_display }}
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <a href="{% url 'patients:profile' c.pk %}" target="_blank" class="btn-secondary text-xs font-semibold flex items-center gap-1.5">
+                            View Profile
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                            </svg>
+                        </a>
+                        
+                        <form method="post" class="inline">
+                            {% csrf_token %}
+                            {% for field in form %}
+                                <input type="hidden" name="{{ field.html_name }}" value="{{ field.value|default_if_none:'' }}">
+                            {% endfor %}
+                            <input type="hidden" name="confirmed_not_duplicate_of" value="{{ c.pk }}">
+                            <button type="submit" class="btn-primary text-xs font-semibold">
+                                Override &amp; Register
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="flex justify-end pt-4 border-t border-gray-100">
+            <a href="{% url 'patients:register' %}" class="btn-secondary text-sm font-semibold py-2 px-6">
+                Go Back &amp; Edit Form
+            </a>
+        </div>
+    </div>
+</div>
 {% endblock %}

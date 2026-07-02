@@ -1,24 +1,38 @@
 @import "tailwindcss";
 
+@theme {
+  --color-ink: #111827;
+  --color-paper: #fafaf9;
+  --color-brand: #0f766e; /* Deep desaturated teal */
+  --color-brand-hover: #115e59;
+  --color-brand-light: #f0fdfa;
+}
+
 @layer components {
   /* Button variants */
   .btn-primary {
-    @apply px-4 py-2 bg-blue-600 text-white rounded font-medium hover:bg-blue-700 transition-colors;
+    @apply px-4 py-2 bg-brand text-white rounded font-medium hover:bg-brand-hover transition-colors cursor-pointer;
   }
 
   .btn-secondary {
-    @apply px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded font-medium hover:bg-gray-50 transition-colors;
+    @apply px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded font-medium hover:bg-gray-50 transition-colors cursor-pointer;
   }
 
   .btn-destructive {
-    @apply px-4 py-2 bg-red-600 text-white rounded font-medium hover:bg-red-700 transition-colors;
+    @apply px-4 py-2 bg-red-600 text-white rounded font-medium hover:bg-red-700 transition-colors cursor-pointer;
   }
 
   /* Form field styling */
-  .form-field input,
+  .form-field input:not([type="checkbox"]):not([type="radio"]),
   .form-field textarea,
   .form-field select {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent bg-white;
+  }
+
+  /* Checkbox & Radio fields styling */
+  .form-field input[type="checkbox"],
+  .form-field input[type="radio"] {
+    @apply h-4 w-4 rounded border-gray-300 text-brand focus:ring-brand cursor-pointer bg-white;
   }
 
   .form-field label {

@@ -6,58 +6,103 @@
     <title>{% block title %}MUST Teaching Hospital EMR{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
 </head>
-<body x-data="{ sidebarOpen: false }" hx-boost="true">
+<body class="bg-paper text-ink min-h-screen flex flex-col font-sans antialiased" hx-boost="true">
     {# Navigation Shell #}
-    <header class="bg-white border-b border-gray-200 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center">
-                    <h1 class="text-lg font-bold text-gray-900">MUST-GSL EMR</h1>
-                </div>
-                <nav class="flex items-center gap-6">
+    <header class="bg-white border-b border-gray-200/80 shadow-xs sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-8">
+                    <div class="flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-brand flex items-center justify-center text-white font-bold text-lg shadow-sm">M</span>
+                        <span class="text-md font-bold tracking-tight text-gray-900">MUST EMR</span>
+                    </div>
                     {% if user.is_authenticated %}
-                        <a href="{% url 'accounts:dashboard' %}" class="text-sm text-gray-600 hover:text-gray-900">Dashboard</a>
-                        <a href="{% url 'patients:register' %}" class="text-sm text-gray-600 hover:text-gray-900">Register Patient</a>
-                        <span class="text-sm text-gray-600">{{ user.username }}</span>
-                        <form method="post" action="{% url 'accounts:logout' %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn-secondary text-sm">Log out</button>
-                        </form>
+                        <nav class="hidden md:flex items-center gap-1">
+                            <a href="{% url 'accounts:dashboard' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors">Dashboard</a>
+                            <a href="{% url 'patients:register' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors">Register Patient</a>
+                            {% if user.is_superuser or user.profile.role == 'Admin' or user.profile.role == 'ICT' %}
+                                <a href="{% url 'accounts:audit_trail' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors">Audit Trail</a>
+                            {% endif %}
+                        </nav>
                     {% endif %}
-                </nav>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    {% if user.is_authenticated %}
+                        <div class="flex items-center gap-3">
+                            <div class="text-right hidden sm:block">
+                                <p class="text-xs font-semibold text-gray-900 leading-3">{{ user.username }}</p>
+                                <p class="text-[10px] font-medium text-gray-500 uppercase tracking-wider mt-0.5">
+                                    {% if user.profile %}
+                                        {{ user.profile.get_role_display }}
+                                    {% else %}
+                                        Superuser
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <span class="w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center font-bold text-gray-700 text-sm select-none">
+                                {{ user.username|slice:":1"|upper }}
+                            </span>
+                            <form method="post" action="{% url 'accounts:logout' %}" class="inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-secondary text-xs px-3 py-1.5 font-semibold">Log out</button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="btn-primary text-xs px-4 py-2 font-semibold">Sign In</a>
+                    {% endif %}
+                    
+                    {# Connection Dot #}
+                    <div class="relative flex items-center justify-center" x-data="{ online: navigator.onLine }" 
+                         @online.window="online = true" @offline.window="online = false">
+                        <span :class="online ? 'bg-green-500' : 'bg-red-500'" class="w-2.5 h-2.5 rounded-full inline-block transition-colors duration-300"></span>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
 
     {# Messages #}
     {% if messages %}
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <ul class="space-y-2">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full">
+            <div class="space-y-2">
                 {% for message in messages %}
-                    <li class="alert alert-info">{{ message }}</li>
+                    {% include "components/_alert_banner.html" with message=message.message severity=message.tags dismissible=True %}
                 {% endfor %}
-            </ul>
+            </div>
         </div>
     {% endif %}
 
     {# Main Content #}
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
         {% block content %}{% endblock %}
     </main>
 
+    {# Footer / Status #}
+    <footer class="border-t border-gray-200 bg-white py-4 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center text-xs text-gray-500">
+            <p>&copy; 2026 MUST Teaching Hospital. All rights reserved.</p>
+            <p>Malawi EMR Platform v1.0</p>
+        </div>
+    </footer>
+
     {# Offline Status Indicator #}
-    <div id="offline-indicator" class="fixed bottom-4 right-4 hidden">
-        <div class="bg-red-100 border border-red-300 text-red-800 px-4 py-2 rounded text-sm flex items-center gap-2">
-            <span class="w-2 h-2 bg-red-500 rounded-full"></span>
-            <span>Offline - changes will sync when connected</span>
+    <div id="offline-indicator" class="fixed bottom-6 right-6 z-50 hidden animate-bounce">
+        <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg shadow-lg flex items-center gap-3">
+            <span class="flex h-3 w-3 relative">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+            </span>
+            <div class="text-xs">
+                <p class="font-bold">Offline Mode Active</p>
+                <p class="text-red-600">Changes will be queued and synchronized on reconnection.</p>
+            </div>
         </div>
     </div>
 
     {# Scripts #}
-    {# Alpine.js first (deferred), then HTMX, then app logic #}
     <script src="{% static 'js/alpinejs.min.js' %}" defer></script>
     <script src="{% static 'js/htmx.min.js' %}"></script>
-    {# TODO(frontend): idb loaded on-demand when building offline outbox (Week 2) #}
     <script src="{% static 'js/chart.min.js' %}"></script>
     <script src="{% static 'js/app.js' %}"></script>
 </body>
