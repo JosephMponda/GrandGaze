@@ -1,17 +1,17 @@
-# Engineer A — Module Spec: Core Platform, Identity & Patient Registration (MPI)
+# Engineer A - Module Spec: Core Platform, Identity & Patient Registration (MPI)
 
 **Django apps owned:** `accounts`, `patients`, plus repo-wide `django-simple-history`/`django-axes`/`django-cryptography` configuration.
 
 **Why this module ships first:** every other engineer's models FK into `Patient` and `User`. This is the critical path. If this slips, everyone slips.
 
-**Brief traceability:** §8.1.1 (Patient Registration/MPI), §9.1 (Clinical Governance Structure — RBAC), §9.3/§9.4 (Legal/Cybersecurity), §12 (User login, role-based dashboard, patient registration/search/profile, audit trail concept).
+**Brief traceability:** §8.1.1 (Patient Registration/MPI), §9.1 (Clinical Governance Structure - RBAC), §9.3/§9.4 (Legal/Cybersecurity), §12 (User login, role-based dashboard, patient registration/search/profile, audit trail concept).
 
 ## 1. Data model
 
 ### `accounts` app
 
 ```
-User (Django's built-in auth.User — do not replace it)
+User (Django's built-in auth.User - do not replace it)
 Profile
   - user            OneToOneField(User)
   - role             CharField, choices: NURSE, CLINICIAN, PHARMACIST, LAB_TECH,
@@ -22,7 +22,7 @@ Profile
   - created_at / updated_at
 ```
 
-Roles map 1:1 to Django `Group` objects (`Nurse`, `Clinician`, `Pharmacist`, `LabTech`, `Radiographer`, `BillingOfficer`, `Admin`, `ICT`). A fixture (`accounts/fixtures/groups_permissions.json`) defines group→permission assignments. **Do not hardcode role checks as `if request.user.profile.role == "NURSE"` scattered through views** — use `@permission_required('app.codename')` or `user.groups.filter(name=...)` via a single `has_role()` helper in `accounts/permissions.py` that every app imports.
+Roles map 1:1 to Django `Group` objects (`Nurse`, `Clinician`, `Pharmacist`, `LabTech`, `Radiographer`, `BillingOfficer`, `Admin`, `ICT`). A fixture (`accounts/fixtures/groups_permissions.json`) defines group→permission assignments. **Do not hardcode role checks as `if request.user.profile.role == "NURSE"` scattered through views** - use `@permission_required('app.codename')` or `user.groups.filter(name=...)` via a single `has_role()` helper in `accounts/permissions.py` that every app imports.
 
 ### `patients` app
 
@@ -72,7 +72,7 @@ ReferralRecord
 
 ## 2. Duplicate detection (patient safety requirement §8.1.1)
 
-On registration, run a fuzzy match against existing patients on: `(first_name, last_name, date_of_birth)` trigram similarity (Postgres `pg_trgm` extension — allowlisted, it's a Postgres extension not a Python package) OR exact `national_id` match OR exact `phone_number` match. If a candidate scores above threshold, block silent creation — show the registering user a "possible duplicate" screen requiring explicit "this is a different person" confirmation before the new record is created. Log that confirmation (who, when, why) — this is a safety-relevant audit event, not optional telemetry.
+On registration, run a fuzzy match against existing patients on: `(first_name, last_name, date_of_birth)` trigram similarity (Postgres `pg_trgm` extension - allowlisted, it's a Postgres extension not a Python package) OR exact `national_id` match OR exact `phone_number` match. If a candidate scores above threshold, block silent creation - show the registering user a "possible duplicate" screen requiring explicit "this is a different person" confirmation before the new record is created. Log that confirmation (who, when, why) - this is a safety-relevant audit event, not optional telemetry.
 
 ## 3. Public interface other engineers use
 
@@ -85,16 +85,16 @@ def register_patient(data: dict, registered_by: User) -> Patient
 def check_possible_duplicate(data: dict) -> QuerySet[Patient]
 ```
 
-Every other app's models should `FK(patients.Patient)` for patient linkage — never duplicate patient identity fields into another app's models.
+Every other app's models should `FK(patients.Patient)` for patient linkage - never duplicate patient identity fields into another app's models.
 
 ## 4. Views/pages (server-rendered, HTMX partials for search-as-you-type)
 
-- `/login/`, `/logout/` — Django's built-in `LoginView`/`LogoutView`, styled, not rebuilt.
-- `/dashboard/` — role-aware landing page: each group sees a different set of quick-links/widgets (this is the "role-based dashboard" MVP requirement). Widget content pulled from each engineer's app via a simple `dashboard_widgets.py` registry pattern — Engineer A defines the registry interface, other engineers register their own widget.
-- `/patients/register/` — registration form, duplicate-check HTMX partial fires on blur of name+DOB fields.
-- `/patients/search/` — HTMX live search (search-as-you-type against `patient_number`, name, phone).
-- `/patients/<id>/` — patient profile: demographics + tabbed HTMX partials for "Visits", "Encounters", "Labs", "Prescriptions", "Billing" — **each tab's content is rendered by the owning engineer's app, included here as an HTMX-loaded partial, not duplicated**.
-- `/admin/audit/` — read-only audit trail viewer (wraps `django-simple-history` records) for Admin/ICT roles only. This satisfies §19.4 "audit trail approach" as a visible feature, not just a database table nobody can see.
+- `/login/`, `/logout/` - Django's built-in `LoginView`/`LogoutView`, styled, not rebuilt.
+- `/dashboard/` - role-aware landing page: each group sees a different set of quick-links/widgets (this is the "role-based dashboard" MVP requirement). Widget content pulled from each engineer's app via a simple `dashboard_widgets.py` registry pattern - Engineer A defines the registry interface, other engineers register their own widget.
+- `/patients/register/` - registration form, duplicate-check HTMX partial fires on blur of name+DOB fields.
+- `/patients/search/` - HTMX live search (search-as-you-type against `patient_number`, name, phone).
+- `/patients/<id>/` - patient profile: demographics + tabbed HTMX partials for "Visits", "Encounters", "Labs", "Prescriptions", "Billing" - **each tab's content is rendered by the owning engineer's app, included here as an HTMX-loaded partial, not duplicated**.
+- `/admin/audit/` - read-only audit trail viewer (wraps `django-simple-history` records) for Admin/ICT roles only. This satisfies §19.4 "audit trail approach" as a visible feature, not just a database table nobody can see.
 
 ## 5. Acceptance criteria
 
@@ -103,5 +103,5 @@ Every other app's models should `FK(patients.Patient)` for patient linkage — n
 - [ ] Registering a near-duplicate (same name+DOB) blocks silent creation and requires explicit confirmation, logged.
 - [ ] Patient search returns results in under 300ms on the seed dataset (500 synthetic patients).
 - [ ] Every create/update to `Patient` is visible in the audit trail viewer with actor + timestamp.
-- [ ] `phone_number` and `national_id` are stored encrypted at rest (verify by inspecting raw DB column — should not be human-readable).
+- [ ] `phone_number` and `national_id` are stored encrypted at rest (verify by inspecting raw DB column - should not be human-readable).
 - [ ] 5 failed logins locks the account for 15 minutes (django-axes).

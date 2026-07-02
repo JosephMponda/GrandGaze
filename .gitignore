@@ -77,12 +77,12 @@ coverage.xml
 .pytest_cache/
 htmlcov/
 
-# Node (safety net — we don't use npm but prevent accidental adds)
+# Node (safety net - we don't use npm but prevent accidental adds)
 node_modules/
 package-lock.json
 package.json
 
-# Tailwind (build output only — source input.css IS committed)
+# Tailwind (build output only - source input.css IS committed)
 # Note: tailwindcss.exe binary is NOT committed (downloaded at setup)
 # But app.css IS committed so offline dev works without rebuild
 # Uncomment if you want to rebuild dynamically:

@@ -32,7 +32,7 @@ class PatientCategory(models.TextChoices):
 class Patient(models.Model):
     """Master Patient Index record. Brief §8.1.1.
 
-    Every other app FKs into this model — never duplicate identity fields
+    Every other app FKs into this model - never duplicate identity fields
     into another app's models (Engineer A spec §3).
     """
 
@@ -79,7 +79,7 @@ class Patient(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.patient_number} — {self.first_name} {self.last_name}"
+        return f"{self.patient_number} - {self.first_name} {self.last_name}"
 
     def save(self, *args, **kwargs):
         self.national_id_lookup = hash_lookup_value(self.national_id) if self.national_id else ""
@@ -99,11 +99,11 @@ class NextOfKin(models.Model):
     phone_number = EncryptedCharField(max_length=32, blank=True)
 
     def __str__(self):
-        return f"{self.name} ({self.relationship}) — NOK of {self.patient.patient_number}"
+        return f"{self.name} ({self.relationship}) - NOK of {self.patient.patient_number}"
 
 
 class PatientMergeRecord(models.Model):
-    """Duplicate patients are never deleted — flagged inactive and merged.
+    """Duplicate patients are never deleted - flagged inactive and merged.
     Brief §8.1.1 duplicate detection / merge workflow.
     """
 
@@ -130,7 +130,7 @@ class ReferralRecord(models.Model):
 
 class DuplicateConfirmation(models.Model):
     """Audit record of a registrar explicitly confirming a possible-duplicate
-    match is actually a different person (Engineer A spec §2 — safety-relevant,
+    match is actually a different person (Engineer A spec §2 - safety-relevant,
     not optional telemetry).
     """
 

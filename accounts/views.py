@@ -8,7 +8,7 @@ from .permissions import role_required
 
 @login_required
 def dashboard(request):
-    """Role-aware landing page — MVP requirement (brief §12)."""
+    """Role-aware landing page - MVP requirement (brief §12)."""
     context = {
         "widgets": widgets_for_user(request.user),
     }

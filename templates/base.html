@@ -49,7 +49,7 @@
     <div id="offline-indicator" class="fixed bottom-4 right-4 hidden">
         <div class="bg-red-100 border border-red-300 text-red-800 px-4 py-2 rounded text-sm flex items-center gap-2">
             <span class="w-2 h-2 bg-red-500 rounded-full"></span>
-            <span>Offline — changes will sync when connected</span>
+            <span>Offline - changes will sync when connected</span>
         </div>
     </div>
 
@@ -57,7 +57,7 @@
     {# Alpine.js first (deferred), then HTMX, then app logic #}
     <script src="{% static 'js/alpinejs.min.js' %}" defer></script>
     <script src="{% static 'js/htmx.min.js' %}"></script>
-    <script src="{% static 'js/idb.min.js' %}"></script>
+    {# TODO(frontend): idb loaded on-demand when building offline outbox (Week 2) #}
     <script src="{% static 'js/chart.min.js' %}"></script>
     <script src="{% static 'js/app.js' %}"></script>
 </body>

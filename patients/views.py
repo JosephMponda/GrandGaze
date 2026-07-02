@@ -17,7 +17,7 @@ def register_patient(request):
             duplicates = services.check_possible_duplicate(form.cleaned_data)
             duplicates = duplicates.exclude(pk=confirmed_candidate_id) if confirmed_candidate_id else duplicates
             if duplicates.exists() and not confirmed_candidate_id:
-                # Block silent creation — surface candidates, require explicit confirmation.
+                # Block silent creation - surface candidates, require explicit confirmation.
                 return render(
                     request,
                     "patients/_duplicate_warning.html",

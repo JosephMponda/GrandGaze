@@ -1,10 +1,10 @@
-# Engineer B — Module Spec: Clinical Encounters & Vital Signs
+# Engineer B - Module Spec: Clinical Encounters & Vital Signs
 
 **Django apps owned:** `encounters`, `vitals`.
 
 **Depends on (frozen by end of Day 2):** `patients.Patient`, `accounts.Profile`/RBAC helpers from Engineer A.
 
-**Brief traceability:** §8.1.3 (Outpatient Clinical Documentation), §8.1.7 (Vital Signs/Observations), §8.1.8 (Provider Documentation), §9.2 (Patient Safety Framework — abnormal vital triggers), §12 MVP ("clinical encounter documentation", "vital signs entry").
+**Brief traceability:** §8.1.3 (Outpatient Clinical Documentation), §8.1.7 (Vital Signs/Observations), §8.1.8 (Provider Documentation), §9.2 (Patient Safety Framework - abnormal vital triggers), §12 MVP ("clinical encounter documentation", "vital signs entry").
 
 ## 1. Data model
 
@@ -78,11 +78,11 @@ EarlyWarningScore
   - computed_at
 ```
 
-## 2. Early Warning Score (patient safety — this is a real judged feature, build it for real)
+## 2. Early Warning Score (patient safety - this is a real judged feature, build it for real)
 
-Implement a simplified adult EWS in `vitals/scoring.py` as a pure function `compute_ews(vital_sign_set) -> (score, risk_level)`, based on standard published banding (temp, BP, pulse, resp rate, SpO2, GCS each contribute 0–3 points, summed). Keep the thresholds in a single constants dict at the top of the file so they're easy to defend/adjust to judges' questions, and add a `# TODO: pediatric-adjusted variant, Phase 2` note — the brief explicitly calls out §8.1.7 "pediatric age-adjusted vital sign alerts" as future scope, don't silently claim you built pediatric EWS if you built adult-only.
+Implement a simplified adult EWS in `vitals/scoring.py` as a pure function `compute_ews(vital_sign_set) -> (score, risk_level)`, based on standard published banding (temp, BP, pulse, resp rate, SpO2, GCS each contribute 0–3 points, summed). Keep the thresholds in a single constants dict at the top of the file so they're easy to defend/adjust to judges' questions, and add a `# TODO: pediatric-adjusted variant, Phase 2` note - the brief explicitly calls out §8.1.7 "pediatric age-adjusted vital sign alerts" as future scope, don't silently claim you built pediatric EWS if you built adult-only.
 
-**Abnormal value alert**: any vital outside a hard safety threshold (e.g. SpO2 < 90%, temp > 39.5°C) fires a same-page HTMX banner/toast immediately on save, and creates an `AlertEvent` (owned by Engineer E's `reporting` app — call `reporting.services.raise_alert(...)`, don't build a second alerting system here).
+**Abnormal value alert**: any vital outside a hard safety threshold (e.g. SpO2 < 90%, temp > 39.5°C) fires a same-page HTMX banner/toast immediately on save, and creates an `AlertEvent` (owned by Engineer E's `reporting` app - call `reporting.services.raise_alert(...)`, don't build a second alerting system here).
 
 ## 3. Public interface other engineers use
 
@@ -101,9 +101,9 @@ def vitals_trend(patient, limit=10) -> QuerySet[VitalSignSet]   # for trend char
 
 ## 4. Views/pages
 
-- `/encounters/patient/<id>/new/` — new encounter form (structured sections matching §8.1.3 fields).
-- `/encounters/<id>/` — encounter detail/edit, sign-off action (locks the record once signed — further edits create an addendum, they don't silently rewrite signed clinical documentation, which would be a governance red flag to judges).
-- `/vitals/patient/<id>/entry/` — vitals entry form, HTMX partial that returns the EWS badge + trend sparkline immediately on submit.
+- `/encounters/patient/<id>/new/` - new encounter form (structured sections matching §8.1.3 fields).
+- `/encounters/<id>/` - encounter detail/edit, sign-off action (locks the record once signed - further edits create an addendum, they don't silently rewrite signed clinical documentation, which would be a governance red flag to judges).
+- `/vitals/patient/<id>/entry/` - vitals entry form, HTMX partial that returns the EWS badge + trend sparkline immediately on submit.
 - Patient-profile "Encounters" and "Vitals" tabs (HTMX partials, plug into Engineer A's patient profile template blocks).
 - Dashboard widget: "patients with abnormal vitals in the last 4 hours" (register via Engineer A's `dashboard_widgets.py`).
 
@@ -113,5 +113,5 @@ def vitals_trend(patient, limit=10) -> QuerySet[VitalSignSet]   # for trend char
 - [ ] Once signed, the encounter is read-only in the UI; edits require an addendum flow, both are visible in the audit trail.
 - [ ] Vitals entry auto-computes BMI and EWS on save.
 - [ ] An out-of-range vital fires a visible alert within the same request/response cycle (no polling delay).
-- [ ] `get_patient_allergies()` returns correct data when called from a throwaway Pharmacy test — this is the cross-module safety contract, test it explicitly.
+- [ ] `get_patient_allergies()` returns correct data when called from a throwaway Pharmacy test - this is the cross-module safety contract, test it explicitly.
 - [ ] Vitals trend chart renders on the patient profile with at least 3 data points from seed data.

@@ -121,7 +121,7 @@ document.addEventListener('htmx:beforeRequest', async (event) => {
       });
 
       // Show offline confirmation toast
-      showToast('Saved offline — will sync when connected', 'info');
+      showToast('Saved offline - will sync when connected', 'info');
     } catch (error) {
       console.error('Failed to queue form submission:', error);
       showToast('Failed to save offline. Please try again.', 'critical');
@@ -164,14 +164,14 @@ async function syncQueuedItems() {
         } else {
           const data = await response.json();
           if (data.status === 'conflict') {
-            showToast(`Conflict on ${item.form_type} — review and resubmit`, 'warning');
+            showToast(`Conflict on ${item.form_type} - review and resubmit`, 'warning');
           } else {
             showToast(`Sync failed: ${data.message || 'Unknown error'}`, 'critical');
           }
         }
       } catch (error) {
         console.error('Sync error:', error);
-        showToast('Sync failed — will retry', 'warning');
+        showToast('Sync failed - will retry', 'warning');
       }
     }
   } catch (error) {
