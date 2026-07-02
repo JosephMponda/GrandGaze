@@ -1,31 +1,64 @@
-<!DOCTYPE html>
+{% load static %}<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}MUST Teaching Hospital EMR{% endblock %}</title>
-    {# TODO(frontend team): swap in Tailwind CLI output per AGENTS.md §5 — no CDN pulls. #}
-    {# TODO(frontend team): vendor htmx.min.js + alpine.min.js under /static/vendor/ per AGENTS.md §5, then: #}
-    {# <script src="{% static 'vendor/htmx.min.js' %}"></script> #}
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
 </head>
-<body>
-    <header>
-        <strong>MUST-GSL EMR</strong>
-        {% if user.is_authenticated %}
-            | <a href="{% url 'accounts:dashboard' %}">Dashboard</a>
-            | <a href="{% url 'patients:register' %}">Register Patient</a>
-            | Signed in as {{ user.username }}
-            | <form method="post" action="{% url 'accounts:logout' %}" style="display:inline">
-                {% csrf_token %}<button type="submit">Log out</button>
-              </form>
-        {% endif %}
+<body x-data="{ sidebarOpen: false }" hx-boost="true">
+    {# Navigation Shell #}
+    <header class="bg-white border-b border-gray-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <h1 class="text-lg font-bold text-gray-900">MUST-GSL EMR</h1>
+                </div>
+                <nav class="flex items-center gap-6">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'accounts:dashboard' %}" class="text-sm text-gray-600 hover:text-gray-900">Dashboard</a>
+                        <a href="{% url 'patients:register' %}" class="text-sm text-gray-600 hover:text-gray-900">Register Patient</a>
+                        <span class="text-sm text-gray-600">{{ user.username }}</span>
+                        <form method="post" action="{% url 'accounts:logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-secondary text-sm">Log out</button>
+                        </form>
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
     </header>
+
+    {# Messages #}
     {% if messages %}
-        <ul>
-            {% for message in messages %}<li>{{ message }}</li>{% endfor %}
-        </ul>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <ul class="space-y-2">
+                {% for message in messages %}
+                    <li class="alert alert-info">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
     {% endif %}
-    <main>
+
+    {# Main Content #}
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {% block content %}{% endblock %}
     </main>
+
+    {# Offline Status Indicator #}
+    <div id="offline-indicator" class="fixed bottom-4 right-4 hidden">
+        <div class="bg-red-100 border border-red-300 text-red-800 px-4 py-2 rounded text-sm flex items-center gap-2">
+            <span class="w-2 h-2 bg-red-500 rounded-full"></span>
+            <span>Offline — changes will sync when connected</span>
+        </div>
+    </div>
+
+    {# Scripts #}
+    {# Alpine.js first (deferred), then HTMX, then app logic #}
+    <script src="{% static 'js/alpinejs.min.js' %}" defer></script>
+    <script src="{% static 'js/htmx.min.js' %}"></script>
+    <script src="{% static 'js/idb.min.js' %}"></script>
+    <script src="{% static 'js/chart.min.js' %}"></script>
+    <script src="{% static 'js/app.js' %}"></script>
 </body>
 </html>
