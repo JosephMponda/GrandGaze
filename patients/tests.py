@@ -6,7 +6,7 @@ from django.urls import reverse
 from accounts.models import Profile, Role
 from accounts.permissions import has_role
 from patients import services
-from patients.models import Patient
+from patients.models import PatientNumberSequence
 
 pytestmark = pytest.mark.django_db
 
@@ -32,20 +32,29 @@ def test_register_patient_generates_unique_number(nurse_user):
 
 def test_encrypted_fields_not_stored_as_plaintext(nurse_user):
     p = services.register_patient(
-        dict(first_name="Grace", last_name="Banda", sex="female", national_id="MW-001", phone_number="0888111222"),
+        dict(
+            first_name="Grace",
+            last_name="Banda",
+            sex="female",
+            national_id="MW-001",
+            phone_number="0888111222",
+            address_line="House 4, Blantyre",
+        ),
         registered_by=nurse_user,
     )
     from django.db import connection
 
     with connection.cursor() as cur:
-        cur.execute("SELECT national_id, phone_number FROM patients_patient WHERE id = %s", [p.id])
-        raw_national_id, raw_phone = cur.fetchone()
+        cur.execute("SELECT national_id, phone_number, address_line FROM patients_patient WHERE id = %s", [p.id])
+        raw_national_id, raw_phone, raw_address = cur.fetchone()
     assert "MW-001" not in raw_national_id
     assert "0888111222" not in raw_phone
+    assert "House 4" not in raw_address
     # but the ORM transparently decrypts
     p.refresh_from_db()
     assert p.national_id == "MW-001"
     assert p.phone_number == "0888111222"
+    assert p.address_line == "House 4, Blantyre"
 
 
 def test_exact_duplicate_detection_via_national_id(nurse_user):
@@ -55,6 +64,13 @@ def test_exact_duplicate_detection_via_national_id(nurse_user):
     )
     matches = services.check_possible_duplicate(dict(national_id="MW-001"))
     assert matches.count() == 1
+
+
+def test_register_patient_advances_patient_number_sequence(nurse_user):
+    patient = services.register_patient(dict(first_name="Grace", last_name="Banda", sex="female"), nurse_user)
+    sequence = PatientNumberSequence.objects.get(prefix=patient.patient_number.rsplit("-", 1)[0] + "-")
+    assert patient.patient_number.startswith("MUST-")
+    assert sequence.next_value == int(patient.patient_number.rsplit("-", 1)[1]) + 1
 
 
 # --- permission-denied path ---
@@ -78,3 +94,23 @@ def test_registration_form_requires_dob_or_age_estimated_flag():
     form = PatientRegistrationForm(data={"first_name": "Grace", "last_name": "Banda", "sex": "female"})
     assert not form.is_valid()
     assert "age_estimated" in form.errors
+
+
+def test_registration_form_validates_plaintext_lengths():
+    from patients.forms import PatientRegistrationForm
+
+    form = PatientRegistrationForm(
+        data={
+            "first_name": "Grace",
+            "last_name": "Banda",
+            "sex": "female",
+            "age_estimated": "on",
+            "national_id": "N" * 65,
+            "phone_number": "0" * 33,
+            "address_line": "A" * 256,
+        }
+    )
+    assert not form.is_valid()
+    assert "national_id" in form.errors
+    assert "phone_number" in form.errors
+    assert "address_line" in form.errors

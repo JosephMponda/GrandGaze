@@ -11,7 +11,7 @@ from django.db.models import Q, QuerySet
 from django.shortcuts import get_object_or_404
 
 from core.encrypted_fields import hash_lookup_value
-from .models import DuplicateConfirmation, Patient
+from .models import DuplicateConfirmation, Patient, PatientNumberSequence
 
 DUPLICATE_MATCH_THRESHOLD = 0.4  # trigram similarity on "first last" name string
 
@@ -64,7 +64,14 @@ def check_possible_duplicate(data: dict) -> QuerySet[Patient]:
 def _generate_patient_number() -> str:
     prefix = f"MUST-{date.today().strftime('%Y%m')}-"
     last = Patient.objects.filter(patient_number__startswith=prefix).order_by("-patient_number").first()
-    next_seq = int(last.patient_number.split("-")[-1]) + 1 if last else 1
+    first_seq = int(last.patient_number.split("-")[-1]) + 1 if last else 1
+    counter, _created = PatientNumberSequence.objects.select_for_update().get_or_create(
+        prefix=prefix,
+        defaults={"next_value": first_seq},
+    )
+    next_seq = max(counter.next_value, first_seq)
+    counter.next_value = next_seq + 1
+    counter.save(update_fields=["next_value"])
     return f"{prefix}{next_seq:05d}"
 
 
@@ -74,12 +81,11 @@ def register_patient(data: dict, registered_by: User) -> Patient:
     check_possible_duplicate() and obtained explicit confirmation if needed
     (see confirm_not_duplicate()).
     """
-    patient = Patient.objects.create(
+    return Patient.objects.create(
         patient_number=_generate_patient_number(),
         registered_by=registered_by,
         **data,
     )
-    return patient
 
 
 @transaction.atomic

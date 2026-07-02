@@ -29,6 +29,11 @@ class PatientCategory(models.TextChoices):
     RESEARCH = "research", "Research participant"
 
 
+class PatientNumberSequence(models.Model):
+    prefix = models.CharField(max_length=12, unique=True)
+    next_value = models.PositiveIntegerField(default=1)
+
+
 class Patient(models.Model):
     """Master Patient Index record. Brief §8.1.1.
 
@@ -50,7 +55,7 @@ class Patient(models.Model):
 
     phone_number = EncryptedCharField(max_length=32, blank=True)
     phone_number_lookup = models.CharField(max_length=64, blank=True, db_index=True, editable=False)
-    address_line = models.CharField(max_length=255, blank=True)
+    address_line = EncryptedCharField(max_length=255, blank=True)
     village = models.CharField(max_length=150, blank=True)
     traditional_authority = models.CharField(max_length=150, blank=True)
     district = models.CharField(max_length=100, blank=True)

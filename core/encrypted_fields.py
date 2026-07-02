@@ -51,7 +51,7 @@ class EncryptedCharField(models.CharField):
 
     def __init__(self, *args, **kwargs):
         # Stored ciphertext is longer than plaintext; widen max_length generously.
-        kwargs.setdefault("max_length", 255)
+        kwargs["max_length"] = max(kwargs.get("max_length", 0), 1024)
         super().__init__(*args, **kwargs)
 
     def get_prep_value(self, value):
