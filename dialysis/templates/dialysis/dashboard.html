@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Dialysis Dashboard{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto py-6">
+    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight text-ink-900">Dialysis</h1>
+            <p class="text-sm text-ink-500 mt-2">Today's sessions</p>
+        </div>
+    </div>
+
+    {% if counts %}
+        <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-2xl overflow-hidden bg-white shadow-sm">
+            {% for item in counts %}
+                <div class="px-6 py-4 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-semibold">{{ item.prescription.patient.full_name }}</p>
+                        <p class="text-xs text-ink-500">{{ item.prescription.frequency_per_week }}x/week &middot; {{ item.prescription.get_vascular_access_display }}</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        {% if item.sessions_today > 0 %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                Done ({{ item.sessions_today }})
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>
+                            <a href="{% url 'dialysis:record_session' item.prescription.pk %}" class="btn-primary text-xs font-semibold py-1.5 px-3">Record</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 text-center">
+            <p class="text-sm text-ink-500">No active dialysis prescriptions.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

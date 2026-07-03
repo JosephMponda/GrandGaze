@@ -1,7 +1,7 @@
 from django.db.models import QuerySet
 from django.utils import timezone
 
-from .models import DispensingRecord, Prescription, PrescriptionStatus
+from .models import DispensingRecord, Drug, Prescription, PrescriptionStatus, StockLevel
 from .safety import CriticalSafetyBlock, check_prescription_safety
 
 
@@ -36,3 +36,16 @@ def active_prescriptions_for(patient) -> QuerySet[Prescription]:
         patient=patient,
         status__in=[PrescriptionStatus.PRESCRIBED, PrescriptionStatus.APPROVED, PrescriptionStatus.DISPENSED],
     )
+
+
+def check_stock(drug: Drug) -> tuple[int, bool]:
+    level = StockLevel.objects.filter(drug=drug).first()
+    qty = level.quantity if level else 0
+    return qty, qty > 0
+
+
+def adjust_stock(drug: Drug, quantity: int, adjusted_by, note: str = "") -> StockLevel:
+    level, _ = StockLevel.objects.get_or_create(drug=drug, defaults={"quantity": 0})
+    level.quantity += quantity
+    level.save(update_fields=["quantity"])
+    return level

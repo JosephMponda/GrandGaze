@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "syncapi",
     "interop",
     "emergency",
+    "dialysis",
 ]
 
 MIDDLEWARE = [

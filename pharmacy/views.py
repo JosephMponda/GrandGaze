@@ -7,8 +7,8 @@ from accounts.permissions import role_required
 from patients.services import get_patient_or_404
 
 from . import services
-from .forms import DispensingRecordForm, PrescriptionForm
-from .models import Prescription, PrescriptionStatus
+from .forms import DispensingRecordForm, PrescriptionForm, StockAdjustForm
+from .models import Prescription, PrescriptionStatus, StockLevel
 from .safety import CriticalSafetyBlock, check_prescription_safety
 
 
@@ -56,6 +56,10 @@ def prescribe(request, patient_id):
 @role_required("Pharmacist", "Admin")
 def queue(request):
     prescriptions = Prescription.objects.exclude(status__in=[PrescriptionStatus.DISPENSED, PrescriptionStatus.CANCELLED]).select_related("patient", "drug")[:50]
+    drug_ids = [p.drug_id for p in prescriptions]
+    stock_map = {s.drug_id: s for s in StockLevel.objects.filter(drug_id__in=drug_ids)}
+    for p in prescriptions:
+        p.stock = stock_map.get(p.drug_id)
     return render(request, "pharmacy/queue.html", {"prescriptions": prescriptions})
 
 
@@ -71,18 +75,40 @@ def approve(request, pk):
 @role_required("Pharmacist", "Admin")
 def dispense(request, pk):
     prescription = get_object_or_404(Prescription, pk=pk)
+    stock_qty, in_stock = services.check_stock(prescription.drug)
     if request.method == "POST":
+        if not in_stock:
+            messages.error(request, f"{prescription.drug.generic_name} is out of stock.")
+            return redirect(reverse("pharmacy:queue"))
         form = DispensingRecordForm(request.POST)
         if form.is_valid():
             services.dispense(prescription, request.user, form.cleaned_data)
+            services.adjust_stock(prescription.drug, -1, request.user, f"dispensed #{prescription.pk}")
             messages.success(request, "Prescription dispensed.")
             return redirect(reverse("pharmacy:queue"))
     else:
         form = DispensingRecordForm()
-    return render(request, "pharmacy/dispense.html", {"form": form, "prescription": prescription})
+    return render(request, "pharmacy/dispense.html", {"form": form, "prescription": prescription, "stock_qty": stock_qty, "in_stock": in_stock})
 
 
 @login_required
 def patient_tab(request, patient_id):
     patient = get_patient_or_404(patient_id)
     return render(request, "pharmacy/_patient_tab.html", {"patient": patient, "prescriptions": services.active_prescriptions_for(patient)})
+
+
+@role_required("Pharmacist", "Admin")
+def stock_adjust(request):
+    if request.method == "POST":
+        form = StockAdjustForm(request.POST)
+        if form.is_valid():
+            drug = form.cleaned_data["drug"]
+            services.adjust_stock(
+                drug, form.cleaned_data["quantity"], request.user, form.cleaned_data.get("note", "")
+            )
+            messages.success(request, f"Added {form.cleaned_data['quantity']} units of {drug.generic_name}.")
+            return redirect(reverse("pharmacy:stock"))
+    else:
+        form = StockAdjustForm()
+    stock_levels = StockLevel.objects.select_related("drug").all()
+    return render(request, "pharmacy/stock.html", {"form": form, "stock_levels": stock_levels})

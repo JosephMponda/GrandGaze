@@ -10,5 +10,6 @@ urlpatterns = [
     path("queue/", views.queue, name="queue"),
     path("prescription/<int:pk>/approve/", views.approve, name="approve"),
     path("prescription/<int:pk>/dispense/", views.dispense, name="dispense"),
+    path("stock/", views.stock_adjust, name="stock"),
 ]
 
