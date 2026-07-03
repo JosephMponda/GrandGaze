@@ -44,6 +44,52 @@
             </form>
         </div>
 
+        {% if debug %}
+        <!-- Demo Accounts Panel -->
+        <div class="bg-amber-50/80 border border-amber-100 rounded-xl p-5 text-sm text-amber-900 mb-4">
+            <div class="flex items-center gap-2 mb-3">
+                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <p class="font-bold text-amber-900">Demo Accounts — All passwords: <code class="bg-amber-100 px-1.5 py-0.5 rounded text-xs font-mono">test123</code></p>
+            </div>
+            <div class="grid grid-cols-2 gap-1.5">
+                <button type="button" onclick="document.getElementById('id_username').value='nurse1'; document.getElementById('id_password').value='test123'" class="text-left px-3 py-2 rounded-lg bg-white/70 hover:bg-white border border-amber-200/60 transition-colors">
+                    <span class="font-semibold text-amber-900">nurse1</span>
+                    <span class="block text-xs text-amber-700">Nurse</span>
+                </button>
+                <button type="button" onclick="document.getElementById('id_username').value='clinician1'; document.getElementById('id_password').value='test123'" class="text-left px-3 py-2 rounded-lg bg-white/70 hover:bg-white border border-amber-200/60 transition-colors">
+                    <span class="font-semibold text-amber-900">clinician1</span>
+                    <span class="block text-xs text-amber-700">Clinician</span>
+                </button>
+                <button type="button" onclick="document.getElementById('id_username').value='pharmacist1'; document.getElementById('id_password').value='test123'" class="text-left px-3 py-2 rounded-lg bg-white/70 hover:bg-white border border-amber-200/60 transition-colors">
+                    <span class="font-semibold text-amber-900">pharmacist1</span>
+                    <span class="block text-xs text-amber-700">Pharmacist</span>
+                </button>
+                <button type="button" onclick="document.getElementById('id_username').value='labtech1'; document.getElementById('id_password').value='test123'" class="text-left px-3 py-2 rounded-lg bg-white/70 hover:bg-white border border-amber-200/60 transition-colors">
+                    <span class="font-semibold text-amber-900">labtech1</span>
+                    <span class="block text-xs text-amber-700">Lab Tech</span>
+                </button>
+                <button type="button" onclick="document.getElementById('id_username').value='radiog1'; document.getElementById('id_password').value='test123'" class="text-left px-3 py-2 rounded-lg bg-white/70 hover:bg-white border border-amber-200/60 transition-colors">
+                    <span class="font-semibold text-amber-900">radiog1</span>
+                    <span class="block text-xs text-amber-700">Radiographer</span>
+                </button>
+                <button type="button" onclick="document.getElementById('id_username').value='billing1'; document.getElementById('id_password').value='test123'" class="text-left px-3 py-2 rounded-lg bg-white/70 hover:bg-white border border-amber-200/60 transition-colors">
+                    <span class="font-semibold text-amber-900">billing1</span>
+                    <span class="block text-xs text-amber-700">Billing Officer</span>
+                </button>
+                <button type="button" onclick="document.getElementById('id_username').value='admin1'; document.getElementById('id_password').value='test123'" class="text-left px-3 py-2 rounded-lg bg-white/70 hover:bg-white border border-amber-200/60 transition-colors">
+                    <span class="font-semibold text-amber-900">admin1</span>
+                    <span class="block text-xs text-amber-700">Admin</span>
+                </button>
+                <button type="button" onclick="document.getElementById('id_username').value='ict1'; document.getElementById('id_password').value='test123'" class="text-left px-3 py-2 rounded-lg bg-white/70 hover:bg-white border border-amber-200/60 transition-colors">
+                    <span class="font-semibold text-amber-900">ict1</span>
+                    <span class="block text-xs text-amber-700">ICT</span>
+                </button>
+            </div>
+        </div>
+        {% endif %}
+
         <!-- Security Disclaimer Card -->
         <div class="bg-blue-50/80 border border-blue-100 rounded-xl p-5 text-sm text-blue-800">
             <div class="flex items-start gap-3">
