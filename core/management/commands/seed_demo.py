@@ -17,6 +17,7 @@ from laboratory.services import create_order, enter_result
 from patients.models import NextOfKin, Patient, PatientNumberSequence
 from patients.services import register_patient
 from pharmacy.models import Drug
+from pharmacy.safety import CriticalSafetyBlock
 from pharmacy.services import approve, dispense, prescribe
 from vitals.services import record_vitals
 
@@ -150,7 +151,19 @@ PATIENTS_DATA = [
                     "route": "oral",
                     "frequency": "three times daily",
                     "duration_days": 7,
-                    "safety_override_reason": "Known penicillin allergy - rash only, benefits outweigh risks for pneumonia. Clinician aware. Will monitor.",
+                    # Deliberately left blocked: this patient has a documented
+                    # penicillin allergy (see the AllergyRecord above), so this
+                    # attempt is expected to be rejected by the critical-safety
+                    # check with no override possible - see `fallback` below
+                    # for what actually gets prescribed instead. This is a
+                    # demo of the safety block working, not a bug.
+                    "fallback": {
+                        "drug_name": "Ceftriaxone 1g",
+                        "dose": "500 mg",
+                        "route": "IM",
+                        "frequency": "once daily",
+                        "duration_days": 7,
+                    },
                 },
             }
         ],
@@ -395,17 +408,44 @@ class Command(BaseCommand):
                 }
                 if "safety_override_reason" in pharmacy:
                     presc_data["safety_override_reason"] = pharmacy["safety_override_reason"]
-                presc, warnings = prescribe(
-                    patient=patient,
-                    drug=drug,
-                    prescribed_by=clinician,
-                    data=presc_data,
-                )
+                try:
+                    presc, warnings = prescribe(
+                        patient=patient,
+                        drug=drug,
+                        prescribed_by=clinician,
+                        data=presc_data,
+                    )
+                except CriticalSafetyBlock as exc:
+                    self.stdout.write(self.style.WARNING(
+                        f"  Prescription of {drug.generic_name} for {patient.full_name} correctly "
+                        f"BLOCKED by critical safety check: {'; '.join(w.message for w in exc.warnings)}"
+                    ))
+                    fallback = pharmacy.get("fallback")
+                    if not fallback:
+                        continue
+                    try:
+                        drug = Drug.objects.get(name=fallback["drug_name"])
+                    except Drug.DoesNotExist:
+                        self.stdout.write(self.style.WARNING(f"  Fallback drug '{fallback['drug_name']}' not found, skipping"))
+                        continue
+                    presc, warnings = prescribe(
+                        patient=patient,
+                        drug=drug,
+                        prescribed_by=clinician,
+                        data={
+                            "dose": fallback["dose"],
+                            "route": fallback["route"],
+                            "frequency": fallback["frequency"],
+                            "duration_days": fallback["duration_days"],
+                            "encounter": encounter,
+                        },
+                    )
+                    self.stdout.write(self.style.SUCCESS(f"  Prescribed {drug.generic_name} instead (penicillin-allergy-safe alternative)"))
                 approved_presc = approve(prescription=presc, approved_by=pharmacist)
                 dispense(
                     prescription=approved_presc,
                     dispensed_by=pharmacist,
-                    data={"quantity_dispensed": f"{pharmacy['duration_days'] * 2} tablets"},
+                    data={"quantity_dispensed": f"{presc.duration_days * 2} tablets"},
                 )
 
             sign_encounter(encounter=encounter, clinician=clinician)

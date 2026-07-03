@@ -2,11 +2,17 @@ from django.db.models import QuerySet
 from django.utils import timezone
 
 from .models import DispensingRecord, Prescription, PrescriptionStatus
-from .safety import check_prescription_safety
+from .safety import CriticalSafetyBlock, check_prescription_safety
 
 
 def prescribe(patient, drug, prescribed_by, data) -> tuple[Prescription, list]:
     warnings = check_prescription_safety(patient, drug, data.get("dose"))
+    critical = [w for w in warnings if w.level == "critical"]
+    if critical:
+        raise CriticalSafetyBlock(
+            "A critical medication safety warning blocks this prescription and cannot be overridden here.",
+            warnings,
+        )
     if warnings and not data.get("safety_override_reason"):
         raise ValueError("A safety override reason is required when medication warnings are present.")
     prescription = Prescription.objects.create(patient=patient, drug=drug, prescribed_by=prescribed_by, **data)

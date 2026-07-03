@@ -2,14 +2,15 @@ from datetime import date
 
 import pytest
 from django.contrib.auth.models import Group, User
+from django.urls import reverse
 
 from accounts.models import Profile, Role
 from encounters.models import AllergyRecord, Encounter, Severity
 from patients.models import Patient
 
 from . import services
-from .models import Drug, DrugAllergyMap, PrescriptionStatus
-from .safety import check_prescription_safety
+from .models import Drug, DrugAllergyMap, Prescription, PrescriptionStatus
+from .safety import CriticalSafetyBlock, check_prescription_safety
 
 pytestmark = pytest.mark.django_db
 
@@ -56,12 +57,50 @@ def test_allergy_safety_warning_uses_encounter_contract(patient, clinician):
 
 
 def test_prescribe_requires_override_reason_when_warning_present(patient, clinician):
+    drug = Drug.objects.create(name="Ibuprofen", generic_name="Ibuprofen", formulation="tablet")
+    services.prescribe(patient, drug, clinician, {"dose": "200 mg", "route": "oral", "frequency": "TDS"})
+
+    with pytest.raises(ValueError):
+        # Second prescription of the same drug within 30 days -> warning-level
+        # "duplicate therapy" alert, not critical - missing reason should
+        # raise plain ValueError, not CriticalSafetyBlock.
+        services.prescribe(patient, drug, clinician, {"dose": "200 mg", "route": "oral", "frequency": "TDS"})
+
+
+def test_critical_warning_blocks_prescription_even_with_override_reason(patient, clinician):
+    """Regression test: a critical-level warning (e.g. a recorded allergy
+    conflict) must not be bypassable just by supplying a
+    safety_override_reason - that path is for warning-level alerts only.
+    Previously the code treated every warning identically, so a free-text
+    reason like "ok" would let a documented-allergy prescription through.
+    """
     drug = Drug.objects.create(name="Amoxicillin 250mg", generic_name="Amoxicillin", formulation="capsule")
     DrugAllergyMap.objects.create(drug=drug, allergen_keyword="penicillin")
     AllergyRecord.objects.create(patient=patient, allergen="Penicillin", reaction="rash", severity=Severity.SEVERE, recorded_by=clinician)
 
-    with pytest.raises(ValueError):
-        services.prescribe(patient, drug, clinician, {"dose": "250 mg", "route": "oral", "frequency": "TDS"})
+    with pytest.raises(CriticalSafetyBlock):
+        services.prescribe(
+            patient,
+            drug,
+            clinician,
+            {"dose": "250 mg", "route": "oral", "frequency": "TDS", "safety_override_reason": "ok, proceeding anyway"},
+        )
+    assert not Prescription.objects.filter(patient=patient, drug=drug).exists()
+
+
+def test_warning_level_alert_still_allows_documented_override(patient, clinician):
+    """Sanity check the fix didn't over-correct: a warning-level alert
+    (duplicate therapy, not critical) should still go through once a reason
+    is documented.
+    """
+    drug = Drug.objects.create(name="Ibuprofen", generic_name="Ibuprofen", formulation="tablet")
+    services.prescribe(patient, drug, clinician, {"dose": "200 mg", "route": "oral", "frequency": "TDS"})
+
+    prescription, warnings = services.prescribe(
+        patient, drug, clinician, {"dose": "200 mg", "route": "oral", "frequency": "TDS", "safety_override_reason": "clinically appropriate to continue"}
+    )
+    assert prescription.pk is not None
+    assert any(w.code == "duplicate" for w in warnings)
 
 
 def test_pediatric_dose_warning(patient):
@@ -90,3 +129,29 @@ def test_dispensing_changes_status_and_records_actor(patient, clinician, pharmac
     prescription.refresh_from_db()
     assert prescription.status == PrescriptionStatus.DISPENSED
     assert record.dispensed_by == pharmacist
+
+
+def test_prescribe_view_blocks_critical_warning_even_with_override_checked(client, patient, clinician):
+    """Same regression as the services-layer test, but through the actual
+    HTTP view - this is where the bug originally shipped (the view computed
+    critical vs. warning level but never branched on it).
+    """
+    drug = Drug.objects.create(name="Amoxicillin 250mg", generic_name="Amoxicillin", formulation="capsule")
+    DrugAllergyMap.objects.create(drug=drug, allergen_keyword="penicillin")
+    AllergyRecord.objects.create(patient=patient, allergen="Penicillin", reaction="rash", severity=Severity.SEVERE, recorded_by=clinician)
+
+    client.force_login(clinician)
+    response = client.post(
+        reverse("pharmacy:prescribe", args=[patient.pk]),
+        {
+            "drug": drug.pk,
+            "dose": "250 mg",
+            "route": "oral",
+            "frequency": "TDS",
+            "proceed_with_warnings": "on",
+            "safety_override_reason": "ok, proceeding anyway",
+        },
+    )
+    assert response.status_code == 200  # re-rendered, blocked - never redirects to the queue
+    assert response.context["blocked"] is True
+    assert not Prescription.objects.filter(patient=patient, drug=drug).exists()

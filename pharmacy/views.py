@@ -9,20 +9,26 @@ from patients.services import get_patient_or_404
 from . import services
 from .forms import DispensingRecordForm, PrescriptionForm
 from .models import Prescription, PrescriptionStatus
-from .safety import check_prescription_safety
+from .safety import CriticalSafetyBlock, check_prescription_safety
 
 
 @login_required
 def prescribe(request, patient_id):
     patient = get_patient_or_404(patient_id)
     warnings = []
+    blocked = False
     if request.method == "POST":
         form = PrescriptionForm(request.POST)
         form.fields["encounter"].queryset = patient.encounters.all()
         if form.is_valid():
             drug = form.cleaned_data["drug"]
             warnings = check_prescription_safety(patient, drug, form.cleaned_data.get("dose"))
+            critical = [w for w in warnings if w.level == "critical"]
             proceeding = form.cleaned_data.get("proceed_with_warnings")
+            if critical:
+                # Critical warnings can never be bypassed from this form -
+                # no override checkbox, no reason field, full stop.
+                return render(request, "pharmacy/prescribe.html", {"form": form, "patient": patient, "warnings": warnings, "blocked": True})
             if warnings and not proceeding:
                 form.fields["proceed_with_warnings"].initial = True
                 return render(request, "pharmacy/prescribe.html", {"form": form, "patient": patient, "warnings": warnings})
@@ -32,13 +38,19 @@ def prescribe(request, patient_id):
                 data = form.cleaned_data.copy()
                 data.pop("proceed_with_warnings", None)
                 data.pop("drug", None)
-                prescription, _ = services.prescribe(patient, drug, request.user, data)
+                try:
+                    prescription, _ = services.prescribe(patient, drug, request.user, data)
+                except CriticalSafetyBlock as exc:
+                    # Defense in depth: something changed the warning set
+                    # (e.g. a new allergy recorded) between the check above
+                    # and this write.
+                    return render(request, "pharmacy/prescribe.html", {"form": form, "patient": patient, "warnings": exc.warnings, "blocked": True})
                 messages.success(request, "Prescription created.")
                 return redirect(reverse("pharmacy:queue"))
     else:
         form = PrescriptionForm()
         form.fields["encounter"].queryset = patient.encounters.all()
-    return render(request, "pharmacy/prescribe.html", {"form": form, "patient": patient, "warnings": warnings})
+    return render(request, "pharmacy/prescribe.html", {"form": form, "patient": patient, "warnings": warnings, "blocked": blocked})
 
 
 @role_required("Pharmacist", "Admin")

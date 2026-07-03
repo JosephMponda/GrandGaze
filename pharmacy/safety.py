@@ -19,6 +19,19 @@ class SafetyWarning:
     message: str
 
 
+class CriticalSafetyBlock(Exception):
+    """Raised when check_prescription_safety() returns a critical-level
+    warning. Unlike warning-level alerts, critical warnings (allergy
+    conflict, pediatric dose exceeded) cannot be bypassed with an override
+    reason - per AGENTS.md/COMPLETED_FEATURES.md §9.2: "critical blocks
+    submit." Carries the full warning list so callers can display why.
+    """
+
+    def __init__(self, message: str, warnings: list[SafetyWarning]):
+        super().__init__(message)
+        self.warnings = warnings
+
+
 def check_prescription_safety(patient, drug, dose=None) -> list[SafetyWarning]:
     warnings = []
     warnings.extend(_check_allergy(patient, drug))

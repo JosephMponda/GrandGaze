@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "billing",
     "syncapi",
     "interop",
+    "emergency",
 ]
 
 MIDDLEWARE = [
