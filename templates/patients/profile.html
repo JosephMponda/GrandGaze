@@ -1,22 +1,142 @@
 {% extends "base.html" %}
-{% block content %}
-<h1>{{ patient.full_name }}</h1>
-<p>
-    Patient number: {{ patient.patient_number }} |
-    Sex: {{ patient.get_sex_display }} |
-    DOB: {{ patient.date_of_birth|default:"unknown (age estimated)" }} |
-    Category: {{ patient.get_patient_category_display }}
-</p>
-<p>Village: {{ patient.village }} | T.A.: {{ patient.traditional_authority }} | District: {{ patient.district }}</p>
+{% block title %}{{ patient.first_name }} {{ patient.last_name }} - MUST EMR{% endblock %}
 
-<nav>
-    {# Each tab below is owned by another engineer's app and loaded as an HTMX partial - #}
-    {# not duplicated here. Placeholders until Engineers B/C/D/E wire up their views. #}
-    <ul>
-        <li>Visits &amp; Encounters (Engineer B)</li>
-        <li>Labs (Engineer C)</li>
-        <li>Prescriptions (Engineer D)</li>
-        <li>Billing (Engineer E)</li>
-    </ul>
-</nav>
+{% block content %}
+
+<div class="mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+    {# Back link #}
+    <a href="{% url 'accounts:dashboard' %}" class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Back to Dashboard
+    </a>
+    <a href="{% url 'patients:register' %}" class="btn-secondary text-xs px-4 py-2 inline-flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        Register New Patient
+    </a>
+</div>
+
+<div class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8 mb-6">
+    <div class="flex flex-col sm:flex-row items-start gap-6">
+
+        {# Avatar #}
+        <div class="flex-shrink-0 w-16 h-16 rounded-2xl bg-brand-light text-brand flex items-center justify-center font-bold text-2xl select-none shadow-sm">
+            {{ patient.first_name|slice:":1"|upper }}{{ patient.last_name|slice:":1"|upper }}
+        </div>
+
+        {# Core Identity #}
+        <div class="flex-1 min-w-0">
+            <div class="flex flex-wrap items-center gap-3 mb-1">
+                <h1 class="text-2xl font-bold text-gray-900 tracking-tight">{{ patient.first_name }} {{ patient.last_name }}</h1>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide
+                    {% if patient.patient_category == 'inpatient' %}bg-blue-50 text-blue-700 border border-blue-100
+                    {% elif patient.patient_category == 'outpatient' %}bg-green-50 text-green-700 border border-green-100
+                    {% else %}bg-gray-100 text-gray-600 border border-gray-200{% endif %}">
+                    {{ patient.get_patient_category_display }}
+                </span>
+            </div>
+            <p class="text-sm text-gray-500 font-mono">{{ patient.patient_number }}</p>
+
+            {# Key Stats Grid #}
+            <dl class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div>
+                    <dt class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Sex</dt>
+                    <dd class="mt-0.5 text-sm font-semibold text-gray-800">{{ patient.get_sex_display }}</dd>
+                </div>
+                <div>
+                    <dt class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Date of Birth</dt>
+                    <dd class="mt-0.5 text-sm font-semibold text-gray-800">
+                        {{ patient.date_of_birth|default:"Not recorded" }}
+                        {% if patient.age_is_estimated %}<span class="text-xs text-gray-400">(est.)</span>{% endif %}
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">District</dt>
+                    <dd class="mt-0.5 text-sm font-semibold text-gray-800">{{ patient.district|default:"—" }}</dd>
+                </div>
+                <div>
+                    <dt class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">T.A.</dt>
+                    <dd class="mt-0.5 text-sm font-semibold text-gray-800">{{ patient.traditional_authority|default:"—" }}</dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+
+    {# Secondary details row #}
+    <div class="mt-6 pt-5 border-t border-gray-100 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 text-sm">
+        <div>
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-0.5">Village</span>
+            <span class="text-gray-700 font-medium">{{ patient.village|default:"—" }}</span>
+        </div>
+        {% if patient.phone_number %}
+        <div>
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-0.5">Phone</span>
+            <span class="text-gray-700 font-medium">{{ patient.phone_number }}</span>
+        </div>
+        {% endif %}
+        {% if patient.guardian_name %}
+        <div>
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-0.5">Guardian / Next of Kin</span>
+            <span class="text-gray-700 font-medium">{{ patient.guardian_name }}</span>
+            {% if patient.guardian_phone %}<span class="text-xs text-gray-400 block">{{ patient.guardian_phone }}</span>{% endif %}
+        </div>
+        {% endif %}
+        <div>
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-0.5">Registered</span>
+            <span class="text-gray-700 font-medium">{{ patient.created_at|date:"d M Y" }}</span>
+        </div>
+    </div>
+</div>
+
+<div x-data="{ activeTab: 'encounters' }">
+
+    {# Tab Bar #}
+    <div class="flex items-center gap-1 border-b border-gray-200 mb-6 overflow-x-auto">
+        {% for tab in tabs %}
+        <button @click="activeTab = '{{ tab.id }}'"
+                :class="activeTab === '{{ tab.id }}' ? 'border-brand text-brand bg-brand-light/50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'"
+                class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 rounded-t-md transition-all whitespace-nowrap -mb-px">
+            {{ tab.label }}
+            {% if tab.badge %}<span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-600 text-[10px] font-bold">{{ tab.badge }}</span>{% endif %}
+        </button>
+        {% empty %}
+        {# Static fallback tabs while engineers B/C/D/E wire up their views #}
+        <button @click="activeTab = 'encounters'"
+                :class="activeTab === 'encounters' ? 'border-brand text-brand bg-brand-light/50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'"
+                class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 rounded-t-md transition-all whitespace-nowrap -mb-px">
+            Visits &amp; Encounters
+        </button>
+        <button @click="activeTab = 'labs'"
+                :class="activeTab === 'labs' ? 'border-brand text-brand bg-brand-light/50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'"
+                class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 rounded-t-md transition-all whitespace-nowrap -mb-px">
+            Labs
+        </button>
+        <button @click="activeTab = 'prescriptions'"
+                :class="activeTab === 'prescriptions' ? 'border-brand text-brand bg-brand-light/50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'"
+                class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 rounded-t-md transition-all whitespace-nowrap -mb-px">
+            Prescriptions
+        </button>
+        <button @click="activeTab = 'billing'"
+                :class="activeTab === 'billing' ? 'border-brand text-brand bg-brand-light/50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'"
+                class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 rounded-t-md transition-all whitespace-nowrap -mb-px">
+            Billing
+        </button>
+        {% endfor %}
+    </div>
+
+    {# Tab Panels — placeholder cards until engineers wire up their HTMX partials #}
+    <div x-show="activeTab === 'encounters'" class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
+        {% include "components/_empty_state.html" with icon="document" title="No encounters yet" message="Visits and encounter records will appear here once Engineer B wires up the encounters module." %}
+    </div>
+    <div x-show="activeTab === 'labs'" style="display:none" class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
+        {% include "components/_empty_state.html" with icon="document" title="No lab results" message="Lab orders and results will appear here once Engineer C wires up the laboratory module." %}
+    </div>
+    <div x-show="activeTab === 'prescriptions'" style="display:none" class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
+        {% include "components/_empty_state.html" with icon="document" title="No prescriptions" message="E-prescriptions and dispensing records will appear here once Engineer D wires up the pharmacy module." %}
+    </div>
+    <div x-show="activeTab === 'billing'" style="display:none" class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
+        {% include "components/_empty_state.html" with icon="document" title="No billing records" message="Revenue cycle data will appear here once Engineer E wires up the billing module." %}
+    </div>
+
+</div>
+
 {% endblock %}
