@@ -1,0 +1,98 @@
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+
+from patients.services import get_patient_or_404
+
+from . import services
+from .forms import AllergyRecordForm, EncounterAddendumForm, EncounterForm
+from .models import Encounter
+
+
+@login_required
+def new_encounter(request, patient_id):
+    patient = get_patient_or_404(patient_id)
+    if request.method == "POST":
+        form = EncounterForm(request.POST)
+        if form.is_valid():
+            encounter = services.create_encounter(patient, request.user, form.cleaned_data)
+            messages.success(request, "Encounter created.")
+            return redirect(reverse("encounters:detail", args=[encounter.pk]))
+    else:
+        form = EncounterForm()
+    return render(request, "encounters/new.html", {"form": form, "patient": patient})
+
+
+@login_required
+def encounter_detail(request, pk):
+    encounter = get_object_or_404(Encounter, pk=pk)
+
+    if request.method == "POST" and "sign" in request.POST:
+        if encounter.is_signed:
+            messages.error(request, "This encounter is already signed.")
+        else:
+            services.sign_encounter(encounter, request.user)
+            messages.success(request, "Encounter signed and locked.")
+        return redirect(reverse("encounters:detail", args=[encounter.pk]))
+
+    if request.method == "POST" and "add_addendum" in request.POST:
+        # Signed encounters are read-only in the UI — further notes are
+        # addenda, never a silent rewrite of signed clinical documentation.
+        addendum_form = EncounterAddendumForm(request.POST)
+        if addendum_form.is_valid():
+            addendum = addendum_form.save(commit=False)
+            addendum.encounter = encounter
+            addendum.author = request.user
+            addendum.save()
+            messages.success(request, "Addendum added.")
+        return redirect(reverse("encounters:detail", args=[encounter.pk]))
+
+    edit_form = None if encounter.is_signed else EncounterForm(instance=encounter)
+    return render(
+        request,
+        "encounters/detail.html",
+        {
+            "encounter": encounter,
+            "edit_form": edit_form,
+            "addendum_form": EncounterAddendumForm(),
+        },
+    )
+
+
+@login_required
+def edit_encounter(request, pk):
+    encounter = get_object_or_404(Encounter, pk=pk)
+    if encounter.is_signed:
+        messages.error(request, "Signed encounters are read-only — add an addendum instead.")
+        return redirect(reverse("encounters:detail", args=[encounter.pk]))
+    form = EncounterForm(request.POST, instance=encounter)
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Encounter updated.")
+    return redirect(reverse("encounters:detail", args=[encounter.pk]))
+
+
+@login_required
+def patient_encounters_tab(request, patient_id):
+    """HTMX partial plugged into Engineer A's patient profile template."""
+    patient = get_patient_or_404(patient_id)
+    encounters = patient.encounters.all()[:20]
+    return render(request, "encounters/_patient_tab.html", {"patient": patient, "encounters": encounters})
+
+
+@login_required
+def add_allergy(request, patient_id):
+    patient = get_patient_or_404(patient_id)
+    if request.method == "POST":
+        form = AllergyRecordForm(request.POST)
+        if form.is_valid():
+            allergy = form.save(commit=False)
+            allergy.patient = patient
+            allergy.recorded_by = request.user
+            allergy.save()
+            messages.success(request, "Allergy recorded.")
+            return redirect(reverse("patients:profile", args=[patient.pk]))
+    else:
+        form = AllergyRecordForm()
+    return render(request, "encounters/add_allergy.html", {"form": form, "patient": patient})

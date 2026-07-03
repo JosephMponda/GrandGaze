@@ -139,4 +139,16 @@
 
 </div>
 
+<nav>
+    {# Each tab below is owned by another engineer's app and loaded as an HTMX partial — #}
+    {# not duplicated here. #}
+    <ul>
+        <li><a href="#" hx-get="{% url 'encounters:patient_tab' patient.pk %}" hx-target="#tab-content">Encounters</a></li>
+        <li><a href="#" hx-get="{% url 'vitals:patient_tab' patient.pk %}" hx-target="#tab-content">Vitals</a></li>
+        <li>Labs (Engineer C)</li>
+        <li>Prescriptions (Engineer D)</li>
+        <li>Billing (Engineer E)</li>
+    </ul>
+</nav>
+<div id="tab-content"></div>
 {% endblock %}

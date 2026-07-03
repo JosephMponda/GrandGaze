@@ -1,0 +1,20 @@
+<div>
+    <strong>Early Warning Score: {{ vitals.ews.score }} ({{ vitals.ews.get_risk_level_display }})</strong>
+    {% if vitals.ews.risk_level == "high" or vitals.ews.risk_level == "critical" %}
+        <p style="color:red;"><strong>⚠ Abnormal vitals — see alerts.</strong></p>
+    {% endif %}
+</div>
+<h3>Recent trend</h3>
+<table border="1">
+    <tr><th>When</th><th>Temp</th><th>BP</th><th>Pulse</th><th>SpO2</th><th>EWS</th></tr>
+    {% for v in trend %}
+        <tr>
+            <td>{{ v.recorded_at }}</td>
+            <td>{{ v.temperature_c|default:"—" }}</td>
+            <td>{{ v.blood_pressure_systolic|default:"—" }}/{{ v.blood_pressure_diastolic|default:"—" }}</td>
+            <td>{{ v.pulse_rate|default:"—" }}</td>
+            <td>{{ v.oxygen_saturation|default:"—" }}</td>
+            <td>{{ v.ews.score|default:"—" }}</td>
+        </tr>
+    {% endfor %}
+</table>

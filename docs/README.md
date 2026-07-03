@@ -12,7 +12,7 @@ This folder is the single source of truth for the build. Read in this order:
 
 ## Timeline anchor (read this before anything else)
 
-Today is **Thur 2 July 2026**. The brief's "Week 0" was 1 June, so per the brief's own table:
+Today is **Wed 1 July 2026**. The brief's "Week 0" was 1 June, so per the brief's own table:
 
 - Stage 6 (final prototype submission) = **Week 6 → w/c 13 Jul**
 - Stage 7 (demo day & judging) = **Week 6–7 → 13–24 Jul**
