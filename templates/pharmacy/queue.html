@@ -1,21 +1,45 @@
 {% extends "base.html" %}
+{% block title %}Pharmacy Queue - MUST EMR{% endblock %}
 {% block content %}
-<h1>Pharmacy Queue</h1>
-<ul>
-    {% for prescription in prescriptions %}
-        <li>
-            {{ prescription.patient.full_name }} — {{ prescription.drug }} {{ prescription.dose }} — {{ prescription.get_status_display }}
-            {% if prescription.status == "prescribed" %}
-                <form method="post" action="{% url 'pharmacy:approve' prescription.pk %}" style="display: inline">
-                    {% csrf_token %}
-                    <button type="submit">Approve</button>
-                </form>
-            {% endif %}
-            <a href="{% url 'pharmacy:dispense' prescription.pk %}">Dispense</a>
-        </li>
-    {% empty %}
-        <li>No prescriptions awaiting pharmacy action.</li>
-    {% endfor %}
-</ul>
-{% endblock %}
+<div class="max-w-4xl mx-auto py-6">
+    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight text-ink-900">Pharmacy Queue</h1>
+            <p class="text-sm text-ink-500 mt-2">Prescriptions awaiting pharmacy action</p>
+        </div>
+    </div>
 
+    {% if prescriptions %}
+        <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-2xl overflow-hidden bg-white shadow-sm">
+            {% for prescription in prescriptions %}
+                <div class="flex items-center justify-between px-6 py-4 hover:bg-paper transition-colors duration-150">
+                    <div>
+                        <p class="text-sm font-semibold text-ink-900">{{ prescription.patient.full_name }}</p>
+                        <p class="text-sm text-ink-500">{{ prescription.drug }} {{ prescription.dose }}</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                            {% if prescription.status == 'prescribed' %}bg-yellow-100 text-yellow-800
+                            {% elif prescription.status == 'approved' %}bg-blue-100 text-blue-800
+                            {% elif prescription.status == 'dispensed' %}bg-green-100 text-green-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ prescription.get_status_display }}
+                        </span>
+                        {% if prescription.status == "prescribed" %}
+                            <form method="post" action="{% url 'pharmacy:approve' prescription.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-secondary text-xs font-semibold py-1.5 px-3 hover:-translate-y-0.5 transition-all duration-200">Approve</button>
+                            </form>
+                        {% endif %}
+                        <a href="{% url 'pharmacy:dispense' prescription.pk %}" class="btn-primary text-xs font-semibold py-1.5 px-3 shadow-sm hover:-translate-y-0.5 transition-all duration-200">Dispense</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 text-center">
+            <p class="text-sm text-ink-500">No prescriptions awaiting pharmacy action.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

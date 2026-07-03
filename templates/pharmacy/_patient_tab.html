@@ -1,10 +1,27 @@
-<h2>Prescriptions</h2>
-<p><a href="{% url 'pharmacy:prescribe' patient.pk %}">Prescribe medication</a></p>
-<ul>
-    {% for prescription in prescriptions %}
-        <li>{{ prescription.drug }} {{ prescription.dose }} — {{ prescription.get_status_display }}</li>
-    {% empty %}
-        <li>No active prescriptions.</li>
-    {% endfor %}
-</ul>
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold text-ink-900">Prescriptions</h2>
+        <a href="{% url 'pharmacy:prescribe' patient.pk %}" class="btn-primary text-sm font-semibold py-2 px-4 shadow-sm hover:-translate-y-0.5 transition-all duration-200">Prescribe Medication</a>
+    </div>
 
+    {% if prescriptions %}
+        <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-xl overflow-hidden">
+            {% for prescription in prescriptions %}
+                <div class="flex items-center justify-between px-4 py-3 bg-white hover:bg-paper transition-colors duration-150">
+                    <div>
+                        <p class="text-sm font-semibold text-ink-900">{{ prescription.drug }} {{ prescription.dose }}</p>
+                    </div>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                        {% if prescription.status == 'prescribed' %}bg-yellow-100 text-yellow-800
+                        {% elif prescription.status == 'approved' %}bg-blue-100 text-blue-800
+                        {% elif prescription.status == 'dispensed' %}bg-green-100 text-green-800
+                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                        {{ prescription.get_status_display }}
+                    </span>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-sm text-ink-500 bg-paper border border-gray-200/60 rounded-xl px-4 py-3">No active prescriptions.</p>
+    {% endif %}
+</div>

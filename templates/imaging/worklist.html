@@ -1,12 +1,38 @@
 {% extends "base.html" %}
+{% block title %}Imaging Worklist - MUST EMR{% endblock %}
 {% block content %}
-<h1>Imaging Worklist</h1>
-<ul>
-    {% for request in requests %}
-        <li>{{ request.modality }} for {{ request.patient.full_name }} — {{ request.get_status_display }}</li>
-    {% empty %}
-        <li>No pending imaging requests.</li>
-    {% endfor %}
-</ul>
-{% endblock %}
+<div class="max-w-4xl mx-auto py-6">
+    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight text-ink-900">Imaging Worklist</h1>
+            <p class="text-sm text-ink-500 mt-2">Pending and in-progress imaging requests</p>
+        </div>
+    </div>
 
+    {% if requests %}
+        <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-2xl overflow-hidden bg-white shadow-sm">
+            {% for request in requests %}
+                <div class="flex items-center justify-between px-6 py-4 hover:bg-paper transition-colors duration-150">
+                    <div>
+                        <p class="text-sm font-semibold text-ink-900">{{ request.modality }}</p>
+                        <p class="text-sm text-ink-500">{{ request.patient.full_name }} &middot; {{ request.patient.patient_number }}</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                            {% if request.status == 'requested' %}bg-yellow-100 text-yellow-800
+                            {% elif request.status == 'in_progress' %}bg-blue-100 text-blue-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ request.get_status_display }}
+                        </span>
+                        <a href="{% url 'imaging:report' request.pk %}" class="text-sm font-semibold text-brand hover:text-brand-dark transition-colors duration-200">Report &rarr;</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 text-center">
+            <p class="text-sm text-ink-500">No pending imaging requests.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

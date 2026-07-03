@@ -1,19 +1,46 @@
-<h2>Imaging</h2>
-<p><a href="{% url 'imaging:request' patient.pk %}">Request imaging</a></p>
-<h3>Pending requests</h3>
-<ul>
-    {% for request in pending_requests %}
-        <li>{{ request.modality }} — {{ request.get_status_display }} <a href="{% url 'imaging:report' request.pk %}">report</a></li>
-    {% empty %}
-        <li>No pending imaging requests.</li>
-    {% endfor %}
-</ul>
-<h3>Recent reports</h3>
-<ul>
-    {% for report in recent_reports %}
-        <li>{{ report.request.modality }} — {{ report.impression }}{% if report.is_critical_finding %} — critical{% endif %}</li>
-    {% empty %}
-        <li>No imaging reports yet.</li>
-    {% endfor %}
-</ul>
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold text-ink-900">Imaging</h2>
+        <a href="{% url 'imaging:request' patient.pk %}" class="btn-primary text-sm font-semibold py-2 px-4 shadow-sm hover:-translate-y-0.5 transition-all duration-200">Request Imaging</a>
+    </div>
 
+    <div>
+        <h3 class="text-sm font-bold text-ink-700 uppercase tracking-wider mb-3">Pending Requests</h3>
+        {% if pending_requests %}
+            <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-xl overflow-hidden">
+                {% for request in pending_requests %}
+                    <div class="flex items-center justify-between px-4 py-3 bg-white hover:bg-paper transition-colors duration-150">
+                        <div>
+                            <p class="text-sm font-semibold text-ink-900">{{ request.modality }}</p>
+                            <p class="text-xs text-ink-500">{{ request.get_status_display }}</p>
+                        </div>
+                        <a href="{% url 'imaging:report' request.pk %}" class="text-sm font-semibold text-brand hover:text-brand-dark transition-colors duration-200">Report &rarr;</a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-sm text-ink-500 bg-paper border border-gray-200/60 rounded-xl px-4 py-3">No pending imaging requests.</p>
+        {% endif %}
+    </div>
+
+    <div>
+        <h3 class="text-sm font-bold text-ink-700 uppercase tracking-wider mb-3">Recent Reports</h3>
+        {% if recent_reports %}
+            <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-xl overflow-hidden">
+                {% for report in recent_reports %}
+                    <div class="flex items-center justify-between px-4 py-3 bg-white hover:bg-paper transition-colors duration-150">
+                        <div>
+                            <p class="text-sm font-semibold text-ink-900">{{ report.request.modality }}</p>
+                            <p class="text-xs text-ink-500">{{ report.impression|truncatechars:60 }}</p>
+                        </div>
+                        {% if report.is_critical_finding %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Critical</span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-sm text-ink-500 bg-paper border border-gray-200/60 rounded-xl px-4 py-3">No imaging reports yet.</p>
+        {% endif %}
+    </div>
+</div>

@@ -1,12 +1,44 @@
 {% extends "base.html" %}
+{% block title %}Imaging Report Detail - MUST EMR{% endblock %}
 {% block content %}
-<h1>Imaging Report</h1>
-<p>{{ report.request.modality }} for {{ report.request.patient.full_name }}</p>
-<h2>Findings</h2>
-<p>{{ report.findings }}</p>
-<h2>Impression</h2>
-<p>{{ report.impression }}</p>
-{% if report.is_critical_finding %}<p>Critical finding</p>{% endif %}
-{% if report.image_reference %}<p>Image reference: {{ report.image_reference }}</p>{% endif %}
-{% endblock %}
+<div class="max-w-4xl mx-auto py-6">
+    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight text-ink-900">Imaging Report</h1>
+            <p class="text-sm text-ink-500 mt-2">{{ report.request.modality }} &middot; {{ report.request.patient.full_name }}</p>
+        </div>
+        <a href="{% url 'patients:profile' report.request.patient.pk %}" class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Back to Patient
+        </a>
+    </div>
 
+    <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <p class="text-xs font-bold text-ink-700 uppercase tracking-wider">Findings</p>
+                <p class="text-sm text-ink-900 mt-1 whitespace-pre-wrap">{{ report.findings }}</p>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-ink-700 uppercase tracking-wider">Impression</p>
+                <p class="text-sm text-ink-900 mt-1 whitespace-pre-wrap">{{ report.impression }}</p>
+            </div>
+        </div>
+
+        {% if report.is_critical_finding %}
+            <div class="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
+                <span class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-lg font-bold">!</span>
+                <p class="text-sm font-semibold text-red-800">Critical Finding — Urgent review required</p>
+            </div>
+        {% endif %}
+
+        {% if report.image_reference %}
+            <div class="bg-paper border border-gray-200/60 rounded-xl p-4 text-sm text-ink-600">
+                Image reference: <strong>{{ report.image_reference }}</strong>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,8 +1,27 @@
 {% extends "base.html" %}
+{% block title %}Lab Workload - MUST EMR{% endblock %}
 {% block content %}
-<h1>Laboratory Workload</h1>
-<p>Pending: {{ summary.pending }}</p>
-<p>Resulted: {{ summary.resulted }}</p>
-<p>Average turnaround: {{ summary.avg_turnaround|default:"not enough data yet" }}</p>
-{% endblock %}
+<div class="max-w-4xl mx-auto py-6">
+    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight text-ink-900">Laboratory Workload</h1>
+            <p class="text-sm text-ink-500 mt-2">Overview of pending and completed lab work</p>
+        </div>
+    </div>
 
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 text-center">
+            <p class="text-xs font-bold text-ink-700 uppercase tracking-wider">Pending</p>
+            <p class="text-4xl font-bold text-ink-900 mt-2">{{ summary.pending }}</p>
+        </div>
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 text-center">
+            <p class="text-xs font-bold text-ink-700 uppercase tracking-wider">Resulted</p>
+            <p class="text-4xl font-bold text-ink-900 mt-2">{{ summary.resulted }}</p>
+        </div>
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 text-center">
+            <p class="text-xs font-bold text-ink-700 uppercase tracking-wider">Avg Turnaround</p>
+            <p class="text-2xl font-bold text-ink-900 mt-2">{{ summary.avg_turnaround|default:"—" }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

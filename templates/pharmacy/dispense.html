@@ -1,11 +1,74 @@
 {% extends "base.html" %}
+{% block title %}Dispense - MUST EMR{% endblock %}
 {% block content %}
-<h1>Dispense Prescription</h1>
-<p>{{ prescription.drug }} {{ prescription.dose }} for {{ prescription.patient.full_name }}</p>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Dispense</button>
-</form>
-{% endblock %}
+<div class="max-w-4xl mx-auto py-6">
+    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight text-ink-900">Dispense Prescription</h1>
+            <p class="text-sm text-ink-500 mt-2">{{ prescription.drug }} {{ prescription.dose }} &middot; {{ prescription.patient.full_name }}</p>
+        </div>
+        <a href="{% url 'pharmacy:queue' %}" class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Back to Queue
+        </a>
+    </div>
 
+    <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 space-y-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+                <p class="text-xs font-bold text-ink-700 uppercase tracking-wider">Drug</p>
+                <p class="text-sm font-semibold text-ink-900 mt-1">{{ prescription.drug }}</p>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-ink-700 uppercase tracking-wider">Dose</p>
+                <p class="text-sm font-semibold text-ink-900 mt-1">{{ prescription.dose }}</p>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-ink-700 uppercase tracking-wider">Route</p>
+                <p class="text-sm font-semibold text-ink-900 mt-1">{{ prescription.get_route_display|default:"—" }}</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <p class="text-xs font-bold text-ink-700 uppercase tracking-wider">Frequency</p>
+                <p class="text-sm font-semibold text-ink-900 mt-1">{{ prescription.frequency }}</p>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-ink-700 uppercase tracking-wider">Duration</p>
+                <p class="text-sm font-semibold text-ink-900 mt-1">{{ prescription.duration_days }} days</p>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" class="space-y-8">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="space-y-2 mb-6">
+                {% for error in form.non_field_errors %}
+                    {% include "components/_alert_banner.html" with message=error type="critical" %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 space-y-6">
+            <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
+                <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/10">1</span>
+                <h3 class="text-base font-semibold text-ink-900">Dispensing Details</h3>
+            </div>
+            {% include "components/_field.html" with field=form.quantity_dispensed %}
+            {% include "components/_field.html" with field=form.notes %}
+        </div>
+
+        <div class="flex items-center justify-end gap-4 pt-6 pb-10">
+            <a href="{% url 'pharmacy:queue' %}" class="btn-secondary text-sm font-semibold py-3 px-6 hover:-translate-y-0.5 transition-all duration-200">Cancel</a>
+            <button type="submit" class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:shadow-brand/30 hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2">
+                Dispense
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
