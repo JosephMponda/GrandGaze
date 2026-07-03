@@ -8,7 +8,7 @@
 </head>
 <body class="bg-paper text-ink min-h-screen flex flex-col font-sans antialiased" hx-boost="true">
     {# Navigation Shell #}
-    <header class="bg-white border-b border-gray-200/80 shadow-xs sticky top-0 z-40">
+    <header class="bg-white border-b border-gray-200/80 shadow-xs sticky top-0 z-40" x-data="{ mobileMenuOpen: false }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center gap-8">
@@ -18,10 +18,10 @@
                     </div>
                     {% if user.is_authenticated %}
                         <nav class="hidden md:flex items-center gap-1">
-                            <a href="{% url 'accounts:dashboard' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors">Dashboard</a>
-                            <a href="{% url 'patients:register' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors">Register Patient</a>
+                            <a href="{% url 'accounts:dashboard' %}" class="px-3 py-2 rounded-md text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'accounts:dashboard' %}bg-gray-100 text-gray-900{% else %}text-gray-600 hover:text-gray-900 hover:bg-gray-50{% endif %}">Dashboard</a>
+                            <a href="{% url 'patients:register' %}" class="px-3 py-2 rounded-md text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'patients:register' %}bg-gray-100 text-gray-900{% else %}text-gray-600 hover:text-gray-900 hover:bg-gray-50{% endif %}">Register Patient</a>
                             {% if user.is_superuser or user.profile.role == 'Admin' or user.profile.role == 'ICT' %}
-                                <a href="{% url 'accounts:audit_trail' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors">Audit Trail</a>
+                                <a href="{% url 'accounts:audit_trail' %}" class="px-3 py-2 rounded-md text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'accounts:audit_trail' %}bg-gray-100 text-gray-900{% else %}text-gray-600 hover:text-gray-900 hover:bg-gray-50{% endif %}">Audit Trail</a>
                             {% endif %}
                         </nav>
                     {% endif %}
@@ -57,9 +57,35 @@
                          @online.window="online = true" @offline.window="online = false">
                         <span :class="online ? 'bg-green-500' : 'bg-red-500'" class="w-2.5 h-2.5 rounded-full inline-block transition-colors duration-300"></span>
                     </div>
+
+                    {# Mobile Menu Button #}
+                    {% if user.is_authenticated %}
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" type="button" class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand">
+                        <span class="sr-only">Open main menu</span>
+                        <svg x-show="!mobileMenuOpen" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg x-show="mobileMenuOpen" style="display: none;" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                    {% endif %}
                 </div>
             </div>
         </div>
+
+        {# Mobile Menu Panel #}
+        {% if user.is_authenticated %}
+        <div x-show="mobileMenuOpen" style="display: none;" x-collapse class="md:hidden border-t border-gray-200 bg-white">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="{% url 'accounts:dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium {% if request.resolver_match.view_name == 'accounts:dashboard' %}bg-brand-light text-brand{% else %}text-gray-700 hover:text-gray-900 hover:bg-gray-50{% endif %}">Dashboard</a>
+                <a href="{% url 'patients:register' %}" class="block px-3 py-2 rounded-md text-base font-medium {% if request.resolver_match.view_name == 'patients:register' %}bg-brand-light text-brand{% else %}text-gray-700 hover:text-gray-900 hover:bg-gray-50{% endif %}">Register Patient</a>
+                {% if user.is_superuser or user.profile.role == 'Admin' or user.profile.role == 'ICT' %}
+                    <a href="{% url 'accounts:audit_trail' %}" class="block px-3 py-2 rounded-md text-base font-medium {% if request.resolver_match.view_name == 'accounts:audit_trail' %}bg-brand-light text-brand{% else %}text-gray-700 hover:text-gray-900 hover:bg-gray-50{% endif %}">Audit Trail</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
     </header>
 
     {# Messages #}
