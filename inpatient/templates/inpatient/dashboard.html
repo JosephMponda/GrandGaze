@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Inpatient Dashboard{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto py-6">
+    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight text-ink-900">Inpatient Dashboard</h1>
+            <p class="text-sm text-ink-500 mt-2">Bed occupancy and active admissions</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {% for ward, occ in ward_data %}
+            <a href="{% url 'inpatient:ward' ward.pk %}" class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow">
+                <p class="text-sm font-bold text-ink-900">{{ ward.name }}</p>
+                <p class="text-2xl font-bold {% if occ.occupied_beds > 0 %}text-amber-600{% else %}text-green-600{% endif %}">
+                    {{ occ.occupied_beds }}/{{ occ.total_beds }}
+                </p>
+                <p class="text-xs text-ink-500">beds occupied</p>
+            </a>
+        {% empty %}
+            <p class="text-sm text-ink-500">No wards configured.</p>
+        {% endfor %}
+    </div>
+
+    {% if admissions %}
+        <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-2xl overflow-hidden bg-white shadow-sm">
+            <div class="px-6 py-3 bg-gray-50 border-b border-gray-100">
+                <p class="text-xs font-bold text-ink-700 uppercase tracking-wider">Active Admissions</p>
+            </div>
+            {% for admission in admissions %}
+                <div class="px-6 py-4 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-semibold">{{ admission.patient.full_name }}</p>
+                        <p class="text-xs text-ink-500">{{ admission.admission_diagnosis }} &middot; {{ admission.bed.ward.name|default:"—" }} / {{ admission.bed.label|default:"—" }}</p>
+                    </div>
+                    <a href="{% url 'inpatient:admission_detail' admission.pk %}" class="btn-secondary text-xs">View</a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 text-center">
+            <p class="text-sm text-ink-500">No active admissions.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

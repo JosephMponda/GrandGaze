@@ -53,5 +53,6 @@ def patient_profile(request, pk):
         {"id": "billing", "label": "Billing", "badge": patient.invoices.count()},
         {"id": "triage", "label": "Triage", "badge": patient.triage_encounters.count()},
         {"id": "dialysis", "label": "Dialysis", "badge": patient.dialysis_prescriptions.count()},
+        {"id": "inpatient", "label": "Admissions", "badge": patient.admissions.count()},
     ]
     return render(request, "patients/profile.html", {"patient": patient, "tabs": tabs})

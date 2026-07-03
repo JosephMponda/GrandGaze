@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Admit Patient{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto py-6">
+    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight text-ink-900">Admit Patient</h1>
+            <p class="text-sm text-ink-500 mt-2">{{ patient.full_name }} &middot; {{ patient.patient_number }}</p>
+        </div>
+    </div>
+
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 space-y-6">
+            <div>
+                <label class="block text-xs font-bold text-ink-700 uppercase tracking-wider mb-1">Admission Diagnosis</label>
+                <input type="text" name="diagnosis" required
+                       class="w-full rounded-lg border-gray-200 text-sm focus:border-brand focus:ring-brand"
+                       placeholder="e.g. Severe malaria, Pneumonia">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-ink-700 uppercase tracking-wider mb-1">Ward</label>
+                <select name="ward" class="w-full rounded-lg border-gray-200 text-sm focus:border-brand focus:ring-brand"
+                        hx-get="/inpatient/beds-for-ward/" hx-target="#bed-select" hx-trigger="change">
+                    <option value="">— Select ward —</option>
+                    {% for ward in wards %}
+                        <option value="{{ ward.pk }}">{{ ward.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div id="bed-select">
+                <label class="block text-xs font-bold text-ink-700 uppercase tracking-wider mb-1">Bed (optional)</label>
+                <select name="bed" class="w-full rounded-lg border-gray-200 text-sm focus:border-brand focus:ring-brand">
+                    <option value="">— Assign later —</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-4">
+            <a href="{% url 'patients:profile' patient.pk %}" class="btn-secondary text-sm">Cancel</a>
+            <button type="submit" class="btn-primary text-sm">Admit</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

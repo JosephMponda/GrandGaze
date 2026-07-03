@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "interop",
     "emergency",
     "dialysis",
+    "inpatient",
 ]
 
 MIDDLEWARE = [
