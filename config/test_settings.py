@@ -30,6 +30,9 @@ INSTALLED_APPS = [
     "imaging",
     "pharmacy",
     "reporting",
+    "billing",
+    "syncapi",
+    "interop",
 ]
 
 MIDDLEWARE = [

@@ -14,6 +14,9 @@ urlpatterns = [
     path("imaging/", include("imaging.urls")),
     path("pharmacy/", include("pharmacy.urls")),
     path("reporting/", include("reporting.urls")),
+    path("api/", include("syncapi.urls")),
+    path("api/", include("interop.urls")),
+    path("billing/", include("billing.urls")),
     path("health/", health_check, name="health_check"),
     path("", RedirectView.as_view(pattern_name="accounts:dashboard", permanent=False)),
 ]

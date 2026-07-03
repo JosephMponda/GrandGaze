@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Invoice #{{ invoice.pk }} - MUST EMR{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto py-6">
+    <div class="border-b border-gray-200 pb-5 flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight text-ink">Invoice #{{ invoice.pk }}</h1>
+            <p class="text-sm text-ink-500 mt-1">{{ invoice.patient.full_name }} · {{ invoice.patient.patient_number }}</p>
+        </div>
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+            {% if invoice.status == 'paid' %}bg-green-100 text-green-800
+            {% elif invoice.status == 'partially_paid' %}bg-amber-100 text-amber-800
+            {% elif invoice.status == 'waived' %}bg-gray-100 text-gray-800
+            {% else %}bg-blue-100 text-blue-800{% endif %}">
+            {{ invoice.get_status_display }}
+        </span>
+    </div>
+
+    <div class="mt-6 bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
+        <h2 class="text-lg font-semibold text-ink mb-4">Line Items</h2>
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-gray-200">
+                    <th class="text-left py-2 font-medium text-ink-500">Service</th>
+                    <th class="text-right py-2 font-medium text-ink-500">Qty</th>
+                    <th class="text-right py-2 font-medium text-ink-500">Amount (MWK)</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for item in invoice.line_items.all %}
+                    <tr>
+                        <td class="py-2 text-ink">{{ item.service_item.name }}</td>
+                        <td class="text-right py-2 text-ink">{{ item.quantity }}</td>
+                        <td class="text-right py-2 text-ink font-semibold">{{ item.amount_mwk|floatformat:2 }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr class="border-t-2 border-gray-200">
+                    <td class="py-3 font-bold text-ink">Total</td>
+                    <td></td>
+                    <td class="text-right py-3 font-bold text-ink">{{ total_billed|floatformat:2 }}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    {% if invoice.payments.all %}
+    <div class="mt-6 bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
+        <h2 class="text-lg font-semibold text-ink mb-4">Payments</h2>
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-gray-200">
+                    <th class="text-left py-2 font-medium text-ink-500">Date</th>
+                    <th class="text-left py-2 font-medium text-ink-500">Method</th>
+                    <th class="text-left py-2 font-medium text-ink-500">Reference</th>
+                    <th class="text-right py-2 font-medium text-ink-500">Amount (MWK)</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for p in invoice.payments.all %}
+                    <tr>
+                        <td class="py-2 text-ink">{{ p.received_at|date:"M j, Y" }}</td>
+                        <td class="py-2 text-ink">{{ p.get_method_display }}</td>
+                        <td class="py-2 text-ink-500">{{ p.reference|default:"—" }}</td>
+                        <td class="text-right py-2 text-ink font-semibold">{{ p.amount_mwk|floatformat:2 }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <div class="mt-6 bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm text-ink-500">Outstanding Balance</p>
+                <p class="text-2xl font-bold {% if balance > 0 %}text-red-600{% else %}text-green-600{% endif %}">MWK {{ balance|floatformat:2 }}</p>
+            </div>
+            {% if balance > 0 %}
+                <button type="button" class="btn-primary text-sm px-4 py-2 font-semibold" onclick="document.getElementById('payment-form').classList.toggle('hidden')">Record Payment</button>
+            {% endif %}
+        </div>
+    </div>
+
+    <form method="post" id="payment-form" class="mt-6 bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 {% if balance <= 0 %}hidden{% endif %}">
+        {% csrf_token %}
+        <h2 class="text-lg font-semibold text-ink mb-4">Record Payment</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% include "components/_field.html" with field=form.amount_mwk %}
+            {% include "components/_field.html" with field=form.method %}
+            {% include "components/_field.html" with field=form.reference %}
+        </div>
+        <div class="flex justify-end mt-4">
+            <button type="submit" class="btn-primary text-sm px-6 py-2 font-semibold">Record Payment</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
