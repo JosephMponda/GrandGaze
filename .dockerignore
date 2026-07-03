@@ -1,0 +1,43 @@
+# Version control
+.git/
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local env files (Docker uses docker-compose environment)
+.env
+.env.example
+
+# Test artifacts
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Static files (will be collected during build)
+staticfiles/
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+nginx.conf
+
+# Documentation
+*.md
+AGENTS.md
+ALLOWED_PACKAGES.md
+CHANGES_SUMMARY.md
+docs/

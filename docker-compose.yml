@@ -1,0 +1,92 @@
+# MUST-GSL EMR - Local fallback / demo Docker Compose bundle
+# AGENTS.md §2: Django + Postgres + Redis + Nginx on a single laptop,
+# no internet required. Also serves as the offline clinic-deployment story.
+#
+# Usage:
+#   docker compose up -d
+#   docker compose exec web python manage.py migrate
+#   docker compose exec web python manage.py loaddata fixtures/*.json
+#   open http://localhost
+
+version: "3.9"
+
+services:
+
+  db:
+    image: postgres:16-alpine
+    container_name: must_emr_db
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: must_emr
+      POSTGRES_USER: must_emr
+      POSTGRES_PASSWORD: must_emr
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U must_emr"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: must_emr_redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  web:
+    build: .
+    container_name: must_emr_web
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DJANGO_SECRET_KEY: "${DJANGO_SECRET_KEY:-dev-insecure-change-me}"
+      DEBUG: "${DEBUG:-False}"
+      ALLOWED_HOSTS: "${ALLOWED_HOSTS:-localhost,127.0.0.1}"
+      DB_NAME: must_emr
+      DB_USER: must_emr
+      DB_PASSWORD: must_emr
+      DB_HOST: db
+      DB_PORT: "5432"
+      REDIS_URL: "redis://redis:6379/0"
+      CRYPTOGRAPHY_KEY: "${CRYPTOGRAPHY_KEY:-dev-insecure-crypto-key}"
+      SECURE_SSL_REDIRECT: "False"
+      SECURE_HSTS_SECONDS: "0"
+    volumes:
+      - static_volume:/app/staticfiles
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8000/health/"]
+      interval: 15s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: must_emr_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      web:
+        condition: service_healthy
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - static_volume:/static:ro
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  postgres_data:
+  static_volume:
