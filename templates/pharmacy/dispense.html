@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Dispense Prescription</h1>
+<p>{{ prescription.drug }} {{ prescription.dose }} for {{ prescription.patient.full_name }}</p>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Dispense</button>
+</form>
+{% endblock %}
+

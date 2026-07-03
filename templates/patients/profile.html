@@ -15,8 +15,9 @@
     <ul>
         <li><a href="#" hx-get="{% url 'encounters:patient_tab' patient.pk %}" hx-target="#tab-content">Encounters</a></li>
         <li><a href="#" hx-get="{% url 'vitals:patient_tab' patient.pk %}" hx-target="#tab-content">Vitals</a></li>
-        <li>Labs (Engineer C)</li>
-        <li>Prescriptions (Engineer D)</li>
+        <li><a href="#" hx-get="{% url 'laboratory:patient_tab' patient.pk %}" hx-target="#tab-content">Labs</a></li>
+        <li><a href="#" hx-get="{% url 'imaging:patient_tab' patient.pk %}" hx-target="#tab-content">Imaging</a></li>
+        <li><a href="#" hx-get="{% url 'pharmacy:patient_tab' patient.pk %}" hx-target="#tab-content">Prescriptions</a></li>
         <li>Billing (Engineer E)</li>
     </ul>
 </nav>

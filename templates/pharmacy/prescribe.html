@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Prescribe Medication</h1>
+<p>{{ patient.full_name }} | {{ patient.patient_number }}</p>
+{% if warnings %}
+    <h2>Medication Safety Warnings</h2>
+    <ul>
+        {% for warning in warnings %}
+            <li>{{ warning.level }}: {{ warning.message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    {% if warnings %}
+        <input type="hidden" name="proceed_with_warnings" value="on">
+    {% endif %}
+    <button type="submit">{% if warnings %}Proceed with documented reason{% else %}Create prescription{% endif %}</button>
+</form>
+{% endblock %}
+

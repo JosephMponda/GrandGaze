@@ -1,0 +1,19 @@
+<h2>Laboratory</h2>
+<p><a href="{% url 'laboratory:order' patient.pk %}">Order lab test</a></p>
+<h3>Pending orders</h3>
+<ul>
+    {% for order in pending_orders %}
+        <li>{{ order.test }} — {{ order.get_status_display }} <a href="{% url 'laboratory:collect' order.pk %}">open</a></li>
+    {% empty %}
+        <li>No pending lab orders.</li>
+    {% endfor %}
+</ul>
+<h3>Recent results</h3>
+<ul>
+    {% for result in recent_results %}
+        <li>{{ result.order.test }}: {{ result.display_value }}{% if result.is_critical %} — critical{% endif %}</li>
+    {% empty %}
+        <li>No lab results yet.</li>
+    {% endfor %}
+</ul>
+

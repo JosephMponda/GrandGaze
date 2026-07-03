@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Lab Result</h1>
+<p>{{ result.order.test }}: {{ result.display_value }}</p>
+<p>Status: {{ result.order.get_status_display }}</p>
+<p>Abnormal: {{ result.is_abnormal|yesno:"yes,no" }} | Critical: {{ result.is_critical|yesno:"yes,no" }}</p>
+{% if result.verified_by %}
+    <p>Verified by {{ result.verified_by }} at {{ result.verified_at }}</p>
+{% else %}
+    <form method="post" action="{% url 'laboratory:verify_result' result.pk %}">
+        {% csrf_token %}
+        <button type="submit">Verify result</button>
+    </form>
+{% endif %}
+{% endblock %}
+

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Enter Lab Result</h1>
+<p>{{ order.test }} for {{ order.patient.full_name }}</p>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save result</button>
+</form>
+{% endblock %}
+

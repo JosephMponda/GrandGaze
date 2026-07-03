@@ -1,0 +1,19 @@
+<h2>Imaging</h2>
+<p><a href="{% url 'imaging:request' patient.pk %}">Request imaging</a></p>
+<h3>Pending requests</h3>
+<ul>
+    {% for request in pending_requests %}
+        <li>{{ request.modality }} — {{ request.get_status_display }} <a href="{% url 'imaging:report' request.pk %}">report</a></li>
+    {% empty %}
+        <li>No pending imaging requests.</li>
+    {% endfor %}
+</ul>
+<h3>Recent reports</h3>
+<ul>
+    {% for report in recent_reports %}
+        <li>{{ report.request.modality }} — {{ report.impression }}{% if report.is_critical_finding %} — critical{% endif %}</li>
+    {% empty %}
+        <li>No imaging reports yet.</li>
+    {% endfor %}
+</ul>
+

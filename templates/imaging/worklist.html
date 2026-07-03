@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Imaging Worklist</h1>
+<ul>
+    {% for request in requests %}
+        <li>{{ request.modality }} for {{ request.patient.full_name }} — {{ request.get_status_display }}</li>
+    {% empty %}
+        <li>No pending imaging requests.</li>
+    {% endfor %}
+</ul>
+{% endblock %}
+

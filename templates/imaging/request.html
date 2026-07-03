@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Request Imaging</h1>
+<p>{{ patient.full_name }} | {{ patient.patient_number }}</p>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Create request</button>
+</form>
+{% endblock %}
+

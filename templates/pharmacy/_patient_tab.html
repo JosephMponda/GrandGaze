@@ -1,0 +1,10 @@
+<h2>Prescriptions</h2>
+<p><a href="{% url 'pharmacy:prescribe' patient.pk %}">Prescribe medication</a></p>
+<ul>
+    {% for prescription in prescriptions %}
+        <li>{{ prescription.drug }} {{ prescription.dose }} — {{ prescription.get_status_display }}</li>
+    {% empty %}
+        <li>No active prescriptions.</li>
+    {% endfor %}
+</ul>
+

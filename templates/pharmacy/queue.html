@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Pharmacy Queue</h1>
+<ul>
+    {% for prescription in prescriptions %}
+        <li>
+            {{ prescription.patient.full_name }} — {{ prescription.drug }} {{ prescription.dose }} — {{ prescription.get_status_display }}
+            {% if prescription.status == "prescribed" %}
+                <form method="post" action="{% url 'pharmacy:approve' prescription.pk %}" style="display: inline">
+                    {% csrf_token %}
+                    <button type="submit">Approve</button>
+                </form>
+            {% endif %}
+            <a href="{% url 'pharmacy:dispense' prescription.pk %}">Dispense</a>
+        </li>
+    {% empty %}
+        <li>No prescriptions awaiting pharmacy action.</li>
+    {% endfor %}
+</ul>
+{% endblock %}
+

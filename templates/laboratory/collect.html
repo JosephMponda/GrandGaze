@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Specimen Collection</h1>
+<p>{{ order.test }} for {{ order.patient.full_name }}</p>
+{% if order.specimen_barcode %}
+    <p>Barcode: {{ order.specimen_barcode }}</p>
+    <div class="barcode" aria-label="Specimen barcode {{ order.specimen_barcode }}">
+        {% for char in order.specimen_barcode %}
+            <span></span>
+        {% endfor %}
+    </div>
+{% endif %}
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Mark specimen collected</button>
+</form>
+<p><a href="{% url 'laboratory:enter_result' order.pk %}">Enter result</a></p>
+<style>
+.barcode { display: flex; gap: 2px; align-items: end; height: 64px; margin: 1rem 0; }
+.barcode span:nth-child(odd) { width: 3px; height: 56px; background: #111827; }
+.barcode span:nth-child(even) { width: 2px; height: 40px; background: #111827; }
+</style>
+{% endblock %}
+

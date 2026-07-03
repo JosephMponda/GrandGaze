@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Imaging Report</h1>
+<p>{{ imaging_request.modality }} for {{ imaging_request.patient.full_name }}</p>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save report</button>
+</form>
+{% endblock %}
+

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Imaging Report</h1>
+<p>{{ report.request.modality }} for {{ report.request.patient.full_name }}</p>
+<h2>Findings</h2>
+<p>{{ report.findings }}</p>
+<h2>Impression</h2>
+<p>{{ report.impression }}</p>
+{% if report.is_critical_finding %}<p>Critical finding</p>{% endif %}
+{% if report.image_reference %}<p>Image reference: {{ report.image_reference }}</p>{% endif %}
+{% endblock %}
+

@@ -31,6 +31,9 @@ INSTALLED_APPS = [
     "patients",
     "encounters",
     "vitals",
+    "laboratory",
+    "imaging",
+    "pharmacy",
     "reporting",
 ]
 
