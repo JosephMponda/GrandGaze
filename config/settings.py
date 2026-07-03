@@ -124,7 +124,7 @@ SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", default=False, cast=bool)  #
 SECURE_HSTS_SECONDS = config("SECURE_HSTS_SECONDS", default=0, cast=int)
 
 # --- django-axes: lock after 5 failed logins for 15 minutes (brief §9.4) ---
-AXES_FAILURE_LIMIT = config("AXES_FAILURE_LIMIT", default=10, cast=int)
+AXES_FAILURE_LIMIT = config("AXES_FAILURE_LIMIT", default=5, cast=int)  # AGENTS.md §7: 5 failed logins -> 15 min lock
 AXES_COOLOFF_TIME = 0.25  # hours = 15 minutes
 AXES_LOCKOUT_PARAMETERS = [["username", "ip_address"]]
 

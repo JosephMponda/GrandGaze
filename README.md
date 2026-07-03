@@ -1,10 +1,21 @@
 # MUST–GSL EMR - Code
 
+**Current status**: see `docs/COMPLETED_FEATURES.md` for the maintained,
+up-to-date traceability matrix (feature -> brief section -> code location).
+That file is the source of truth for "what's done" - everything below this
+point is a **historical build log** from the Engineer A/B passes early in
+the project and is kept for its debugging detail (the Postgres-specific
+bugs below are worth reading), but its own "what's implemented" / "not yet
+built" claims are stale: `laboratory`, `imaging`, `pharmacy`, `billing`,
+`reporting`, `interop`, `syncapi`, and the Tailwind/HTMX/Alpine frontend
+have all since been built. Don't rely on this file alone to judge project
+completeness.
+
 Engineer A foundation (`accounts` + `patients`) built per
 `docs/backend/engineer-A-core-identity/`. This is the critical-path module -
 everyone else's models FK into `Patient`/`User`/`Profile`.
 
-## ⚠️ Reconciliation note (2 July) — read before merging
+## ⚠️ Reconciliation note (2 July, historical) — read before merging
 
 A parallel pass (pushed to `github.com/JosephMponda/GrandGaze`, described as
 Codex-authored) built on top of the zip from the previous session. Diffed it
@@ -140,16 +151,12 @@ is available to test against, per AGENTS.md §5.3.
   real Postgres end-to-end (system checks, migrations, and a full HTTP
   walkthrough — registration → encounter → vitals → alert → dashboard)
 
-## Not yet built (next up, per AGENTS.md's own module map)
+## Not yet built (historical, as of this section's original writing)
 
-- `encounters`/`vitals` (Engineer B) - depends on this being contract-frozen, which it now is.
-- `laboratory`/`imaging` (Engineer C)
-- `pharmacy` (Engineer D)
-- `billing`/`dialysis`/`reporting`/`interop`/`syncapi` (Engineer E)
-- Tailwind CLI + vendored HTMX/Alpine (frontend) - templates currently render
-  plain unstyled HTML with `hx-get` attributes wired but no HTMX script
-  loaded yet (see `TODO(frontend team)` markers in `templates/base.html`,
-  and `FRONTEND_INTEGRATION.md` for how to merge frontend markup in safely).
-- `django-filter`, `drf-spectacular` schema views, and the `interop`
-  FHIR-Bundle endpoint are installed/configured but have no views yet - DRF
-  is intentionally not used for server-rendered pages per AGENTS.md §3.
+This list was accurate when Engineer A/B's passes wrapped, and is left here
+only for historical context on the build order. It is **not current** -
+see `docs/COMPLETED_FEATURES.md` for what's actually built and what's still
+open (still-open items as of the last update there: appointment/queue,
+inpatient/ward management, emergency triage, nursing documentation, generic
+CPOE, dialysis, and inventory - all tracked in that file's "Not Yet Built
+(Phase-2 Candidates)" table).

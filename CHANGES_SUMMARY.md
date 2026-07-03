@@ -1,8 +1,16 @@
 # Changes Summary — for the team
 
-Ten things to know about the current state of the codebase, in the order
-they matter for you today. Full detail on each is in `README.md`'s
-"Reconciliation note" section — this is the short version.
+**This is a historical snapshot from the Engineer A/B handoff, not a live
+status doc.** For current status, use `docs/COMPLETED_FEATURES.md` (the
+maintained traceability matrix). Items 1–10 below are still accurate as
+engineering history/gotchas worth knowing (the encrypted-field lookup-hash
+pattern in particular, item 4, is a real pattern later modules should
+follow) — it's specifically the "Not yet built" section at the end that has
+since gone stale and should not be trusted.
+
+Ten things to know about the state of the codebase as of the Engineer A/B
+handoff, in the order they mattered at the time. Full detail on each is in
+`README.md`'s "Reconciliation note" section — this is the short version.
 
 1. **Engineer A foundation is done and merged**: `accounts` (login, RBAC
    groups, role-based dashboard, audit trail) + `patients` (registration,
@@ -74,11 +82,11 @@ they matter for you today. Full detail on each is in `README.md`'s
     to run this locally against real Postgres. Read that before touching
     `templates/patients/register.html` or `templates/accounts/dashboard.html`.
 
-## Not yet built
+## Not yet built (stale — see docs/COMPLETED_FEATURES.md instead)
 
-`laboratory`/`imaging` (Engineer C), `pharmacy` (Engineer D),
-`billing`/`dialysis`/`reporting` (rest of Engineer E's scope beyond the
-minimal `AlertEvent` model built here — Engineer B needed it as a hard
-dependency), `syncapi`/offline sync, Tailwind CLI + vendored HTMX/Alpine
-(currently plain unstyled HTML with `hx-*` attributes wired but no HTMX
-script loaded — see `TODO(frontend team)` markers in `templates/base.html`).
+Everything that was listed here as not-yet-built at the time of the
+Engineer A/B handoff — `laboratory`/`imaging`, `pharmacy`,
+`billing`/`reporting`, `syncapi`/offline sync, and the Tailwind/HTMX/Alpine
+frontend — has since been built. `dialysis` remains a stretch goal and is
+not built. For the current, maintained list of what's outstanding, use
+`docs/COMPLETED_FEATURES.md`'s "Not Yet Built (Phase-2 Candidates)" table.
