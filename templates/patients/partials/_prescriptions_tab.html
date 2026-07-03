@@ -1,0 +1,76 @@
+{# ── Prescriptions Tab Partial (HTMX) ────────────────────────────────────── #}
+<div class="space-y-6 animate-fade-in">
+    
+    <div class="flex items-center justify-between border-b border-gray-200 pb-4">
+        <div>
+            <h3 class="text-lg font-bold text-gray-900">Medications</h3>
+            <p class="text-sm text-gray-500">Active and historical prescriptions</p>
+        </div>
+        <button type="button" class="btn-primary text-sm font-semibold flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            New Prescription
+        </button>
+    </div>
+
+    {% if prescriptions %}
+    <div class="space-y-4">
+        {% for rx in prescriptions %}
+        <div class="bg-white border {% if rx.is_active %}border-blue-200 shadow-sm{% else %}border-gray-200/70 opacity-75{% endif %} rounded-xl p-5 transition-all">
+            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-full {% if rx.is_active %}bg-blue-100 text-blue-600{% else %}bg-gray-100 text-gray-500{% endif %} flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                    </div>
+                    
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <h4 class="text-base font-bold text-gray-900">{{ rx.drug_name }}</h4>
+                            {% if rx.is_active %}
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-green-100 text-green-700 uppercase tracking-wider">Active</span>
+                            {% else %}
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-600 uppercase tracking-wider">Completed</span>
+                            {% endif %}
+                        </div>
+                        
+                        <p class="text-sm font-medium text-gray-900 mb-2">
+                            {{ rx.dose_value }}{{ rx.dose_unit }} &bull; {{ rx.get_route_display }} &bull; {{ rx.get_frequency_display }}
+                        </p>
+                        
+                        <div class="text-xs text-gray-500 space-y-1">
+                            <p>Duration: <span class="font-medium text-gray-700">{{ rx.duration }} days</span> ({{ rx.start_date|date:"M j, Y" }} - {{ rx.end_date|date:"M j, Y" }})</p>
+                            <p>Prescribed by: <span class="font-medium text-gray-700">Dr. {{ rx.prescriber.last_name }}</span></p>
+                            {% if rx.instructions %}
+                            <p class="mt-2 text-gray-600 italic bg-gray-50 px-3 py-1.5 rounded border border-gray-100 inline-block">"{{ rx.instructions }}"</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-end gap-2 shrink-0">
+                    {% if rx.status == 'PENDING' %}
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-100">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Pending Dispense
+                        </span>
+                    {% elif rx.status == 'DISPENSED' %}
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            Dispensed
+                        </span>
+                    {% endif %}
+                    
+                    {% if rx.is_active %}
+                    <button class="text-xs font-semibold text-red-600 hover:text-red-700 mt-2">Stop Medication</button>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        {% include "components/_empty_state.html" with icon="folder" title="No prescriptions" message="This patient does not have any active or historical prescriptions on file." %}
+    {% endif %}
+
+</div>
