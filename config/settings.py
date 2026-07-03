@@ -132,6 +132,9 @@ AXES_LOCKOUT_PARAMETERS = [["username", "ip_address"]]
 # in any real deployment. Never commit a real key. ---
 CRYPTOGRAPHY_KEY = config("CRYPTOGRAPHY_KEY", default=SECRET_KEY)
 
+# --- Email: console backend for demo (password reset) ---
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
 # --- DRF / drf-spectacular: used ONLY for offline-sync, FHIR-lite export,
 # dashboard JSON per AGENTS.md §2 - not a parallel API for the whole app. ---
 REST_FRAMEWORK = {

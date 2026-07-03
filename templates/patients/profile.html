@@ -98,58 +98,40 @@
             {{ tab.label }}
             {% if tab.badge %}<span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-600 text-[10px] font-bold">{{ tab.badge }}</span>{% endif %}
         </button>
-        {% empty %}
-        {# Static fallback tabs while engineers B/C/D/E wire up their views #}
-        <button @click="activeTab = 'encounters'"
-                :class="activeTab === 'encounters' ? 'border-brand text-brand bg-brand-light/50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'"
-                class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 rounded-t-md transition-all whitespace-nowrap -mb-px">
-            Visits &amp; Encounters
-        </button>
-        <button @click="activeTab = 'labs'"
-                :class="activeTab === 'labs' ? 'border-brand text-brand bg-brand-light/50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'"
-                class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 rounded-t-md transition-all whitespace-nowrap -mb-px">
-            Labs
-        </button>
-        <button @click="activeTab = 'prescriptions'"
-                :class="activeTab === 'prescriptions' ? 'border-brand text-brand bg-brand-light/50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'"
-                class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 rounded-t-md transition-all whitespace-nowrap -mb-px">
-            Prescriptions
-        </button>
-        <button @click="activeTab = 'billing'"
-                :class="activeTab === 'billing' ? 'border-brand text-brand bg-brand-light/50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'"
-                class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 rounded-t-md transition-all whitespace-nowrap -mb-px">
-            Billing
-        </button>
         {% endfor %}
     </div>
 
-    {# Tab Panels — placeholder cards until engineers wire up their HTMX partials #}
-    <div x-show="activeTab === 'encounters'" class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
-        {% include "components/_empty_state.html" with icon="document" title="No encounters yet" message="Visits and encounter records will appear here once Engineer B wires up the encounters module." %}
+    {# Tab Panels — loaded via HTMX from each module's patient_tab endpoint #}
+    <div id="tp-encounters" x-show="activeTab === 'encounters'"
+         x-init="$nextTick(() => htmx.process($el))"
+         hx-get="{% url 'encounters:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
     </div>
-    <div x-show="activeTab === 'labs'" style="display:none" class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
-        {% include "components/_empty_state.html" with icon="document" title="No lab results" message="Lab orders and results will appear here once Engineer C wires up the laboratory module." %}
+    <div id="tp-vitals" x-show="activeTab === 'vitals'" style="display:none"
+         x-init="$nextTick(() => htmx.process($el))"
+         hx-get="{% url 'vitals:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
     </div>
-    <div x-show="activeTab === 'prescriptions'" style="display:none" class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
-        {% include "components/_empty_state.html" with icon="document" title="No prescriptions" message="E-prescriptions and dispensing records will appear here once Engineer D wires up the pharmacy module." %}
+    <div id="tp-labs" x-show="activeTab === 'labs'" style="display:none"
+         x-init="$nextTick(() => htmx.process($el))"
+         hx-get="{% url 'laboratory:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
     </div>
-    <div x-show="activeTab === 'billing'" style="display:none" class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
-        {% include "components/_empty_state.html" with icon="document" title="No billing records" message="Revenue cycle data will appear here once Engineer E wires up the billing module." %}
+    <div id="tp-imaging" x-show="activeTab === 'imaging'" style="display:none"
+         x-init="$nextTick(() => htmx.process($el))"
+         hx-get="{% url 'imaging:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
+    </div>
+    <div id="tp-prescriptions" x-show="activeTab === 'prescriptions'" style="display:none"
+         x-init="$nextTick(() => htmx.process($el))"
+         hx-get="{% url 'pharmacy:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
+    </div>
+    <div id="tp-billing" x-show="activeTab === 'billing'" style="display:none"
+         x-init="$nextTick(() => htmx.process($el))"
+         hx-get="{% url 'billing:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
     </div>
 
 </div>
-
-<nav>
-    {# Each tab below is owned by another engineer's app and loaded as an HTMX partial — #}
-    {# not duplicated here. #}
-    <ul>
-        <li><a href="#" hx-get="{% url 'encounters:patient_tab' patient.pk %}" hx-target="#tab-content">Encounters</a></li>
-        <li><a href="#" hx-get="{% url 'vitals:patient_tab' patient.pk %}" hx-target="#tab-content">Vitals</a></li>
-        <li><a href="#" hx-get="{% url 'laboratory:patient_tab' patient.pk %}" hx-target="#tab-content">Labs</a></li>
-        <li><a href="#" hx-get="{% url 'imaging:patient_tab' patient.pk %}" hx-target="#tab-content">Imaging</a></li>
-        <li><a href="#" hx-get="{% url 'pharmacy:patient_tab' patient.pk %}" hx-target="#tab-content">Prescriptions</a></li>
-        <li>Billing (Engineer E)</li>
-    </ul>
-</nav>
-<div id="tab-content"></div>
 {% endblock %}

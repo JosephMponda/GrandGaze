@@ -44,4 +44,12 @@ def search_patients(request):
 @login_required
 def patient_profile(request, pk):
     patient = services.get_patient_or_404(pk)
-    return render(request, "patients/profile.html", {"patient": patient})
+    tabs = [
+        {"id": "encounters", "label": "Visits & Encounters", "badge": patient.encounters.count()},
+        {"id": "vitals", "label": "Vitals", "badge": patient.vital_sign_sets.count()},
+        {"id": "labs", "label": "Labs", "badge": patient.lab_orders.count()},
+        {"id": "imaging", "label": "Imaging", "badge": patient.imaging_requests.count()},
+        {"id": "prescriptions", "label": "Prescriptions", "badge": patient.prescriptions.count()},
+        {"id": "billing", "label": "Billing", "badge": patient.invoices.count()},
+    ]
+    return render(request, "patients/profile.html", {"patient": patient, "tabs": tabs})

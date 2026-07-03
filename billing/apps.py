@@ -8,8 +8,8 @@ class BillingConfig(AppConfig):
     def ready(self):
         from accounts.dashboard_widgets import register_widget
         register_widget(
-            title="Billing",
-            url_name="billing:patient_invoices",
+            title="Billing Dashboard",
+            url_name="billing:dashboard",
             roles=["BillingOfficer", "Admin"],
             icon="bill",
         )

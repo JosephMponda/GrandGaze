@@ -32,6 +32,10 @@
                     {% endfor %}
                 </div>
 
+                <div class="flex items-center justify-between text-sm">
+                    <a href="{% url 'accounts:password_reset' %}" class="font-medium text-brand hover:text-brand-dark transition-colors">Forgot password?</a>
+                </div>
+
                 <div class="pt-4">
                     <button type="submit" class="w-full btn-primary py-3 text-sm font-semibold tracking-wide shadow-md shadow-brand/20 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex justify-center items-center">
                         Sign In to Portal

@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 
 from patients.models import Patient
@@ -9,12 +10,32 @@ from .services import add_line_item, create_invoice, outstanding_balance, record
 
 
 @login_required
+def dashboard(request):
+    recent = Invoice.objects.select_related("patient").order_by("-created_at")[:20]
+    counts = Invoice.objects.aggregate(
+        total=Count("pk"),
+        unpaid=Count("pk", filter=Q(status__in=["draft", "issued", "partially_paid"])),
+        paid=Count("pk", filter=Q(status="paid")),
+    )
+    return render(request, "billing/dashboard.html", {"recent": recent, "counts": counts})
+
+
+@login_required
 def patient_invoices(request, patient_id):
     patient = get_object_or_404(Patient, pk=patient_id)
     invoices = Invoice.objects.filter(patient=patient).prefetch_related("line_items", "payments").order_by("-created_at")
     for inv in invoices:
         inv.balance = outstanding_balance(inv)
     return render(request, "billing/patient_invoices.html", {"patient": patient, "invoices": invoices})
+
+
+@login_required
+def patient_tab(request, patient_id):
+    patient = get_object_or_404(Patient, pk=patient_id)
+    invoices = Invoice.objects.filter(patient=patient).prefetch_related("line_items", "payments").order_by("-created_at")
+    for inv in invoices:
+        inv.balance = outstanding_balance(inv)
+    return render(request, "billing/_patient_tab.html", {"patient": patient, "invoices": invoices})
 
 
 @login_required

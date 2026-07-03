@@ -29,7 +29,8 @@ def patient(billing_officer):
 
 @pytest.fixture
 def service_item():
-    return ServiceCatalogItem.objects.create(name="Consultation", code="CONS", price_mwk=5000)
+    item, _ = ServiceCatalogItem.objects.get_or_create(code="CONS", defaults={"name": "Consultation", "price_mwk": 5000})
+    return item
 
 
 # --- services: happy path ---

@@ -1,0 +1,31 @@
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold text-ink-900">Billing</h2>
+        <a href="{% url 'billing:create_invoice' patient.pk %}" class="btn-primary text-sm font-semibold py-2 px-4 shadow-sm hover:-translate-y-0.5 transition-all duration-200">New Invoice</a>
+    </div>
+
+    {% if invoices %}
+        <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-xl overflow-hidden">
+            {% for inv in invoices %}
+                <a href="{% url 'billing:invoice_detail' inv.pk %}" class="flex items-center justify-between px-4 py-3 bg-white hover:bg-paper transition-colors duration-150">
+                    <div>
+                        <p class="text-sm font-semibold text-ink-900">Invoice #{{ inv.pk }}</p>
+                        <p class="text-xs text-ink-500">{{ inv.created_at|date:"M j, Y, g:i a" }}</p>
+                    </div>
+                    <div class="text-right flex items-center gap-3">
+                        <span class="text-xs text-ink-500">MWK {{ inv.balance|floatformat:2 }}</span>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                            {% if inv.status == 'paid' %}bg-green-100 text-green-800
+                            {% elif inv.status == 'partially_paid' %}bg-amber-100 text-amber-800
+                            {% elif inv.status == 'waived' %}bg-gray-100 text-gray-800
+                            {% else %}bg-blue-100 text-blue-800{% endif %}">
+                            {{ inv.get_status_display }}
+                        </span>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-sm text-ink-500 bg-paper border border-gray-200/60 rounded-xl px-4 py-3">No invoices yet.</p>
+    {% endif %}
+</div>
