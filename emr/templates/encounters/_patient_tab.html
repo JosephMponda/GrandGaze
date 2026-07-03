@@ -1,0 +1,19 @@
+<h2>Encounters</h2>
+<p><a href="{% url 'encounters:new' patient.pk %}">+ New encounter</a> |
+   <a href="{% url 'encounters:add_allergy' patient.pk %}">+ Record allergy</a></p>
+<h3>Allergies</h3>
+<ul>
+    {% for a in patient.allergies.all %}
+        <li>{{ a.allergen }} — {{ a.get_severity_display }}{% if a.reaction %} ({{ a.reaction }}){% endif %}</li>
+    {% empty %}
+        <li>No known allergies recorded.</li>
+    {% endfor %}
+</ul>
+<h3>Encounter history</h3>
+<ul>
+    {% for e in encounters %}
+        <li><a href="{% url 'encounters:detail' e.pk %}">{{ e.created_at }} — {{ e.get_encounter_type_display }} ({{ e.get_status_display }})</a></li>
+    {% empty %}
+        <li>No encounters yet.</li>
+    {% endfor %}
+</ul>

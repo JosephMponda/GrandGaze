@@ -1,0 +1,7 @@
+<ul>
+    {% for p in results %}
+        <li><a href="{% url 'patients:profile' p.pk %}">{{ p.patient_number }} — {{ p.full_name }}</a></li>
+    {% empty %}
+        {% if query %}<li>No matches for "{{ query }}".</li>{% endif %}
+    {% endfor %}
+</ul>

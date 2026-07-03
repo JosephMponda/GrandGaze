@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Dashboard</h1>
+
+<section>
+    <h2>Find a patient</h2>
+    <input type="search" name="q" placeholder="Name, patient number, or phone"
+           hx-get="{% url 'patients:search' %}" hx-trigger="keyup changed delay:300ms"
+           hx-target="#search-results">
+    <div id="search-results"></div>
+</section>
+
+<section>
+    <h2>Your quick links</h2>
+    {% if widgets %}
+        <ul>
+            {% for w in widgets %}
+                <li><a href="{% url w.url_name %}">{{ w.title }}</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No widgets registered for your role yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

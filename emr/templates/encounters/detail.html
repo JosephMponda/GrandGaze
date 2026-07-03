@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Encounter #{{ encounter.pk }} — {{ encounter.patient.full_name }}</h1>
+<p>Status: {{ encounter.get_status_display }}
+   {% if encounter.is_signed %}(signed by {{ encounter.signed_by }} at {{ encounter.signed_at }}){% endif %}</p>
+
+<h2>Presenting complaint</h2>
+<p>{{ encounter.presenting_complaint }}</p>
+<h2>Diagnosis</h2>
+<p>{{ encounter.diagnosis|default:"—" }}</p>
+<h2>Clinical plan</h2>
+<p>{{ encounter.clinical_plan|default:"—" }}</p>
+
+{% if edit_form %}
+    <h2>Edit</h2>
+    <form method="post" action="{% url 'encounters:edit' encounter.pk %}">
+        {% csrf_token %}
+        {{ edit_form.as_p }}
+        <button type="submit">Save</button>
+    </form>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" name="sign" value="1">Sign &amp; lock this encounter</button>
+    </form>
+{% else %}
+    <p><em>This encounter is signed and read-only. Add an addendum instead of editing it.</em></p>
+{% endif %}
+
+<h2>Addenda</h2>
+<ul>
+    {% for a in encounter.addenda.all %}
+        <li>{{ a.created_at }} — {{ a.author }}: {{ a.note }}</li>
+    {% empty %}
+        <li>None.</li>
+    {% endfor %}
+</ul>
+<form method="post">
+    {% csrf_token %}
+    {{ addendum_form.as_p }}
+    <button type="submit" name="add_addendum" value="1">Add addendum</button>
+</form>
+{% endblock %}

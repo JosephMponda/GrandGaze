@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Possible duplicate patient</h1>
+<p>The details you entered are similar to {{ candidates|length }} existing record(s). Confirm this is a
+   <strong>different person</strong> before creating a new record, or open the existing record instead.</p>
+{# NOTE: re-posting hidden fields is the MVP-simple approach; checkbox fields need explicit
+   checked-state handling if this becomes the shipped version — flag for Engineer A follow-up. #}
+
+<ul>
+    {% for c in candidates %}
+        <li>
+            <a href="{% url 'patients:profile' c.pk %}" target="_blank">{{ c.patient_number }} — {{ c.full_name }}</a>
+            (DOB: {{ c.date_of_birth|default:"unknown" }})
+            <form method="post" style="display:inline">
+                {% csrf_token %}
+                {% for field in form %}
+                    <input type="hidden" name="{{ field.html_name }}" value="{{ field.value|default_if_none:'' }}">
+                {% endfor %}
+                <input type="hidden" name="confirmed_not_duplicate_of" value="{{ c.pk }}">
+                <button type="submit">This is a different person</button>
+            </form>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Alerts — last 4 hours</h1>
+<ul>
+    {% for a in alerts %}
+        <li>[{{ a.severity }}] {{ a.raised_at }} — <a href="{% url 'patients:profile' a.patient.pk %}">{{ a.patient.full_name }}</a>: {{ a.message }}</li>
+    {% empty %}
+        <li>No alerts in the last 4 hours.</li>
+    {% endfor %}
+</ul>
+{% endblock %}
