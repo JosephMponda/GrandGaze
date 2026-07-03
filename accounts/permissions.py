@@ -1,7 +1,7 @@
 """
 Single source of truth for role checks. AGENTS.md / Engineer A spec §1:
 do not hardcode `request.user.profile.role == "NURSE"` scattered through
-views — every app imports has_role() from here instead.
+views - every app imports has_role() from here instead.
 """
 from functools import wraps
 

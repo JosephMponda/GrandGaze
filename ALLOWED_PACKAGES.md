@@ -6,7 +6,7 @@ Per AGENTS.md §5: no new dependency without an entry here first, with a one-lin
 |---|---|
 | django (>=5.2,<6.0) | Core framework, LTS. |
 | djangorestframework | Offline-sync/FHIR-lite/dashboard JSON endpoints only. |
-| django-filter | DRF filtering — explicitly allowlisted exception in AGENTS.md §5.2. |
+| django-filter | DRF filtering - explicitly allowlisted exception in AGENTS.md §5.2. |
 | psycopg[binary] | Postgres driver. |
 | django-simple-history | Audit trail on every clinical/PHI model. |
 | django-axes | Account lockout after 5 failed logins. |
@@ -20,12 +20,12 @@ Per AGENTS.md §5: no new dependency without an entry here first, with a one-lin
 
 ## Removed from the original AGENTS.md allowlist
 
-- **`django-cryptography`** — REMOVED. It is unmaintained (last release years
+- **`django-cryptography`** - REMOVED. It is unmaintained (last release years
   ago) and hard-incompatible with Django >=5.0: it imports
   `django.utils.baseconv`, which Django removed in 5.0. `manage.py check`
   fails immediately with `ImportError: cannot import name 'baseconv'`.
 
-  Replacement: `core/encrypted_fields.py` — a ~40-line `EncryptedCharField`
+  Replacement: `core/encrypted_fields.py` - a ~40-line `EncryptedCharField`
   built directly on `cryptography.fernet`. This adds **zero new packages**:
   `cryptography` is already pulled in transitively by `django-axes`. This is
   the AGENTS.md §5.2 instruction taken literally ("prefer what's already
@@ -34,5 +34,5 @@ Per AGENTS.md §5: no new dependency without an entry here first, with a one-lin
 
   If the team would rather pin `Django<5.0` to keep `django-cryptography`
   working as originally specified, or adopt a different field-encryption
-  package, raise it — this was a build-blocking substitution made to keep
+  package, raise it - this was a build-blocking substitution made to keep
   the Day-2 contract-freeze on schedule, not a unilateral architecture change.

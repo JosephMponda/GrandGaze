@@ -5,14 +5,14 @@ AGENTS.md §2/§7 and brief §9.4.
 NOTE for the team: AGENTS.md allowlists `django-cryptography` for this, but
 that package is unmaintained and hard-incompatible with Django >=5.0 (it
 imports `django.utils.baseconv`, removed in Django 5.0). Rather than add a
-different new dependency, this uses `cryptography.fernet` directly — it's
+different new dependency, this uses `cryptography.fernet` directly - it's
 already a transitive dependency pulled in by django-axes, so this adds
 nothing new to the dependency tree. If the team prefers a different fix
 (e.g. pinning Django <5.0, or a different package), update
 ALLOWED_PACKAGES.md accordingly; flagging this here rather than deciding
 unilaterally is exactly what AGENTS.md §5 asks for.
 
-IMPORTANT — Fernet is non-deterministic (same plaintext encrypts to
+IMPORTANT - Fernet is non-deterministic (same plaintext encrypts to
 different ciphertext each time). That's correct for security, but it means
 `Patient.objects.filter(national_id="...")` against the encrypted column
 will never match anything. Any field that needs exact-match lookup (e.g.
@@ -40,7 +40,7 @@ def _get_fernet() -> Fernet:
 
 def hash_lookup_value(value: str) -> str:
     """Deterministic blind index for exact-match queries on an encrypted
-    field. Not reversible — safe to index in the DB alongside the ciphertext.
+    field. Not reversible - safe to index in the DB alongside the ciphertext.
     """
     key = getattr(settings, "CRYPTOGRAPHY_KEY", None) or settings.SECRET_KEY
     return hmac.new(key.encode(), str(value).encode(), hashlib.sha256).hexdigest()
@@ -68,7 +68,7 @@ class EncryptedCharField(models.CharField):
         try:
             return _get_fernet().decrypt(value.encode()).decode()
         except InvalidToken:
-            # Value predates encryption or key rotated — surface raw value
+            # Value predates encryption or key rotated - surface raw value
             # rather than crash; ops should re-encrypt via a data migration.
             return value
 

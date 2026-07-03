@@ -1,7 +1,7 @@
 """
 Django settings for the MUST-GSL EMR project.
 
-Stack decisions here follow AGENTS.md §2 exactly — do not add packages or
+Stack decisions here follow AGENTS.md §2 exactly - do not add packages or
 patterns not already on ALLOWED_PACKAGES.md without a sign-off entry there.
 """
 from pathlib import Path
@@ -68,7 +68,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 # --- Database: PostgreSQL 16 per AGENTS.md. Never swap this for sqlite in
-# committed settings — use DATABASE_URL env override for CI/local dev if
+# committed settings - use DATABASE_URL env override for CI/local dev if
 # Postgres isn't reachable, see README "Local dev without Postgres".
 DATABASES = {
     "default": {
@@ -100,6 +100,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [BASE_DIR / "static"]  # cant believe i missed this part .. but we are past that
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -126,7 +127,7 @@ AXES_LOCKOUT_PARAMETERS = [["username", "ip_address"]]
 CRYPTOGRAPHY_KEY = config("CRYPTOGRAPHY_KEY", default=SECRET_KEY)
 
 # --- DRF / drf-spectacular: used ONLY for offline-sync, FHIR-lite export,
-# dashboard JSON per AGENTS.md §2 — not a parallel API for the whole app. ---
+# dashboard JSON per AGENTS.md §2 - not a parallel API for the whole app. ---
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",

@@ -69,3 +69,13 @@ coverage.xml
 .DS_Store
 Thumbs.db
 
+
+# Tailwind (build output only - source input.css IS committed)
+# Note: tailwindcss.exe binary is NOT committed (downloaded at setup)
+tailwindcss.exe
+tailwindcss-windows-*.exe
+# But app.css IS committed so offline dev works without rebuild
+# Uncomment if you want to rebuild dynamically:
+# /static/css/app.css
+
+
