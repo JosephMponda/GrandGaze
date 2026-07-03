@@ -1,0 +1,17 @@
+<h2>Vitals</h2>
+<p><a href="{% url 'vitals:entry' patient.pk %}">+ Record vitals</a></p>
+<table border="1">
+    <tr><th>When</th><th>Temp</th><th>BP</th><th>Pulse</th><th>SpO2</th><th>EWS</th></tr>
+    {% for v in trend %}
+        <tr>
+            <td>{{ v.recorded_at }}</td>
+            <td>{{ v.temperature_c|default:"—" }}</td>
+            <td>{{ v.blood_pressure_systolic|default:"—" }}/{{ v.blood_pressure_diastolic|default:"—" }}</td>
+            <td>{{ v.pulse_rate|default:"—" }}</td>
+            <td>{{ v.oxygen_saturation|default:"—" }}</td>
+            <td>{{ v.ews.score|default:"—" }}</td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="6">No vitals recorded yet.</td></tr>
+    {% endfor %}
+</table>

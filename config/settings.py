@@ -29,6 +29,9 @@ INSTALLED_APPS = [
     "core",
     "accounts",
     "patients",
+    "encounters",
+    "vitals",
+    "reporting",
 ]
 
 MIDDLEWARE = [

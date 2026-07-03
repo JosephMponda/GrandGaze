@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Record Vitals — {{ patient.full_name }}</h1>
+<form hx-post="{% url 'vitals:entry' patient.pk %}" hx-target="#vitals-result">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save vitals</button>
+</form>
+<div id="vitals-result"></div>
+{% endblock %}
