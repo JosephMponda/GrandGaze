@@ -96,17 +96,15 @@
         {% endif %}
     </header>
 
-    {# Messages #}
-    {# Django messages → fired as toasts after Alpine initialises #}
     {% if messages %}
     <script>
         document.addEventListener('alpine:initialized', () => {
-            {% for message in messages %}
-                window.showToast(
-                    "{{ message.message|escapejs }}",
-                    "{{ message.tags|escapejs }}"
-                );
-            {% endfor %}
+            /* {% for message in messages %} */
+            window.showToast(
+                "{{ message.message|escapejs }}",
+                "{{ message.tags|escapejs }}"
+            );
+            /* {% endfor %} */
         }, { once: true });
     </script>
     {% endif %}
