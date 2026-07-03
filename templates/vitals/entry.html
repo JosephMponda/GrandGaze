@@ -1,10 +1,258 @@
 {% extends "base.html" %}
+{% block title %}Record Vitals — {{ patient.full_name }} - MUST EMR{% endblock %}
+
 {% block content %}
-<h1>Record Vitals — {{ patient.full_name }}</h1>
-<form hx-post="{% url 'vitals:entry' patient.pk %}" hx-target="#vitals-result">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save vitals</button>
-</form>
-<div id="vitals-result"></div>
+<div class="max-w-4xl mx-auto py-6"
+     x-data="{
+        temp: null, pulse: null, sbp: null, dbp: null, rr: null, spo2: null,
+        avpu: 'A',
+        news2Score: null,
+        news2Risk: null,
+        
+        scoreComponent(val, ranges) {
+            if (val === null || val === '' || isNaN(val)) return null;
+            val = parseFloat(val);
+            for (const [score, [low, high]] of Object.entries(ranges)) {
+                if ((low === null || val >= low) && (high === null || val <= high)) return parseInt(score);
+            }
+            return 0;
+        },
+        
+        calcNEWS2() {
+            const tempScore = this.scoreComponent(this.temp, {
+                '3': [null, 35.0], '1': [35.1, 36.0], '0': [36.1, 38.0], '1x': [38.1, 39.0], '2': [39.1, null]
+            });
+            const pulseScore = this.scoreComponent(this.pulse, {
+                '3': [null, 40], '1': [41, 50], '0': [51, 90], '1x': [91, 110], '2': [111, 130], '3x': [131, null]
+            });
+            const sbpScore = this.scoreComponent(this.sbp, {
+                '3': [null, 90], '2': [91, 100], '1': [101, 110], '0': [111, 219], '3x': [220, null]
+            });
+            const rrScore = this.scoreComponent(this.rr, {
+                '3': [null, 8], '1': [9, 11], '0': [12, 20], '2': [21, 24], '3x': [25, null]
+            });
+            const spo2Score = this.scoreComponent(this.spo2, {
+                '3': [null, 91], '2': [92, 93], '1': [94, 95], '0': [96, null]
+            });
+            const avpuScore = this.avpu === 'A' ? 0 : 3;
+            
+            const scores = [tempScore, pulseScore, sbpScore, rrScore, spo2Score].filter(s => s !== null).map(s => Math.abs(parseInt(s)));
+            scores.push(avpuScore);
+            
+            if (scores.length < 3) { this.news2Score = null; this.news2Risk = null; return; }
+            
+            const total = scores.reduce((a, b) => a + b, 0);
+            this.news2Score = total;
+            if (total <= 4) this.news2Risk = 'low';
+            else if (total <= 6) this.news2Risk = 'medium';
+            else this.news2Risk = 'high';
+        }
+     }">
+
+    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight text-ink-900">Record Vitals</h1>
+            <p class="text-sm text-ink-500 mt-2">{{ patient.full_name }} &middot; {{ patient.patient_number }}</p>
+        </div>
+        <a href="{% url 'patients:profile' patient.pk %}" class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            Back to Patient
+        </a>
+    </div>
+
+    <!-- NEWS2 Live Score Badge -->
+    <div class="mb-8 bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-ink-500 mb-1">NEWS2 Score (Live)</h3>
+                <p class="text-xs text-ink-400">Fills in as you enter values below</p>
+            </div>
+            <div x-show="news2Score !== null" class="text-right">
+                <div class="text-4xl font-black"
+                     :class="{
+                        'text-green-600': news2Risk === 'low',
+                        'text-amber-500': news2Risk === 'medium',
+                        'text-red-600': news2Risk === 'high'
+                     }" x-text="news2Score"></div>
+                <div class="text-sm font-bold mt-1 px-3 py-0.5 rounded-full inline-block"
+                     :class="{
+                        'bg-green-100 text-green-700': news2Risk === 'low',
+                        'bg-amber-100 text-amber-700': news2Risk === 'medium',
+                        'bg-red-100 text-red-700': news2Risk === 'high'
+                     }">
+                    <span x-text="news2Risk === 'low' ? 'Low Risk' : news2Risk === 'medium' ? 'Medium Risk' : 'High Risk — Escalate'"></span>
+                </div>
+            </div>
+            <div x-show="news2Score === null" class="text-right text-ink-400 text-sm italic">
+                Awaiting input...
+            </div>
+        </div>
+    </div>
+
+    <form hx-post="{% url 'vitals:entry' patient.pk %}" hx-target="#vitals-result" hx-swap="innerHTML" class="space-y-8">
+        {% csrf_token %}
+
+        <!-- Primary Vitals -->
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 space-y-6">
+            <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
+                <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold">1</span>
+                <h3 class="text-base font-semibold text-ink-900">Primary Vitals</h3>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                <!-- Temperature -->
+                <div>
+                    <label class="block text-sm font-medium text-ink-700 mb-1">Temperature</label>
+                    <div class="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:border-brand focus-within:ring-1 focus-within:ring-brand transition-all">
+                        <input type="number" name="temperature_c" step="0.1" min="30" max="43"
+                               x-model="temp" @input="calcNEWS2()"
+                               class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white"
+                               placeholder="36.5">
+                        <span class="inline-flex items-center px-3 bg-gray-50 text-ink-400 text-sm border-l border-gray-200">°C</span>
+                    </div>
+                </div>
+
+                <!-- Pulse -->
+                <div>
+                    <label class="block text-sm font-medium text-ink-700 mb-1">Pulse Rate</label>
+                    <div class="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:border-brand focus-within:ring-1 focus-within:ring-brand transition-all">
+                        <input type="number" name="pulse_rate" min="20" max="300"
+                               x-model="pulse" @input="calcNEWS2()"
+                               class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white"
+                               placeholder="72">
+                        <span class="inline-flex items-center px-3 bg-gray-50 text-ink-400 text-sm border-l border-gray-200">bpm</span>
+                    </div>
+                </div>
+
+                <!-- Respiratory Rate -->
+                <div>
+                    <label class="block text-sm font-medium text-ink-700 mb-1">Respiratory Rate</label>
+                    <div class="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:border-brand focus-within:ring-1 focus-within:ring-brand transition-all">
+                        <input type="number" name="respiratory_rate" min="5" max="60"
+                               x-model="rr" @input="calcNEWS2()"
+                               class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white"
+                               placeholder="16">
+                        <span class="inline-flex items-center px-3 bg-gray-50 text-ink-400 text-sm border-l border-gray-200">br/min</span>
+                    </div>
+                </div>
+
+                <!-- Systolic BP -->
+                <div>
+                    <label class="block text-sm font-medium text-ink-700 mb-1">Systolic BP</label>
+                    <div class="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:border-brand focus-within:ring-1 focus-within:ring-brand transition-all">
+                        <input type="number" name="blood_pressure_systolic" min="50" max="280"
+                               x-model="sbp" @input="calcNEWS2()"
+                               class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white"
+                               placeholder="120">
+                        <span class="inline-flex items-center px-3 bg-gray-50 text-ink-400 text-sm border-l border-gray-200">mmHg</span>
+                    </div>
+                </div>
+
+                <!-- Diastolic BP -->
+                <div>
+                    <label class="block text-sm font-medium text-ink-700 mb-1">Diastolic BP</label>
+                    <div class="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:border-brand focus-within:ring-1 focus-within:ring-brand transition-all">
+                        <input type="number" name="blood_pressure_diastolic" min="30" max="180"
+                               x-model="dbp"
+                               class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white"
+                               placeholder="80">
+                        <span class="inline-flex items-center px-3 bg-gray-50 text-ink-400 text-sm border-l border-gray-200">mmHg</span>
+                    </div>
+                </div>
+
+                <!-- SpO2 -->
+                <div>
+                    <label class="block text-sm font-medium text-ink-700 mb-1">Oxygen Saturation (SpO2)</label>
+                    <div class="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:border-brand focus-within:ring-1 focus-within:ring-brand transition-all">
+                        <input type="number" name="oxygen_saturation" min="50" max="100"
+                               x-model="spo2" @input="calcNEWS2()"
+                               class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white"
+                               placeholder="98">
+                        <span class="inline-flex items-center px-3 bg-gray-50 text-ink-400 text-sm border-l border-gray-200">%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AVPU -->
+            <div>
+                <label class="block text-sm font-medium text-ink-700 mb-2">Consciousness (AVPU)</label>
+                <div class="flex flex-wrap gap-2" x-model="avpu" @change="calcNEWS2()">
+                    <template x-for="opt in [['A','Alert'],['V','Voice'],['P','Pain'],['U','Unresponsive']]" :key="opt[0]">
+                        <label class="relative cursor-pointer">
+                            <input type="radio" name="avpu_score" :value="opt[0]" x-model="avpu" @change="calcNEWS2()" class="sr-only peer">
+                            <span class="px-4 py-2 rounded-xl border text-sm font-semibold transition-all peer-checked:bg-brand peer-checked:text-white peer-checked:border-brand border-gray-200 bg-white text-ink-700 hover:border-brand/50"
+                                  x-text="opt[0] + ' — ' + opt[1]"></span>
+                        </label>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secondary Measurements -->
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 space-y-6">
+            <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
+                <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold">2</span>
+                <h3 class="text-base font-semibold text-ink-900">Additional Measurements</h3>
+                <span class="text-xs text-ink-400">(Optional)</span>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-ink-700 mb-1">Weight</label>
+                    <div class="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:border-brand focus-within:ring-1 focus-within:ring-brand">
+                        <input type="number" name="weight_kg" step="0.1" class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white" placeholder="70.0">
+                        <span class="inline-flex items-center px-3 bg-gray-50 text-ink-400 text-sm border-l border-gray-200">kg</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-ink-700 mb-1">Height</label>
+                    <div class="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:border-brand focus-within:ring-1 focus-within:ring-brand">
+                        <input type="number" name="height_cm" step="0.1" class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white" placeholder="165">
+                        <span class="inline-flex items-center px-3 bg-gray-50 text-ink-400 text-sm border-l border-gray-200">cm</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-ink-700 mb-1">Blood Glucose</label>
+                    <div class="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:border-brand focus-within:ring-1 focus-within:ring-brand">
+                        <input type="number" name="blood_glucose" step="0.1" class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white" placeholder="5.4">
+                        <span class="inline-flex items-center px-3 bg-gray-50 text-ink-400 text-sm border-l border-gray-200">mmol/L</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-ink-700 mb-1">Pain Score</label>
+                    <div class="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:border-brand focus-within:ring-1 focus-within:ring-brand">
+                        <input type="number" name="pain_score" min="0" max="10" class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white" placeholder="0">
+                        <span class="inline-flex items-center px-3 bg-gray-50 text-ink-400 text-sm border-l border-gray-200">/ 10</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-ink-700 mb-1">Glasgow Coma Scale</label>
+                    <div class="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:border-brand focus-within:ring-1 focus-within:ring-brand">
+                        <input type="number" name="glasgow_coma_scale" min="3" max="15" class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white" placeholder="15">
+                        <span class="inline-flex items-center px-3 bg-gray-50 text-ink-400 text-sm border-l border-gray-200">/ 15</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-ink-700 mb-1">Pregnancy Status</label>
+                    <select name="pregnancy_status" class="w-full rounded-xl border-gray-200 shadow-sm focus:border-brand focus:ring-brand sm:text-sm">
+                        <option value="n/a">N/A</option>
+                        <option value="pregnant">Pregnant</option>
+                        <option value="not_pregnant">Not Pregnant</option>
+                        <option value="unknown">Unknown</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-4 pt-2 pb-10">
+            <a href="{% url 'patients:profile' patient.pk %}" class="btn-secondary text-sm font-semibold py-3 px-6 hover:-translate-y-0.5 transition-all duration-200">Cancel</a>
+            <button type="submit" class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:shadow-brand/30 hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2">
+                Save Vitals
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
+        </div>
+    </form>
+
+    <!-- HTMX response target -->
+    <div id="vitals-result"></div>
+</div>
 {% endblock %}
