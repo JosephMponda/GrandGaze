@@ -1,11 +1,10 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 from django.urls import reverse
 
 from . import services
 from .forms import PatientRegistrationForm
-from .models import Patient
 
 
 @login_required
@@ -15,18 +14,18 @@ def register_patient(request):
         confirmed_candidate_id = request.POST.get("confirmed_not_duplicate_of")
         if form.is_valid():
             duplicates = services.check_possible_duplicate(form.cleaned_data)
-            duplicates = duplicates.exclude(pk=confirmed_candidate_id) if confirmed_candidate_id else duplicates
-            if duplicates.exists() and not confirmed_candidate_id:
-                # Block silent creation - surface candidates, require explicit confirmation.
+            confirmed_candidate = duplicates.filter(pk=confirmed_candidate_id).first() if confirmed_candidate_id else None
+            remaining_duplicates = duplicates.exclude(pk=confirmed_candidate.pk) if confirmed_candidate else duplicates
+            if remaining_duplicates.exists() or (confirmed_candidate_id and not confirmed_candidate):
+                # Block silent creation — surface candidates, require explicit confirmation.
                 return render(
                     request,
                     "patients/_duplicate_warning.html",
-                    {"form": form, "candidates": duplicates},
+                    {"form": form, "candidates": remaining_duplicates},
                 )
             patient = services.register_patient(form.cleaned_data, registered_by=request.user)
-            if confirmed_candidate_id:
-                candidate = get_object_or_404(Patient, pk=confirmed_candidate_id)
-                services.confirm_not_duplicate(patient, candidate, confirmed_by=request.user)
+            if confirmed_candidate:
+                services.confirm_not_duplicate(patient, confirmed_candidate, confirmed_by=request.user)
             messages.success(request, f"Patient {patient.patient_number} registered.")
             return redirect(reverse("patients:profile", args=[patient.pk]))
     else:
