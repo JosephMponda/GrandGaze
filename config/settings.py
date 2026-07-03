@@ -73,7 +73,7 @@ DATABASES = {
         "NAME": config("DB_NAME", default="must_emr"),
         "USER": config("DB_USER", default="must_emr"),
         "PASSWORD": config("DB_PASSWORD", default="must_emr"),
-        "HOST": config("DB_HOST", default="localhost"),
+        "HOST": config("DB_HOST", default="127.0.0.1"),
         "PORT": config("DB_PORT", default="5432"),
     }
 }
