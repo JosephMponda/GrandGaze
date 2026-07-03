@@ -24,7 +24,10 @@ def search_patients(query: str) -> QuerySet[Patient]:
     query = (query or "").strip()
     if not query:
         return Patient.objects.none()
-    filters = Q(patient_number__icontains=query) | Q(first_name__icontains=query) | Q(last_name__icontains=query)
+    tokens = query.split()
+    filters = Q()
+    for token in tokens:
+        filters |= Q(patient_number__icontains=token) | Q(first_name__icontains=token) | Q(last_name__icontains=token)
     filters |= Q(phone_number_lookup=hash_lookup_value(query))  # encrypted field: exact match only
     return Patient.objects.filter(filters).filter(is_active=True)[:25]
 
