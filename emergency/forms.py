@@ -1,8 +1,10 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.db import transaction
 from django.utils import timezone
 
 from patients.models import Patient
+from patients.services import _generate_patient_number
 
 from .models import TriageCategory, TriageEncounter
 
@@ -34,8 +36,10 @@ class RapidRegisterForm(forms.Form):
     triage_category = forms.ChoiceField(choices=TriageCategory.choices, label="Triage Category")
     presenting_condition = forms.CharField(widget=forms.Textarea(attrs={"rows": 3}), label="Presenting Condition / Complaint")
 
+    @transaction.atomic
     def save(self, registered_by) -> tuple[Patient, TriageEncounter]:
         patient = Patient.objects.create(
+            patient_number=_generate_patient_number(),
             first_name=self.cleaned_data["first_name"],
             last_name=self.cleaned_data["last_name"],
             sex=self.cleaned_data["sex"],
