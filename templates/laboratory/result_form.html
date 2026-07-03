@@ -32,8 +32,8 @@
                 <h3 class="text-base font-semibold text-ink-900">Result Entry</h3>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {% include "components/_field.html" with field=form.value %}
-                {% include "components/_field.html" with field=form.unit %}
+                {% include "components/_field.html" with field=form.value_numeric %}
+                {% include "components/_field.html" with field=form.value_text %}
             </div>
             {% include "components/_field.html" with field=form.notes %}
         </div>

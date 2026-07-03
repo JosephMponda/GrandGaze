@@ -35,7 +35,9 @@
                 {% include "components/_field.html" with field=form.modality %}
                 {% include "components/_field.html" with field=form.clinical_indication %}
             </div>
+            {% include "components/_field.html" with field=form.encounter %}
             {% include "components/_field.html" with field=form.pregnancy_status_checked %}
+            {% include "components/_field.html" with field=form.scheduled_at %}
         </div>
 
         <div class="flex items-center justify-end gap-4 pt-6 pb-10">

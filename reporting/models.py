@@ -21,6 +21,7 @@ class AlertEvent(models.Model):
     message = models.TextField()
     raised_at = models.DateTimeField(auto_now_add=True)
     acknowledged_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    acknowledged_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ["-raised_at"]
