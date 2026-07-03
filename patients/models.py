@@ -30,6 +30,10 @@ class PatientCategory(models.TextChoices):
 
 
 class PatientNumberSequence(models.Model):
+    """Locked counter per month-prefix, so concurrent registrations can't
+    generate the same patient_number (see services._generate_patient_number).
+    """
+
     prefix = models.CharField(max_length=12, unique=True)
     next_value = models.PositiveIntegerField(default=1)
 

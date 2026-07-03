@@ -38,27 +38,26 @@ def check_possible_duplicate(data: dict) -> QuerySet[Patient]:
     dob = data.get("date_of_birth")
 
     exact = Patient.objects.filter(is_active=True)
-    exact_matches = Patient.objects.none()
+    exact_ids = set()
     if data.get("national_id"):
-        exact_matches = exact_matches | exact.filter(national_id_lookup=hash_lookup_value(data["national_id"]))
+        exact_ids |= set(exact.filter(national_id_lookup=hash_lookup_value(data["national_id"])).values_list("pk", flat=True))
     if data.get("phone_number"):
-        exact_matches = exact_matches | exact.filter(phone_number_lookup=hash_lookup_value(data["phone_number"]))
+        exact_ids |= set(exact.filter(phone_number_lookup=hash_lookup_value(data["phone_number"])).values_list("pk", flat=True))
 
-    fuzzy_matches = Patient.objects.none()
+    fuzzy_ids = set()
     if first_name and last_name:
-        full_name = f"{first_name} {last_name}"
         candidates = Patient.objects.filter(is_active=True)
         if dob:
             candidates = candidates.filter(date_of_birth=dob)
-        fuzzy_matches = (
+        fuzzy_ids = set(
             candidates.annotate(
                 similarity=TrigramSimilarity("first_name", first_name) + TrigramSimilarity("last_name", last_name)
             )
             .filter(similarity__gt=DUPLICATE_MATCH_THRESHOLD)
-            .order_by("-similarity")
+            .values_list("pk", flat=True)
         )
 
-    return (exact_matches | fuzzy_matches).distinct()[:10]
+    return Patient.objects.filter(pk__in=exact_ids | fuzzy_ids)
 
 
 def _generate_patient_number() -> str:
@@ -81,11 +80,12 @@ def register_patient(data: dict, registered_by: User) -> Patient:
     check_possible_duplicate() and obtained explicit confirmation if needed
     (see confirm_not_duplicate()).
     """
-    return Patient.objects.create(
+    patient = Patient.objects.create(
         patient_number=_generate_patient_number(),
         registered_by=registered_by,
         **data,
     )
+    return patient
 
 
 @transaction.atomic

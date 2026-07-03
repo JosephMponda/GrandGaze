@@ -21,7 +21,7 @@ def register_patient(request):
                 return render(
                     request,
                     "patients/_duplicate_warning.html",
-                    {"form": form, "candidates": remaining_duplicates},
+                    {"form": form, "candidates": remaining_duplicates[:10]},
                 )
             patient = services.register_patient(form.cleaned_data, registered_by=request.user)
             if confirmed_candidate:

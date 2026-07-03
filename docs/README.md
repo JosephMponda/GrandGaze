@@ -12,12 +12,12 @@ This folder is the single source of truth for the build. Read in this order:
 
 ## Timeline anchor (read this before anything else)
 
-Today is **Thur 2 July 2026**. The brief's "Week 0" was 1 June, so per the brief's own table:
+Today is **Wed 1 July 2026**. The brief's "Week 0" was 1 June, so per the brief's own table:
 
 - Stage 6 (final prototype submission) = **Week 6 → w/c 13 Jul**
 - Stage 7 (demo day & judging) = **Week 6–7 → 13–24 Jul**
 
-That gives us **~11 working days to a submittable build** and **~20 to demo day**. This is tight. `AGENTS.md` and every `02_BUILD_PLAN.md` are built against this exact calendar — do not silently slip it. If a task is going to blow the calendar, flag it in standup the same day, don't discover it on day 14.
+That gives us **~16 working days to a submittable build** and **~20 to demo day**. This is tight. `AGENTS.md` and every `02_BUILD_PLAN.md` are built against this exact calendar — do not silently slip it. If a task is going to blow the calendar, flag it in standup the same day, don't discover it on day 14.
 
 ## One rule above all others
 

@@ -50,7 +50,10 @@ class EncryptedCharField(models.CharField):
     """Transparently encrypts/decrypts a CharField's value at rest."""
 
     def __init__(self, *args, **kwargs):
-        # Stored ciphertext is longer than plaintext; widen max_length generously.
+        # Ciphertext is much longer than plaintext — force the DB column wide
+        # regardless of what max_length the caller declares (that declared
+        # value still matters for form-level plaintext validation, see
+        # patients/forms.py clean_<field>() methods).
         kwargs["max_length"] = max(kwargs.get("max_length", 0), 1024)
         super().__init__(*args, **kwargs)
 

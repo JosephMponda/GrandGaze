@@ -1,9 +1,19 @@
 from django import forms
 
-from .models import NextOfKin, Patient
+from .models import NextOfKin, Patient, PatientCategory
 
 
 class PatientRegistrationForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Model has a sensible default; don't hard-fail a submission that
+        # omits this (e.g. a non-browser client) just because ModelForm
+        # otherwise requires any field lacking blank=True.
+        self.fields["patient_category"].required = False
+
+    def clean_patient_category(self):
+        return self.cleaned_data.get("patient_category") or PatientCategory.OUTPATIENT
+
     class Meta:
         model = Patient
         fields = [

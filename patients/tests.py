@@ -6,7 +6,7 @@ from django.urls import reverse
 from accounts.models import Profile, Role
 from accounts.permissions import has_role
 from patients import services
-from patients.models import PatientNumberSequence
+from patients.models import Patient, PatientNumberSequence
 
 pytestmark = pytest.mark.django_db
 
@@ -64,6 +64,30 @@ def test_exact_duplicate_detection_via_national_id(nurse_user):
     )
     matches = services.check_possible_duplicate(dict(national_id="MW-001"))
     assert matches.count() == 1
+
+
+def test_forged_confirmation_id_does_not_bypass_duplicate_check(client, nurse_user):
+    """Regression test: a confirmed_not_duplicate_of value that doesn't match
+    any real candidate must not silently let the registration through.
+    """
+    client.force_login(nurse_user)
+    services.register_patient(
+        dict(first_name="Grace", last_name="Banda", sex="female", national_id="MW-001"),
+        registered_by=nurse_user,
+    )
+    response = client.post(
+        reverse("patients:register"),
+        {
+            "first_name": "Grace",
+            "last_name": "Banda",
+            "sex": "female",
+            "age_estimated": "on",
+            "national_id": "MW-001",
+            "confirmed_not_duplicate_of": "999999",  # not a real candidate pk
+        },
+    )
+    assert response.status_code == 200  # re-rendered warning, not a redirect to a new patient
+    assert Patient.objects.filter(national_id_lookup__isnull=False).count() == 1
 
 
 def test_register_patient_advances_patient_number_sequence(nurse_user):
