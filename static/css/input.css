@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@source "../../templates/**/*.html";
+@source "../../**/*.html";
 @theme {
   --color-ink: #111827;
   --color-paper: #fafaf9;

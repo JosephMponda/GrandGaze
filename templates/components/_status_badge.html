@@ -1,18 +1,3 @@
-{% comment %}
-    Reusable status badge component.
-    Params:
-      - label: Text inside the badge.
-      - severity: 'success', 'warning', 'critical', 'info' (defaults to 'info')
-{% endcomment %}
-<span class="badge badge-{% if severity == 'success' %}success{% elif severity == 'warning' %}warning{% elif severity == 'critical' or severity == 'danger' or severity == 'error' %}critical{% else %}info{% endif %} inline-flex items-center gap-1.5">
-    {% if severity == 'success' %}
-        <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-    {% elif severity == 'warning' %}
-        <span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span>
-    {% elif severity == 'critical' or severity == 'danger' or severity == 'error' %}
-        <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>
-    {% else %}
-        <span class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
-    {% endif %}
-    <span>{{ label }}</span>
+<span class="badge badge-{{ status|default:'info' }}">
+    {{ text }}
 </span>

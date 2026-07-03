@@ -1,60 +1,27 @@
-{% comment %}
-    Reusable Django Form Field.
-    Expects 'field' as a context variable.
-{% endcomment %}
-{% if field.field.widget.input_type == 'checkbox' %}
-    <div class="flex items-start gap-3 py-1">
-        <div class="flex items-center h-5">
+<div class="form-field mb-4">
+    {% if field.label %}
+        <label for="{{ field.id_for_label }}">
+            {{ field.label }} {% if field.field.required %}<span class="text-red-600">*</span>{% endif %}
+        </label>
+    {% endif %}
+    
+    {% if field.field.widget.input_type == 'checkbox' or field.field.widget.input_type == 'radio' %}
+        <div class="flex items-center gap-2 mt-2">
             {{ field }}
+            <span class="text-sm text-gray-700">{{ field.help_text|safe }}</span>
         </div>
-        <div class="text-sm">
-            <label for="{{ field.id_for_label }}" class="font-medium text-gray-700 cursor-pointer select-none">
-                {{ field.label }}
-                {% if field.field.required %}
-                    <span class="text-red-500 font-bold">*</span>
-                {% endif %}
-            </label>
-            {% if field.help_text %}
-                <p class="text-xs text-gray-500 mt-0.5">{{ field.help_text|safe }}</p>
-            {% endif %}
-            {% if field.errors %}
-                {% for error in field.errors %}
-                    <p class="error text-red-600 text-xs mt-1 flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                        </svg>
-                        {{ error }}
-                    </p>
-                {% endfor %}
-            {% endif %}
-        </div>
-    </div>
-{% else %}
-    <div class="form-field flex flex-col">
-        {% if field.label %}
-            <label for="{{ field.id_for_label }}">
-                {{ field.label }}
-                {% if field.field.required %}
-                    <span class="text-red-500 font-bold">*</span>
-                {% endif %}
-            </label>
-        {% endif %}
-        
+    {% else %}
         {{ field }}
-
-        {% if field.errors %}
-            {% for error in field.errors %}
-                <p class="error">
-                    <svg class="w-4 h-4 inline shrink-0 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                    </svg>
-                    {{ error }}
-                </p>
-            {% endfor %}
-        {% endif %}
-
         {% if field.help_text %}
             <p class="text-xs text-gray-500 mt-1">{{ field.help_text|safe }}</p>
         {% endif %}
-    </div>
-{% endif %}
+    {% endif %}
+
+    {% if field.errors %}
+        <div class="error">
+            {% for error in field.errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>

@@ -67,7 +67,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full">
             <div class="space-y-2">
                 {% for message in messages %}
-                    {% include "components/_alert_banner.html" with message=message.message severity=message.tags dismissible=True %}
+                    {% include "components/_alert_banner.html" with message=message.message type=message.tags dismissible=True %}
                 {% endfor %}
             </div>
         </div>

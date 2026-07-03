@@ -2,23 +2,23 @@
 {% block title %}Sign In - MUST EMR{% endblock %}
 
 {% block content %}
-<div class="min-h-[70vh] flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-6">
+<div class="flex flex-col justify-center items-center py-4 px-4 sm:px-6 lg:px-8 mt-10">
+    <div class="max-w-md w-full">
         <!-- Logo and Heading -->
-        <div class="text-center">
-            <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-brand text-white font-bold text-2xl shadow-md mb-4">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand text-white font-bold text-3xl shadow-lg shadow-brand/20 mb-6">
                 M
             </div>
-            <h2 class="text-2xl font-bold tracking-tight text-gray-900">Sign in to MUST EMR</h2>
-            <p class="mt-1.5 text-xs text-gray-500">Malawi Master Patient Index & Clinical Portal</p>
+            <h2 class="text-3xl font-bold tracking-tight text-ink-900">Sign in to MUST EMR</h2>
+            <p class="mt-2 text-sm text-ink-500">Malawi Master Patient Index & Clinical Portal</p>
         </div>
 
         <!-- Login Card -->
-        <div class="bg-white border border-gray-200/80 rounded-xl shadow-xs p-8">
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-xl shadow-ink/5 p-8 sm:p-10 mb-8">
             {% if form.non_field_errors %}
                 <div class="space-y-2 mb-6">
                     {% for error in form.non_field_errors %}
-                        {% include "components/_alert_banner.html" with message=error severity="critical" %}
+                        {% include "components/_alert_banner.html" with message=error type="critical" %}
                     {% endfor %}
                 </div>
             {% endif %}
@@ -32,23 +32,23 @@
                     {% endfor %}
                 </div>
 
-                <div class="pt-2">
-                    <button type="submit" class="w-full btn-primary py-2.5 text-sm font-semibold tracking-wide shadow-sm hover:shadow transition-all duration-150 flex justify-center items-center">
-                        Sign In
+                <div class="pt-4">
+                    <button type="submit" class="w-full btn-primary py-3 text-sm font-semibold tracking-wide shadow-md shadow-brand/20 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex justify-center items-center">
+                        Sign In to Portal
                     </button>
                 </div>
             </form>
         </div>
 
         <!-- Security Disclaimer Card -->
-        <div class="bg-blue-50/50 border border-blue-100 rounded-lg p-4 text-xs text-blue-800/85">
-            <div class="flex gap-2.5">
-                <svg class="w-4 h-4 shrink-0 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-blue-50/80 border border-blue-100 rounded-xl p-5 text-sm text-blue-800">
+            <div class="flex items-start gap-3">
+                <svg class="w-5 h-5 shrink-0 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                 </svg>
-                <div class="space-y-1">
-                    <p class="font-bold">Protected Health Information (PHI) Notice</p>
-                    <p class="leading-relaxed">This system contains confidential patient records protected under Malawian law. Authorized access only. All sessions and clinical audit actions are tracked and recorded automatically. Idle sessions will lock after 15 minutes.</p>
+                <div class="space-y-1.5">
+                    <p class="font-bold text-blue-900">Protected Health Information (PHI) Notice</p>
+                    <p class="leading-relaxed opacity-90 text-xs">This system contains confidential patient records protected under Malawian law. Authorized access only. All sessions and clinical actions are tracked and recorded automatically. Idle sessions will lock after 15 minutes.</p>
                 </div>
             </div>
         </div>
