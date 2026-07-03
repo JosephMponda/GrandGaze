@@ -186,15 +186,83 @@
     }
   }
 
-  //  Toast Notifications
-  function showToast(message, severity = 'info') {
-    const toast = document.createElement('div');
-    toast.className = `fixed top-4 right-4 alert alert-${severity} shadow-lg z-50`;
-    toast.textContent = message;
-    document.body.appendChild(toast);
+  // Toast Notifications (Alpine store-driven) 
+  // Public API used by offline sync, HTMX error handling, and Django messages.
+  window.showToast = function (message, type = 'info', duration = 4500) {
+    // Wait for Alpine to be ready
+    const dispatch = () => {
+      if (window.Alpine && Alpine.store('toasts')) {
+        Alpine.store('toasts').add(message, type, duration);
+      } else {
+        // Fallback: retry after Alpine initialises
+        document.addEventListener('alpine:initialized', () => {
+          Alpine.store('toasts').add(message, type, duration);
+        }, { once: true });
+      }
+    };
+    dispatch();
+  };
 
-    setTimeout(() => toast.remove(), 4000);
+  // HTMX Button Loading States 
+  // On any HTMX request, find the triggering form's submit button and
+  // replace its content with a spinner. Restored after the request completes.
+  document.body.addEventListener('htmx:beforeRequest', (e) => {
+    const trigger = e.detail.elt;
+    const form = trigger.closest('form') || (trigger.tagName === 'FORM' ? trigger : null);
+    if (!form) return;
+    const btn = form.querySelector('[type="submit"]');
+    if (!btn || btn.dataset.loading) return;
+    btn.dataset.loading = 'true';
+    btn.dataset.originalHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `
+      <svg class="animate-spin -ml-0.5 mr-2 h-4 w-4 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>Processing…`;
+  });
+
+  function restoreButtons() {
+    document.querySelectorAll('[data-loading="true"]').forEach((btn) => {
+      btn.innerHTML = btn.dataset.originalHtml || btn.innerHTML;
+      btn.disabled = false;
+      delete btn.dataset.loading;
+      delete btn.dataset.originalHtml;
+    });
   }
+
+  document.body.addEventListener('htmx:afterRequest', (e) => {
+    restoreButtons();
+    // Surface Django-level 5xx errors as toast
+    const status = e.detail.xhr?.status;
+    if (status >= 500) {
+      window.showToast('Server error (500). The backend team has been notified.', 'critical');
+    }
+  });
+
+  document.body.addEventListener('htmx:responseError', () => {
+    restoreButtons();
+    window.showToast('Request failed. Check your connection and try again.', 'critical');
+  });
+
+  document.body.addEventListener('htmx:sendError', () => {
+    restoreButtons();
+    window.showToast('Cannot reach server. You may be offline.', 'warning');
+  });
+
+  // Also restore on regular (non-HTMX) form submit
+  document.addEventListener('submit', (e) => {
+    const btn = e.target.querySelector('[type="submit"]');
+    if (!btn || btn.dataset.loading) return;
+    btn.dataset.loading = 'true';
+    btn.dataset.originalHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `
+      <svg class="animate-spin -ml-0.5 mr-2 h-4 w-4 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>Processing…`;
+  });
 
   //  Initialize
   initDB().catch((error) => console.error('Database init failed:', error));
