@@ -46,7 +46,7 @@ def prescribe(request, patient_id):
                     # and this write.
                     return render(request, "pharmacy/prescribe.html", {"form": form, "patient": patient, "warnings": exc.warnings, "blocked": True})
                 messages.success(request, "Prescription created.")
-                return redirect(reverse("pharmacy:queue"))
+                return redirect(reverse("patients:profile", args=[patient.pk]))
     else:
         form = PrescriptionForm()
         form.fields["encounter"].queryset = patient.encounters.all()
@@ -69,7 +69,7 @@ def cancel(request, pk):
     if request.method == "POST":
         services.cancel_prescription(prescription, request.user)
         messages.success(request, "Prescription cancelled.")
-    return redirect(reverse("pharmacy:queue"))
+    return redirect(reverse("patients:profile", args=[prescription.patient_id]))
 
 
 @role_required("Pharmacist", "Admin")
