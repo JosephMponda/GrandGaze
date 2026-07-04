@@ -33,6 +33,9 @@ INSTALLED_APPS = [
     "billing",
     "syncapi",
     "interop",
+    "emergency",
+    "dialysis",
+    "inpatient",
 ]
 
 MIDDLEWARE = [

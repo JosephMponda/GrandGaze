@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.db import models
+from simple_history.models import HistoricalRecords
 
 from encounters.models import Encounter
 from patients.models import Patient
@@ -37,6 +38,8 @@ class VitalSignSet(models.Model):
 
     recorded_at = models.DateTimeField(auto_now_add=True)
 
+    history = HistoricalRecords()
+
     class Meta:
         ordering = ["-recorded_at"]
 
@@ -62,6 +65,8 @@ class EarlyWarningScore(models.Model):
     score = models.IntegerField()
     risk_level = models.CharField(max_length=10, choices=RiskLevel.choices)
     computed_at = models.DateTimeField(auto_now_add=True)
+
+    history = HistoricalRecords()
 
     def __str__(self):
         return f"EWS {self.score} ({self.get_risk_level_display()})"

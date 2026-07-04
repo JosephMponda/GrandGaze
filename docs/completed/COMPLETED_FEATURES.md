@@ -18,7 +18,8 @@
 | Duplicate detection + merge | Trigram similarity (`pg_trgm`) + exact ID/phone match; blocking interstitial with logged override; merge workflow | `patients/services.py`, `patients/views.py` |
 | Visit/encounter history | `Encounter` FK'd to `Patient`; tab on profile | `encounters/` |
 | Referral tracking | `ReferralRecord` (source, destination, reason) | `patients/models.py` |
-| Consent flags | `consent_care/teaching/research` booleans | `patients/models.py` |
+| Consent flags | `consent_care/teaching/research/data_use` booleans | `patients/models.py` |
+| Patient edit view | `/patients/<pk>/edit/` reusing registration form | `patients/views.py` |
 | Audit trail | `django-simple-history` on `Patient` + `DuplicateConfirmation` log | `patients/` |
 
 ## §8.1.2 Appointment, Queue, Patient Flow — **NOT BUILT**
@@ -33,18 +34,38 @@ See §7.2 for scheduling / queue models.
 | Past medical/surgical history | `past_medical_history`, `past_surgical_history` | `encounters/models.py` |
 | Medication, allergy, social, family history | `medication_history`, `allergy_history`, `social_history`, `family_history` | `encounters/models.py` |
 | Review of systems + exam | `examination_findings` | `encounters/models.py` |
-| Diagnosis + differential | `diagnosis`, `differential_diagnosis` | `encounters/models.py` |
+| Diagnosis + ICD-11 coding | `diagnosis` + `icd_code` (CharField 20) + `icd_display` | `encounters/models.py` |
 | Clinical plan | `clinical_plan` | `encounters/models.py` |
 | Structured templates | `ClinicalTemplate` (JSON field config) | `encounters/models.py` |
 | Signature + timestamp + audit | `signed_by`/`signed_at`; `EncounterAddendum` for post-sign edits | `encounters/models.py` |
 
-## §8.1.4 Inpatient / Ward Management — **NOT BUILT**
+## §8.1.4 Inpatient / Ward Management — **COMPLETE**
 
-See §7.3 for ward / bed / admission models.
+| Requirement | Implementation | Location |
+|---|---|---|
+| Admission workflow | `Admission` model with status (active/transferred/discharged/dead) | `inpatient/models.py` |
+| Ward management | `Ward` (name, department, bed_count) + `Bed` (ward FK, label, occupancy) | `inpatient/models.py` |
+| Bed assignment | `assign_bed()` / `free_bed()` services | `inpatient/services.py` |
+| Transfer | `transfer_patient()` — frees old bed, assigns new | `inpatient/services.py` |
+| Discharge + death documentation | `discharge()` — frees bed, timestamp + summary; `DEAD` status when disposition="dead" | `inpatient/services.py` |
+| Ward round notes | `WardRoundNote` with optional diagnosis/plan update | `inpatient/models.py` |
+| Bed board | `/inpatient/ward/<id>/` — color-coded occupancy grid | `inpatient/views.py` |
+| Inpatient dashboard | `/inpatient/dashboard/` — occupancy per ward + active admissions | `inpatient/views.py` |
+| Patient tab | Admission history on profile | `inpatient/views.py` |
+| Dashboard widget | "Bed Occupancy" for Clinician/Nurse/Admin | `inpatient/apps.py` |
+| Seed data | 4 wards (Medical/Surgical/Paediatric/Maternity) + beds + demo admission | `core/management/commands/seed_demo.py` |
+| Admit button | Direct link on patient profile | `templates/patients/profile.html` |
 
-## §8.1.5 Emergency & Triage — **NOT BUILT**
+## §8.1.5 Emergency & Triage — **COMPLETE**
 
-See §7.3 for triage / emergency-specific models.
+| Requirement | Implementation | Location |
+|---|---|---|
+| Triage assessment | `TriageEncounter` with 5-level CTAS category | `emergency/models.py` |
+| Rapid registration | `RapidRegisterForm` — minimal patient + triage in one step | `emergency/forms.py` |
+| Triage queue | `/emergency/queue/` — severity-sorted (immediate → non-urgent) | `emergency/views.py` |
+| Triage resolution | `resolve_triage()` — outcome (discharged/admitted/referred/dead) | `emergency/services.py` |
+| Patient tab | HTMX partial showing triage history with category/outcome badges | `emergency/templates/emergency/_patient_tab.html` |
+| Dashboard widget | "Triage Queue" for Nurse/Clinician/Admin | `emergency/apps.py` |
 
 ## §8.1.6 Nursing Documentation — **NOT BUILT**
 
@@ -80,7 +101,7 @@ This section covers generic order sets (CPOE) separate from lab/imaging/pharmacy
 | Specimen tracking | Specimen type on `LabTest`; `specimen_barcode` on `LabOrder` | `laboratory/models.py` |
 | Result entry + verification | `LabResult` with separate `entered_by`/`verified_by` (enforced different users) | `laboratory/models.py` |
 | Critical result alerts | `is_critical` auto-set; calls `raise_alert()` on save | `laboratory/views.py` |
-| LOINC-ready | `loinc_code` nullable field on `LabTest` | `laboratory/models.py` |
+| LOINC-ready | `loinc_code` on `LabTest`; 6 seeded tests with real codes (FBC 58410-2, Malaria RDT 87591-4, Creatinine 2160-0, HIV 75622-1, Glucose 2345-7, Urinalysis 24356-8) | `laboratory/models.py`, `laboratory/migrations/0003_seed_loinc_codes.py` |
 | Workload dashboard | `/labs/workload/` — pending/resulted counts, turnaround time | `laboratory/views.py` |
 
 ## §8.1.11 Pharmacy, Prescribing & Medication Safety — **COMPLETE**
@@ -89,16 +110,28 @@ This section covers generic order sets (CPOE) separate from lab/imaging/pharmacy
 |---|---|---|
 | Electronic prescribing | `Prescription` with dose/route/frequency/duration | `pharmacy/models.py` |
 | Allergy alerts | `check_prescription_safety()` queries `DrugAllergyMap` + `encounters.services.get_patient_allergies()` | `pharmacy/safety.py` |
+| Drug-drug interaction warnings | `Drug.interacting_drugs` M2M; `_check_drug_interaction()` queries active prescriptions for flagged interactions; critical-level block | `pharmacy/models.py`, `pharmacy/safety.py` |
+| Breastfeeding/lactation warning | `Drug.contraindicated_in_breastfeeding`; warns if flagged + patient sex is female | `pharmacy/models.py`, `pharmacy/safety.py` |
 | Duplicate therapy warning | Checks active prescriptions for same drug/generic_name | `pharmacy/safety.py` |
-| Pediatric dosing | `pediatric_max_dose_mg` on `Drug`; dose check against patient age | `pharmacy/safety.py` |
+| Pediatric dosing | `pediatric_max_dose_mg` on `Drug`; dose check against patient age; transparent warning if DOB missing | `pharmacy/safety.py` |
 | Pregnancy/renal contraindication | `contraindicated_in_pregnancy/renal` on `Drug`; checks patient vital status + diagnosis | `pharmacy/safety.py` |
-| Prescription approval workflow | `prescribed -> approved -> dispensed -> cancelled` with separate `approved_by` role | `pharmacy/views.py` |
+| Prescription approval workflow | `prescribed -> approved -> dispensed -> cancelled` with separate `approved_by` role; cancel view at `pharmacy/prescription/<pk>/cancel/` | `pharmacy/views.py` |
 | Override documentation | `safety_override_reason` required when bypassing critical alert | `pharmacy/models.py` |
 | Stock note | `stock_note` free-text on `DispensingRecord` | `pharmacy/models.py` |
 
-## §8.1.12 Dialysis & CKD — **NOT BUILT**
+## §8.1.12 Dialysis & CKD — **COMPLETE**
 
-See §7.3. Dialysis is a stretch goal.
+| Requirement | Implementation | Location |
+|---|---|---|
+| CKD staging | `CKDDiagnosis` (patient, stage 1–5, diagnosed_by, notes) | `dialysis/models.py` |
+| Dialysis prescribing | `DialysisPrescription` (frequency, fluid target, access type) | `dialysis/models.py` |
+| Session recording | `DialysisSession` (pre/post weight, auto-calculated fluid removal, complications) | `dialysis/models.py` |
+| Missed session heuristic | `missed_sessions()` — naive weekday checker (`ponytail:` comment) | `dialysis/services.py` |
+| Patient tab | CKD diagnosis + active prescriptions + Record Session buttons | `dialysis/views.py` |
+| Session log | Per-prescription session history with pre/post weight table | `dialysis/views.py` |
+| Dashboard | `/dialysis/dashboard/` — today's session status per patient | `dialysis/views.py` |
+| Dashboard widget | "Dialysis Sessions Today" for Clinician/Nurse/Admin | `dialysis/apps.py` |
+| Tests | 8 tests (diagnosis, prescribe, session, missed) | `dialysis/tests.py` |
 
 ## §8.1.13 ICU / HDU / Critical Care — **NOT BUILT**
 
@@ -115,15 +148,24 @@ See §7.3.
 | Revenue dashboard | `/billing/` — payment tracking | `billing/views.py` |
 | Unpaid bills report | `unpaid_invoices_for()` service function | `billing/services.py` |
 
-## §8.1.15 Inventory / Supplies — **NOT BUILT**
+## §8.1.15 Inventory / Stock Management — **COMPLETE**
 
-See §7.3.
+| Requirement | Implementation | Location |
+|---|---|---|
+| Drug stock tracking | `StockLevel` (OneToOneField → Drug, quantity, low_stock_threshold) | `pharmacy/models.py` |
+| Stock check | `check_stock(drug)` → `(qty, in_stock)` | `pharmacy/services.py` |
+| Stock adjustment | `adjust_stock(drug, qty, user, note)` — get_or_create + add | `pharmacy/services.py` |
+| Dispense guard | Dispensing view checks stock; blocks with error if 0; deducts 1 on success | `pharmacy/views.py` |
+| Stock management UI | `/pharmacy/stock/` — add stock form + levels table with Low/Out badges | `pharmacy/templates/pharmacy/stock.html` |
+| Queue stock display | Stock level shown per drug on queue page | `templates/pharmacy/queue.html` |
+| Dashboard widget | "Stock Management" for Pharmacist/Admin | `pharmacy/apps.py` |
+| Migration | `pharmacy/0003_add_stocklevel.py` | `pharmacy/migrations/` |
 
 ## §8.1.16 Clinical Governance & Audit — **COMPLETE**
 
 | Requirement | Implementation | Location |
 |---|---|---|
-| Audit trail | `django-simple-history` on all clinical/PHI models (create/update/delete versioned) | `config/settings.py` |
+| Audit trail | `django-simple-history` on all clinical/PHI models (include `AlertEvent`, `EncounterAddendum`, `AllergyRecord`, `VitalSignSet`, `EarlyWarningScore`, `NextOfKin` — full coverage) | `config/settings.py` |
 | Audit viewer | `/accounts/admin/audit/` — role-gated (Admin/ICT only) | `accounts/views.py` |
 | Electronic signatures | `signed_by`/`signed_at` on Encounter, `verified_by` on LabResult | `encounters/`, `laboratory/` |
 | RBAC documentation | 8 groups fixture with permissions; `@role_required` decorator | `accounts/` |
@@ -137,9 +179,9 @@ Cross-module communication not yet formalized beyond the shared alert hub.
 | Requirement | Implementation | Location |
 |---|---|---|
 | FHIR-inspired data model | Field names FHIR-shape-compatible (e.g. `Patient.gender` uses FHIR value set) | `patients/models.py` |
-| FHIR-Bundle export | `GET /api/interop/patient/<id>/bundle/` — Patient + Encounter serialized | `interop/views.py` |
-| LOINC readiness | `loinc_code` on `LabTest` | `laboratory/models.py` |
-| ICD readiness | Not yet populated — ICD field considered stretch | — |
+| FHIR-Bundle export | `GET /api/interop/patient/<id>/bundle/` — Patient + Encounter serialized. IDs use `Patient/{pk}` / `Encounter/{pk}` format. ICD-11 codes in reasonCode with HL7 system URI. | `interop/views.py`, `interop/serializers.py` |
+| LOINC readiness | `loinc_code` on `LabTest` with `^\d+-\d+$` format validation | `laboratory/models.py` |
+| ICD-11 readiness | `icd_code` + `icd_display` on Encounter; 5 ICD-11 codes seeded in demo data | `encounters/models.py`, `seed_demo.py` |
 | API documentation | `/api/schema/`, `/api/docs/`, `/api/redoc/` via drf-spectacular | `config/urls.py` |
 | Mobile money interface | `mobile_money` payment method + reference field | `billing/models.py` |
 
@@ -162,13 +204,15 @@ Cross-module communication not yet formalized beyond the shared alert hub.
 
 ### §9.2 Patient Safety Framework
 - Allergy alerts (pharmacy prescribing time)
+- Drug-drug interaction warnings (M2M on Drug, critical-level block)
+- Breastfeeding/lactation warnings (contraindication flag + sex-based check)
 - Critical lab result alerts (auto-fire on save)
 - Abnormal vital sign triggers (hard thresholds)
-- Pediatric dosing safeguards (dose vs age check)
+- Pediatric dosing safeguards (dose vs age check; transparent when DOB unknown)
 - Duplicate patient record warning (trigram + exact match)
 - Time-stamped clinical notes (all Encounter/Lab orders)
 - Alert prioritization (critical vs warning levels; warnings can be acknowledged, critical blocks submit)
-- Audit logs on every PHI write
+- Audit logs on every PHI write (AlertEvent now historied)
 
 ### §9.3 Legal, Ethical, Compliance Requirements
 - Field-level encryption (Fernet-based, via `core/encrypted_fields.py`)
@@ -214,7 +258,7 @@ Cross-module communication not yet formalized beyond the shared alert hub.
 | User login | ✅ Django LoginView + axes lockout |
 | Role-based dashboard | ✅ Widget registry per role |
 | Patient registration + search | ✅ Full Malawi-context + duplicate detection |
-| Patient profile | ✅ 6 HTMX tabs (demographics, encounters, vitals, labs, imaging, pharmacy, billing) |
+| Patient profile | ✅ 9 HTMX tabs (demographics, encounters, vitals, labs, imaging, pharmacy, billing, dialysis, admissions) |
 | Clinical encounter | ✅ Sign-and-lock with addenda |
 | Vital signs entry | ✅ EWS + auto-computed BMI + alerts |
 | Lab order + result | ✅ Full verify workflow |
@@ -227,18 +271,13 @@ Cross-module communication not yet formalized beyond the shared alert hub.
 
 ---
 
-## Not Yet Built (Phase-2 Candidates, mapped to brief)
+## Not Yet Built
 
-| § | Feature | Priority | Why skip Phase 1 |
+| § | Feature | Priority | Notes |
 |---|---|---|---|
 | §8.1.2 | Appointment scheduling / Queue | High | Requires calendar UI — complex frontend |
-| §8.1.4 | Inpatient / Ward management | High | Admission flow + bed management |
-| §8.1.5 | Emergency & Triage | High | Rapid registration + triage categories |
 | §8.1.6 | Nursing documentation | Medium | After inpatient scope |
 | §8.1.9 | Generic CPOE | Medium | Order sets beyond lab/imaging/pharmacy |
-| §8.1.12 | Dialysis & CKD | Medium | Standalone module, judging bonus |
-| §8.1.14 | Inventory / Stock | High | Drug stock + reagent tracking |
-| §8.1.15 | Full appointment system | Medium | Calendar + SMS reminders |
 | §8.2.x | Imaging full PACS | Low | Metadata-only in Phase 1 |
 | §8.2.x | Theatre / Anaesthesia | Low | Future specialist module |
 | §8.2.x | Maternal / Child Health | Medium | Antenatal + partograph |

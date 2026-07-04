@@ -64,6 +64,17 @@
                         <span :class="online ? 'bg-green-500' : 'bg-red-500'" class="w-2.5 h-2.5 rounded-full inline-block transition-colors duration-300"></span>
                     </div>
 
+                    {% if user.is_authenticated %}
+                    {# Session Idle Timer — warns at 13min, session dies at 15min #}
+                    <div x-data="idleTimer()" x-init="init()"
+                         @click="reset()" @keydown="reset()" @mousemove="reset()">
+                        <div x-show="showWarning" x-transition
+                             class="fixed top-4 right-4 z-[9999] bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-xl shadow-lg text-xs font-medium">
+                            Session idle — will lock in <span x-text="remaining"></span>s
+                        </div>
+                    </div>
+                    {% endif %}
+
                     {# Mobile Menu Button #}
                     {% if user.is_authenticated %}
                     <button @click="mobileMenuOpen = !mobileMenuOpen" type="button" class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand">
@@ -131,7 +142,7 @@
     <footer class="border-t border-gray-200 bg-white py-4 mt-auto">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center text-xs text-gray-500">
             <p>&copy; 2026 MUST Teaching Hospital. All rights reserved.</p>
-            <p>Malawi EMR Platform v1.0</p>
+            <p>MUST · GSL | Malawi EMR Platform v1.0</p>
         </div>
     </footer>
 
@@ -221,6 +232,31 @@
                 }
             });
         });
+        Alpine.data('idleTimer', () => ({
+            showWarning: false,
+            remaining: 120,
+            timer: null,
+            warningTimer: null,
+            init() {
+                this.reset();
+            },
+            reset() {
+                this.showWarning = false;
+                clearTimeout(this.timer);
+                clearTimeout(this.warningTimer);
+                this.warningTimer = setTimeout(() => {
+                    this.showWarning = true;
+                    this.remaining = 120;
+                    this.timer = setInterval(() => {
+                        this.remaining -= 1;
+                        if (this.remaining <= 0) {
+                            clearInterval(this.timer);
+                            window.location.href = "{% url 'accounts:logout' %}";
+                        }
+                    }, 1000);
+                }, 13 * 60 * 1000);
+            }
+        }));
     </script>
     <script src="{% static 'js/alpinejs.min.js' %}" defer></script>
     <script src="{% static 'js/htmx.min.js' %}"></script>

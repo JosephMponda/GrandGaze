@@ -5,11 +5,14 @@ from rest_framework import serializers
 
 class FHIRPatientSerializer(serializers.Serializer):
     resourceType = serializers.CharField(default="Patient", read_only=True)
-    id = serializers.IntegerField(source="pk")
+    id = serializers.SerializerMethodField()
     identifier = serializers.SerializerMethodField()
     name = serializers.SerializerMethodField()
     gender = serializers.CharField(source="sex")
     birthDate = serializers.DateField(source="date_of_birth", allow_null=True)
+
+    def get_id(self, obj):
+        return f"Patient/{obj.pk}"
 
     def get_identifier(self, obj):
         return [
@@ -25,10 +28,13 @@ class FHIRPatientSerializer(serializers.Serializer):
 
 class FHIREncounterSerializer(serializers.Serializer):
     resourceType = serializers.CharField(default="Encounter", read_only=True)
-    id = serializers.IntegerField(source="pk")
+    id = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
     period = serializers.SerializerMethodField()
     reasonCode = serializers.SerializerMethodField()
+
+    def get_id(self, obj):
+        return f"Encounter/{obj.pk}"
 
     def get_status(self, obj):
         return "finished" if obj.signed_at else "in-progress"
@@ -37,7 +43,12 @@ class FHIREncounterSerializer(serializers.Serializer):
         return {"start": obj.created_at.isoformat() if obj.created_at else None}
 
     def get_reasonCode(self, obj):
-        return [{"text": obj.presenting_complaint}] if obj.presenting_complaint else []
+        codes = []
+        if obj.presenting_complaint:
+            codes.append({"text": obj.presenting_complaint})
+        if obj.icd_code:
+            codes.append({"coding": [{"system": "http://hl7.org/fhir/sid/icd-11", "code": obj.icd_code, "display": obj.icd_display or obj.icd_code}]})
+        return codes
 
 
 class FHIRBundleSerializer(serializers.Serializer):

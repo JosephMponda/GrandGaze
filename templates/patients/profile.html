@@ -9,10 +9,16 @@
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         Back to Dashboard
     </a>
-    <a href="{% url 'patients:register' %}" class="btn-secondary text-xs px-4 py-2 inline-flex items-center gap-1.5">
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-        Register New Patient
-    </a>
+    <div class="flex items-center gap-2">
+        <a href="{% url 'patients:edit' patient.pk %}" class="btn-secondary text-xs px-4 py-2 inline-flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            Edit
+        </a>
+        <a href="{% url 'inpatient:admit' patient.pk %}" class="btn-primary text-xs px-4 py-2 inline-flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+            Admit
+        </a>
+    </div>
 </div>
 
 <div class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8 mb-6">
@@ -46,7 +52,7 @@
                     <dt class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Date of Birth</dt>
                     <dd class="mt-0.5 text-sm font-semibold text-gray-800">
                         {{ patient.date_of_birth|default:"Not recorded" }}
-                        {% if patient.age_is_estimated %}<span class="text-xs text-gray-400">(est.)</span>{% endif %}
+                        {% if patient.age_estimated %}<span class="text-xs text-gray-400">(est.)</span>{% endif %}
                     </dd>
                 </div>
                 <div>
@@ -73,13 +79,16 @@
             <span class="text-gray-700 font-medium">{{ patient.phone_number }}</span>
         </div>
         {% endif %}
-        {% if patient.guardian_name %}
+        {% with nok=patient.next_of_kin.first %}
+        {% if nok %}
         <div>
             <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-0.5">Guardian / Next of Kin</span>
-            <span class="text-gray-700 font-medium">{{ patient.guardian_name }}</span>
-            {% if patient.guardian_phone %}<span class="text-xs text-gray-400 block">{{ patient.guardian_phone }}</span>{% endif %}
+            <span class="text-gray-700 font-medium">{{ nok.name }}</span>
+            <span class="text-xs text-gray-400 block">{{ nok.relationship }}</span>
+            {% if nok.phone_number %}<span class="text-xs text-gray-400 block">{{ nok.phone_number }}</span>{% endif %}
         </div>
         {% endif %}
+        {% endwith %}
         <div>
             <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-0.5">Registered</span>
             <span class="text-gray-700 font-medium">{{ patient.created_at|date:"d M Y" }}</span>
@@ -136,6 +145,21 @@
          x-init="$nextTick(() => htmx.process($el))"
          hx-get="{% url 'billing:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
          hx-boost="false"
+         class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
+    </div>
+    <div id="tp-triage" x-show="activeTab === 'triage'" style="display:none"
+         x-init="$nextTick(() => htmx.process($el))"
+         hx-get="{% url 'emergency:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
+    </div>
+    <div id="tp-dialysis" x-show="activeTab === 'dialysis'" style="display:none"
+         x-init="$nextTick(() => htmx.process($el))"
+         hx-get="{% url 'dialysis:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
+    </div>
+    <div id="tp-inpatient" x-show="activeTab === 'inpatient'" style="display:none"
+         x-init="$nextTick(() => htmx.process($el))"
+         hx-get="{% url 'inpatient:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
          class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
     </div>
 

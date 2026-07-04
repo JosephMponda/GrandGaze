@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Stock Management - MUST EMR{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto py-6">
+    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight text-ink-900">Stock Management</h1>
+            <p class="text-sm text-ink-500 mt-2">Add stock and view current levels</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8">
+            <h2 class="text-lg font-semibold text-ink-900 mb-6">Add Stock</h2>
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                {% include "components/_field.html" with field=form.drug %}
+                {% include "components/_field.html" with field=form.quantity %}
+                {% include "components/_field.html" with field=form.note %}
+                <button type="submit" class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:shadow-brand/30 hover:-translate-y-0.5 transition-all duration-200">
+                    Add Stock
+                </button>
+            </form>
+        </div>
+
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8">
+            <h2 class="text-lg font-semibold text-ink-900 mb-6">Current Levels</h2>
+            {% if stock_levels %}
+                <div class="divide-y divide-gray-100">
+                    {% for level in stock_levels %}
+                        <div class="flex items-center justify-between py-3">
+                            <div>
+                                <p class="text-sm font-semibold text-ink-900">{{ level.drug.generic_name }}</p>
+                                <p class="text-xs text-ink-500">{{ level.drug.formulation }}</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm font-bold {% if level.is_low %}text-red-600{% else %}text-green-600{% endif %}">
+                                    {{ level.quantity }}
+                                </span>
+                                {% if level.is_low %}
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        Low
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-sm text-ink-500">No stock records yet. Add stock above.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

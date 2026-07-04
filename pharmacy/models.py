@@ -21,7 +21,9 @@ class Drug(models.Model):
     is_controlled = models.BooleanField(default=False)
     pediatric_max_dose_mg = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     contraindicated_in_pregnancy = models.BooleanField(default=False)
+    contraindicated_in_breastfeeding = models.BooleanField(default=False)
     contraindicated_in_renal = models.BooleanField(default=False)
+    interacting_drugs = models.ManyToManyField("self", symmetrical=True, blank=True)
 
     class Meta:
         ordering = ["generic_name", "name"]
@@ -82,4 +84,21 @@ class DispensingRecord(models.Model):
 
     def __str__(self):
         return f"Dispensed {self.prescription}"
+
+
+class StockLevel(models.Model):
+    drug = models.OneToOneField(Drug, on_delete=models.CASCADE, related_name="stock")
+    quantity = models.PositiveIntegerField(default=0)
+    low_stock_threshold = models.PositiveIntegerField(default=10)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.drug.generic_name}: {self.quantity} (threshold {self.low_stock_threshold})"
+
+    @property
+    def is_low(self) -> bool:
+        return self.quantity <= self.low_stock_threshold
+
+    class Meta:
+        verbose_name_plural = "Stock levels"
 

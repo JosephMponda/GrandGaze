@@ -14,4 +14,10 @@ class PharmacyConfig(AppConfig):
             roles=["Pharmacist", "Clinician", "Admin"],
             icon="pill",
         )
+        register_widget(
+            title="Stock Management",
+            url_name="pharmacy:stock",
+            roles=["Pharmacist", "Admin"],
+            icon="box",
+        )
 

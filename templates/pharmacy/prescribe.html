@@ -15,7 +15,23 @@
         </a>
     </div>
 
-    {% if warnings %}
+    {% if blocked %}
+        <div class="bg-red-50 border border-red-300 rounded-2xl p-6 mb-8 space-y-4">
+            <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-lg font-bold">!</span>
+                <h3 class="text-base font-bold text-red-900">Prescription Blocked — Critical Safety Warning</h3>
+            </div>
+            <p class="text-sm text-red-800">This prescription cannot be submitted from this form. Critical warnings below cannot be overridden here — choose a different medication, or escalate to the prescribing clinician for a documented clinical decision outside this workflow.</p>
+            <ul class="space-y-2">
+                {% for warning in warnings %}
+                    <li class="flex items-start gap-2 text-sm text-red-800">
+                        <span class="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0"></span>
+                        <strong>{{ warning.level }}:</strong> {{ warning.message }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% elif warnings %}
         <div class="bg-red-50 border border-red-200 rounded-2xl p-6 mb-8 space-y-4">
             <div class="flex items-center gap-3">
                 <span class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-lg font-bold">!</span>
@@ -32,6 +48,7 @@
         </div>
     {% endif %}
 
+    {% if not blocked %}
     <form method="post" class="space-y-8">
         {% csrf_token %}
 
@@ -75,5 +92,10 @@
             </button>
         </div>
     </form>
+    {% else %}
+    <div class="flex items-center justify-end gap-4 pt-2 pb-10">
+        <a href="{% url 'patients:profile' patient.pk %}" class="btn-secondary text-sm font-semibold py-3 px-6 hover:-translate-y-0.5 transition-all duration-200">Back to Patient</a>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

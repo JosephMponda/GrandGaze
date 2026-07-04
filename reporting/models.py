@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from simple_history.models import HistoricalRecords
 
 
 class Severity(models.TextChoices):
@@ -22,6 +23,8 @@ class AlertEvent(models.Model):
     raised_at = models.DateTimeField(auto_now_add=True)
     acknowledged_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     acknowledged_at = models.DateTimeField(null=True, blank=True)
+
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["-raised_at"]

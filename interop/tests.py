@@ -38,7 +38,7 @@ def test_patient_bundle_returns_fhir_shape(api_client, patient, nurse_user):
     assert len(data["entry"]) >= 1
     patient_resource = data["entry"][0]["resource"]
     assert patient_resource["resourceType"] == "Patient"
-    assert patient_resource["id"] == patient.pk
+    assert patient_resource["id"] == f"Patient/{patient.pk}"
     assert len(patient_resource["name"]) >= 1
 
 

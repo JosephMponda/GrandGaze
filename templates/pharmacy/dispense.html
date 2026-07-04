@@ -40,6 +40,17 @@
                 <p class="text-sm font-semibold text-ink-900 mt-1">{{ prescription.duration_days }} days</p>
             </div>
         </div>
+        <div class="border-t border-gray-100 pt-4 flex items-center gap-2">
+            <span class="text-xs font-bold text-ink-700 uppercase tracking-wider">Stock:</span>
+            <span class="text-sm font-semibold {% if not in_stock %}text-red-600{% elif stock_qty <= 10 %}text-amber-600{% else %}text-green-600{% endif %}">
+                {{ stock_qty }}
+            </span>
+            {% if not in_stock %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Out of stock</span>
+            {% elif stock_qty <= 10 %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Low</span>
+            {% endif %}
+        </div>
     </div>
 
     <form method="post" class="space-y-8">

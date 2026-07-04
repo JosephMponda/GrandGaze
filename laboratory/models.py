@@ -39,6 +39,12 @@ class LabTest(models.Model):
     class Meta:
         ordering = ["name"]
 
+    def clean(self):
+        import re
+        if self.loinc_code and not re.fullmatch(r"\d+-\d+", self.loinc_code):
+            from django.core.exceptions import ValidationError
+            raise ValidationError({"loinc_code": f"LOINC code must be in 'XXXXX-N' format, got '{self.loinc_code}'."})
+
     def __str__(self):
         return self.name
 
