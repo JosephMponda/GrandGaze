@@ -199,14 +199,14 @@ No MaHIS linkage exists. No national HIE API integration.
 
 ## Summary: What to adopt before demo day
 
-| # | Improvement | Reference | Effort | Priority |
-|---|---|---|---|---|
-| 1 | ICD-11 code field on Encounter + seed common codes | ICD-11 [10], §8.1.18 | 2h | **P2** — mentioned in brief, fills obvious gap |
-| 2 | FHIR wrapper serializer for Patient+Encounter | FHIR [7] | 1h | **P3** — polish for judges reviewing interop |
-| 3 | UUID resource IDs on Patient, Encounter | FHIR [7] | 1h | **P3** — non-breaking, future-proofs FHIR |
-| 4 | `dicom_uid` field on ImagingRequest | DICOM [8] | 10min | **P3** — zero-cost readiness signal |
-| 5 | LOINC code pattern validation | LOINC [9] | 15min | **P3** — data quality |
-| 6 | OpenMRS Visit model grouping | OpenMRS [11] | Already planned in AGENTS.md | Phase 4 |
+| # | Improvement | Reference | Effort | Priority | Status |
+|---|---|---|---|---|---|
+| 1 | ICD-11 code field on Encounter + seed common codes | ICD-11 [10], §8.1.18 | 2h | **P2** | **DONE** — `icd_code` + `icd_display` on Encounter, 5 codes seeded |
+| 2 | FHIR wrapper serializer for Patient+Encounter | FHIR [7] | 1h | **P3** | **DONE** — `id` now `Patient/{pk}` / `Encounter/{pk}`, ICD codes in reasonCode |
+| 3 | UUID resource IDs on Patient, Encounter | FHIR [7] | 1h | **P3** | Deferred — non-breaking; `Patient/{pk}` format is valid FHIR |
+| 4 | `dicom_uid` field on ImagingRequest | DICOM [8] | 10min | **P3** | Deferred — metadata-only scope, no DICOM toolkit in stack |
+| 5 | LOINC code pattern validation | LOINC [9] | 15min | **P3** | **DONE** — `LabTest.clean()` enforces `^\d+-\d+$` format |
+| 6 | OpenMRS Visit model grouping | OpenMRS [11] | Already planned in AGENTS.md | Phase 4 | Deferred |
 
 ## Deliberate non-adoptions
 

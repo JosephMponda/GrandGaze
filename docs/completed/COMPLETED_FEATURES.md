@@ -34,7 +34,7 @@ See §7.2 for scheduling / queue models.
 | Past medical/surgical history | `past_medical_history`, `past_surgical_history` | `encounters/models.py` |
 | Medication, allergy, social, family history | `medication_history`, `allergy_history`, `social_history`, `family_history` | `encounters/models.py` |
 | Review of systems + exam | `examination_findings` | `encounters/models.py` |
-| Diagnosis + differential | `diagnosis`, `differential_diagnosis` | `encounters/models.py` |
+| Diagnosis + ICD-11 coding | `diagnosis` + `icd_code` (CharField 20) + `icd_display` | `encounters/models.py` |
 | Clinical plan | `clinical_plan` | `encounters/models.py` |
 | Structured templates | `ClinicalTemplate` (JSON field config) | `encounters/models.py` |
 | Signature + timestamp + audit | `signed_by`/`signed_at`; `EncounterAddendum` for post-sign edits | `encounters/models.py` |
@@ -165,7 +165,7 @@ See §7.3.
 
 | Requirement | Implementation | Location |
 |---|---|---|
-| Audit trail | `django-simple-history` on all clinical/PHI models (include `AlertEvent` — fixed P0 gap) | `config/settings.py` |
+| Audit trail | `django-simple-history` on all clinical/PHI models (include `AlertEvent`, `EncounterAddendum`, `AllergyRecord`, `VitalSignSet`, `EarlyWarningScore`, `NextOfKin` — full coverage) | `config/settings.py` |
 | Audit viewer | `/accounts/admin/audit/` — role-gated (Admin/ICT only) | `accounts/views.py` |
 | Electronic signatures | `signed_by`/`signed_at` on Encounter, `verified_by` on LabResult | `encounters/`, `laboratory/` |
 | RBAC documentation | 8 groups fixture with permissions; `@role_required` decorator | `accounts/` |
@@ -179,9 +179,9 @@ Cross-module communication not yet formalized beyond the shared alert hub.
 | Requirement | Implementation | Location |
 |---|---|---|
 | FHIR-inspired data model | Field names FHIR-shape-compatible (e.g. `Patient.gender` uses FHIR value set) | `patients/models.py` |
-| FHIR-Bundle export | `GET /api/interop/patient/<id>/bundle/` — Patient + Encounter serialized | `interop/views.py` |
-| LOINC readiness | `loinc_code` on `LabTest` | `laboratory/models.py` |
-| ICD readiness | Not yet populated — ICD field considered stretch | — |
+| FHIR-Bundle export | `GET /api/interop/patient/<id>/bundle/` — Patient + Encounter serialized. IDs use `Patient/{pk}` / `Encounter/{pk}` format. ICD-11 codes in reasonCode with HL7 system URI. | `interop/views.py`, `interop/serializers.py` |
+| LOINC readiness | `loinc_code` on `LabTest` with `^\d+-\d+$` format validation | `laboratory/models.py` |
+| ICD-11 readiness | `icd_code` + `icd_display` on Encounter; 5 ICD-11 codes seeded in demo data | `encounters/models.py`, `seed_demo.py` |
 | API documentation | `/api/schema/`, `/api/docs/`, `/api/redoc/` via drf-spectacular | `config/urls.py` |
 | Mobile money interface | `mobile_money` payment method + reference field | `billing/models.py` |
 

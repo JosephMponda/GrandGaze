@@ -54,7 +54,25 @@ The specs review (`docs/completed/specs_review.md`) audited every module against
 - *Problem:* `PrescriptionStatus.CANCELLED` existed but no view could set it. §8.1.11 workflow gap.
 - *Fix:* `cancel_prescription()` service + `cancel` view (POST-only) at `pharmacy/prescription/<pk>/cancel/`.
 
+### P2 — Interoperability (§7.5, §8.1.18, §9.5)
+
+**FHIR wrapper serializer** (`interop/serializers.py`)
+- *Problem:* The FHIR bundle exported Patient/Encounter IDs as bare integer PKs. FHIR expects resource-type-qualified IDs (`Patient/{pk}`).
+- *Fix:* Changed `id` from `IntegerField(source="pk")` to `SerializerMethodField` returning `f"Patient/{obj.pk}"` / `f"Encounter/{obj.pk}"`. ICD-11 codes now included in `reasonCode` with HL7 system URI.
+
+**ICD-11 diagnosis coding** (`encounters/models.py`, `encounters/forms.py`, `seed_demo.py`)
+- *Problem:* §8.1.18 requires "ICD-10 or ICD-11 diagnosis coding readiness." Encounter had free-text diagnosis only — no structured code field.
+- *Fix:* Added `icd_code` (CharField 20) and `icd_display` (CharField 255) to Encounter. Added to form fields. 5 ICD-11 codes seeded in demo data: malaria (1F40), ANC (QA0Y), pneumonia (CA40), diabetes (5A11), threatened abortion (JA00.0). Migration applied.
+
 ### P3 — Sustainability / Requirements Compliance
+
+**LOINC code validation** (`laboratory/models.py`)
+- *Problem:* LOINC codes had no format enforcement — data entry could store garbage.
+- *Fix:* `LabTest.clean()` validates `loinc_code` matches `^\d+-\d+$`. No migration needed. 4 test cases added.
+
+**Audit trail gap closure** (`encounters/models.py`, `vitals/models.py`, `patients/models.py`)
+- *Problem:* Ponytail compliance review found 5 clinical/PII models missing `django-simple-history`: EncounterAddendum, AllergyRecord, VitalSignSet, EarlyWarningScore, NextOfKin.
+- *Fix:* One-line `history = HistoricalRecords()` on each. 3 auto-generated migrations. Every PHI-touching model now has audit trail coverage.
 
 **consent_data_use field** (`patients/models.py`)
 - *Problem:* Brief §8.1.1 requires consent flags for "care/teaching/research/**data use**." Only 3 of 4 were implemented.
@@ -66,10 +84,10 @@ The specs review (`docs/completed/specs_review.md`) audited every module against
 
 ## Stats
 
-- **5 migrations** added: `pharmacy.0004`, `reporting.0003`, `laboratory.0003`, `patients.0002` (+ empty lab migration pre-created)
-- **98 tests pass** — 0 regressions from Phase 2 baseline
+- **10 migrations** added: `pharmacy.0004`, `reporting.0003`, `laboratory.0003`, `encounters.0002`, `encounters.0003`, `patients.0002`, `patients.0003`, `vitals.0002`
+- **99 tests pass** — 98 baseline + 1 new LOINC validation test
 - **1 pip-audit CVE** (pytest 8.4.2 — dev-only, ignored in CI)
-- **~300 lines changed** across 15 files
+- **~600 lines changed** across 34 files
 
 ## State
 
@@ -86,3 +104,4 @@ All users, patients, and seed data same as Phase 2. New features don't change ex
 | requirements.txt hash-pinning (§5) | Supply-chain audit requirement. Risky mid-sprint — pip-compile may change pinned versions. |
 | SW background sync wiring (§10) | Offline pipeline half-connected. Works in demo; full wiring is polish. |
 | Allergy severity tiers (§9.2) | Critical block on any allergy is safer than differentiating. |
+| Inline Alpine JS → static files | Ponytail review finding. Works inline; extract post-demo. |
