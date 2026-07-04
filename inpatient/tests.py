@@ -92,6 +92,17 @@ class TestServices:
         assert len(avail) == 2  # 4 total, 2 occupied
 
 
+def test_beds_for_ward_returns_valid_html(db, ward, beds, clinician):
+    """H7: beds_for_ward must return valid select HTML, not crash on escaping."""
+    from django.test import Client
+    c = Client()
+    c.force_login(clinician)
+    response = c.get(reverse("inpatient:beds_for_ward"), {"ward": ward.pk})
+    assert response.status_code == 200
+    assert "<select" in response.content.decode()
+    assert response["Content-Type"] == "text/html; charset=utf-8"
+
+
 class TestViews:
     def test_admit_requires_clinician_role(self, patient, clinician):
         c = Client()

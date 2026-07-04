@@ -85,3 +85,55 @@ def test_encounter_requires_presenting_complaint(client, clinician_user, patient
     r = client.post(reverse("encounters:new", args=[patient.pk]), {"encounter_type": "outpatient"})
     assert r.status_code == 200  # re-rendered form, not created
     assert Encounter.objects.filter(patient=patient).count() == 0
+
+
+# --- pipeline-bug regression tests (C3, C5, C7, H1, H5) ---
+
+
+def test_encounter_detail_has_patient_in_context(client, clinician_user, patient):
+    """C3: patient must be in template context for patient.full_name etc."""
+    encounter = services.create_encounter(patient, clinician_user, dict(presenting_complaint="Cough"))
+    client.force_login(clinician_user)
+    response = client.get(reverse("encounters:detail", args=[encounter.pk]))
+    assert response.status_code == 200
+    assert response.context["patient"] == patient
+
+
+def test_sign_button_has_name_attribute(client, clinician_user, patient):
+    """C5: the sign button must have name='sign' for view to detect the action."""
+    encounter = services.create_encounter(patient, clinician_user, dict(presenting_complaint="Cough"))
+    client.force_login(clinician_user)
+    response = client.get(reverse("encounters:detail", args=[encounter.pk]))
+    assert 'name="sign"' in response.content.decode()
+
+
+def test_addendum_form_submission_via_view(client, clinician_user, patient):
+    """C7: the addendum form wired into the template must actually work."""
+    encounter = services.create_encounter(patient, clinician_user, dict(presenting_complaint="Cough"))
+    services.sign_encounter(encounter, clinician_user)
+    client.force_login(clinician_user)
+    response = client.post(
+        reverse("encounters:detail", args=[encounter.pk]),
+        {"add_addendum": "1", "note": "Follow-up: patient improving"},
+    )
+    assert response.status_code == 302
+    assert encounter.addenda.count() == 1
+    assert encounter.addenda.first().note == "Follow-up: patient improving"
+
+
+def test_edit_encounter_requires_role(client, clinician_user, patient):
+    """H5: edit_encounter must raise PermissionDenied for non-Clinician/Nurse/Admin."""
+    nobody = User.objects.create_user("nobody", password="TestPass123!")
+    client.force_login(nobody)
+    encounter = services.create_encounter(patient, clinician_user, dict(presenting_complaint="Cough"))
+    response = client.get(reverse("encounters:edit", args=[encounter.pk]))
+    assert response.status_code == 403
+
+
+def test_edit_encounter_get_redirects_to_detail(client, clinician_user, patient):
+    """H1: GET on edit_encounter should redirect to detail view, not crash."""
+    encounter = services.create_encounter(patient, clinician_user, dict(presenting_complaint="Cough"))
+    client.force_login(clinician_user)
+    response = client.get(reverse("encounters:edit", args=[encounter.pk]))
+    assert response.status_code == 302
+    assert reverse("encounters:detail", args=[encounter.pk]) in response.headers["Location"]

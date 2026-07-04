@@ -56,6 +56,35 @@ def test_wrong_password_does_not_log_in(client, nurse_user):
     assert not response.wsgi_request.user.is_authenticated
 
 
+# --- logout / redirect behaviour (regression tests) ---
+
+
+def test_logout_get_redirects_instead_of_405(client, nurse_user):
+    """GET /logout/ must redirect (Django 5.x LogoutView dropped get())."""
+    client.force_login(nurse_user)
+    response = client.get(reverse("accounts:logout"))
+    assert response.status_code == 302
+    assert "/accounts/login/" in response.headers["Location"]
+
+
+def test_logged_in_user_redirected_from_login_page(client, nurse_user):
+    """redirect_authenticated_user=True sends logged-in users to dashboard."""
+    client.force_login(nurse_user)
+    response = client.get(reverse("accounts:login"))
+    assert response.status_code == 302
+    assert reverse("accounts:dashboard") in response.headers["Location"]
+
+
+def test_control_panel_renders_without_crash(client, nurse_user):
+    """Control panel must not throw NoReverseMatch (regression for ward_dashboard)."""
+    Group.objects.get_or_create(name="Admin")
+    nurse_user.groups.add(Group.objects.get(name="Admin"))
+    client.force_login(nurse_user)
+    response = client.get(reverse("accounts:control_panel"))
+    assert response.status_code == 200
+    assert "Control Panel" in response.content.decode()
+
+
 # --- validation-failure path ---
 
 

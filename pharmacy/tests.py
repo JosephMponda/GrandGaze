@@ -1,6 +1,7 @@
 from datetime import date
 
 import pytest
+from django import forms
 from django.contrib.auth.models import Group, User
 from django.urls import reverse
 
@@ -118,6 +119,28 @@ def test_duplicate_therapy_warning(patient, clinician):
     warnings = check_prescription_safety(patient, drug, "200 mg")
 
     assert any(w.code == "duplicate" and w.level == "warning" for w in warnings)
+
+
+def test_notes_field_rendered_in_prescribe_form(client, patient, clinician):
+    """C1: the notes field must appear and accept input."""
+    client.force_login(clinician)
+    response = client.get(reverse("pharmacy:prescribe", args=[patient.pk]))
+    assert 'name="notes"' in response.content.decode()
+
+
+def test_encounter_field_rendered_in_prescribe_form(client, patient, clinician):
+    """H6: form has encounter field, queryset is filtered, template must render it."""
+    client.force_login(clinician)
+    response = client.get(reverse("pharmacy:prescribe", args=[patient.pk]))
+    assert 'name="encounter"' in response.content.decode()
+
+
+def test_proceed_with_warnings_is_checkbox_not_hidden(patient, clinician):
+    """H4: proceed_with_warnings widget must be a visible CheckboxInput."""
+    from pharmacy.forms import PrescriptionForm
+    form = PrescriptionForm()
+    widget = form.fields["proceed_with_warnings"].widget
+    assert isinstance(widget, forms.CheckboxInput)
 
 
 def test_dispensing_changes_status_and_records_actor(patient, clinician, pharmacist):
