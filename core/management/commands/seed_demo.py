@@ -12,6 +12,8 @@ from encounters.models import AllergyRecord
 from encounters.services import create_encounter, sign_encounter
 from imaging.models import ImagingModality
 from imaging.services import create_request, enter_report
+from inpatient.models import Bed, Ward
+from inpatient.services import admit_patient, assign_bed
 from laboratory.models import LabTest
 from laboratory.services import create_order, enter_result
 from patients.models import NextOfKin, Patient, PatientNumberSequence
@@ -293,6 +295,33 @@ def create_users():
     return USERS
 
 
+def create_wards_and_beds():
+    wards_data = [
+        ("Medical Ward", "Medicine", 8),
+        ("Surgical Ward", "Surgery", 6),
+        ("Paediatric Ward", "Paediatrics", 6),
+        ("Maternity Ward", "Obstetrics", 6),
+    ]
+    for name, dept, bed_count in wards_data:
+        ward, _ = Ward.objects.get_or_create(name=name, defaults={"department": dept, "bed_count": bed_count})
+        for i in range(1, bed_count + 1):
+            Bed.objects.get_or_create(ward=ward, label=f"{ward.name[0]}-{i:02d}")
+    return Ward.objects.all()
+
+
+def seed_demo_admission(patient, beds):
+    """Admit patient #5 (Mary Gondwe, the dialysis patient) as a demo."""
+    clinician = USERS["CLINICIAN"]
+    ward = Ward.objects.filter(name="Medical Ward").first()
+    if not ward:
+        return
+    bed = Bed.objects.filter(ward=ward, is_occupied=False).first()
+    if not bed:
+        return
+    admission = admit_patient(patient, clinician, "CKD Stage 4 — initiate hemodialysis", bed=bed)
+    return admission
+
+
 class Command(BaseCommand):
     help = "Seed the database with realistic demo data for the full patient journey"
 
@@ -489,6 +518,20 @@ class Command(BaseCommand):
             "encounters_encounteraddendum",
             "encounters_allergyrecord",
             "encounters_encounter",
+            "emergency_triageencounter",
+            "emergency_historicaltriageencounter",
+            "dialysis_dialysissession",
+            "dialysis_dialysisprescription",
+            "dialysis_ckddiagnosis",
+            "dialysis_historicaldialysissession",
+            "dialysis_historicaldialysisprescription",
+            "dialysis_historicalckddiagnosis",
+            "inpatient_wardroundnote",
+            "inpatient_admission",
+            "inpatient_bed",
+            "inpatient_ward",
+            "inpatient_historicalwardroundnote",
+            "inpatient_historicaladmission",
             "patients_nextofkin",
             "patients_duplicateconfirmation",
             "patients_patient",
@@ -510,11 +553,22 @@ class Command(BaseCommand):
         create_users()
         self.stdout.write(self.style.SUCCESS(f"  Created {len(USERS)} users"))
 
+        self.stdout.write("Creating wards and beds...")
+        create_wards_and_beds()
+        self.stdout.write(self.style.SUCCESS("  Wards and beds created"))
+
         self.stdout.write("Creating patients and clinical data...")
+        patients = []
         for i, pdata in enumerate(PATIENTS_DATA, 1):
             patient = self._seed_patient(pdata)
+            patients.append(patient)
             name = f"{patient.first_name} {patient.last_name}"
             self.stdout.write(self.style.SUCCESS(f"  [{i}] {name} ({patient.patient_number})"))
+
+        self.stdout.write("Creating demo admission for patient #5...")
+        if len(patients) >= 5:
+            seed_demo_admission(patients[4], None)
+            self.stdout.write(self.style.SUCCESS("  Patient #5 admitted to Medical Ward"))
 
         self.stdout.write(self.style.SUCCESS("\nDemo data seeded successfully!"))
         self.stdout.write("Users: nurse1, clinician1, pharmacist1, labtech1, radiog1, billing1, admin1, ict1")
