@@ -2,9 +2,15 @@
 {% block title %}New Invoice - {{ patient.full_name }} - MUST EMR{% endblock %}
 {% block content %}
 <div class="max-w-3xl mx-auto py-6">
-    <div class="border-b border-gray-200 pb-5">
-        <h1 class="text-3xl font-bold tracking-tight text-ink">New Invoice</h1>
-        <p class="text-sm text-ink-500 mt-1">{{ patient.full_name }} · {{ patient.patient_number }}</p>
+    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight text-ink">New Invoice</h1>
+            <p class="text-sm text-ink-500 mt-1">{{ patient.full_name }} · {{ patient.patient_number }}</p>
+        </div>
+        <a href="{% url 'patients:profile' patient.pk %}" class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            Back to Patient
+        </a>
     </div>
 
     <form method="post" class="mt-6 space-y-8">
@@ -28,7 +34,7 @@
         </div>
 
         <div class="flex items-center justify-end gap-4">
-            <a href="{% url 'billing:patient_invoices' patient.pk %}" class="btn-secondary text-sm px-4 py-2">Cancel</a>
+            <a href="{% url 'patients:profile' patient.pk %}" class="btn-secondary text-sm px-4 py-2">Cancel</a>
             <button type="submit" class="btn-primary text-sm px-6 py-2 font-semibold">Create Invoice</button>
         </div>
     </form>
