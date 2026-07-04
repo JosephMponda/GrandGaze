@@ -2,9 +2,15 @@
 {% block title %}Recent Alerts - MUST EMR{% endblock %}
 {% block content %}
 <div class="max-w-4xl mx-auto py-6">
-    <div class="border-b border-gray-200 pb-5">
-        <h1 class="text-3xl font-bold tracking-tight text-ink">Alerts</h1>
-        <p class="text-sm text-ink-500 mt-1">Patient safety alerts from the last 4 hours</p>
+    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight text-ink">Alerts</h1>
+            <p class="text-sm text-ink-500 mt-1">Patient safety alerts from the last 4 hours</p>
+        </div>
+        <a href="{% url 'accounts:dashboard' %}" class="btn-secondary text-sm font-semibold inline-flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            Back to Dashboard
+        </a>
     </div>
 
     {% if alerts %}
