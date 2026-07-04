@@ -75,12 +75,14 @@
                 {% include "components/_field.html" with field=form.frequency %}
                 {% include "components/_field.html" with field=form.duration_days %}
             </div>
+            {% include "components/_field.html" with field=form.encounter %}
             {% include "components/_field.html" with field=form.notes %}
             {% if warnings %}
-                <div class="bg-paper border border-gray-200/60 rounded-xl p-4">
+                <div class="bg-paper border border-gray-200/60 rounded-xl p-4 space-y-4">
                     <p class="text-xs font-bold text-ink-700 uppercase tracking-wider mb-2">Override</p>
                     <p class="text-sm text-ink-600">Checking this box confirms you have documented a clinical reason for overriding the warnings.</p>
                     {% include "components/_field.html" with field=form.proceed_with_warnings %}
+                    {% include "components/_field.html" with field=form.safety_override_reason %}
                 </div>
             {% endif %}
         </div>

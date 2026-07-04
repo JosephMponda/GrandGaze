@@ -54,6 +54,7 @@ class Prescription(models.Model):
     duration_days = models.PositiveIntegerField(null=True, blank=True)
     status = models.CharField(max_length=15, choices=PrescriptionStatus.choices, default=PrescriptionStatus.PRESCRIBED)
     safety_override_reason = models.TextField(blank=True)
+    notes = models.TextField(blank=True)
     approved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True, related_name="prescriptions_approved")
     approved_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

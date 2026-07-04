@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
+from accounts.permissions import role_required
 from patients.services import get_patient_or_404
 
 from . import services
@@ -48,28 +49,33 @@ def encounter_detail(request, pk):
             messages.success(request, "Addendum added.")
         return redirect(reverse("encounters:detail", args=[encounter.pk]))
 
+    addenda = encounter.addenda.all()
     edit_form = None if encounter.is_signed else EncounterForm(instance=encounter)
     return render(
         request,
         "encounters/detail.html",
         {
             "encounter": encounter,
+            "patient": encounter.patient,
             "edit_form": edit_form,
             "addendum_form": EncounterAddendumForm(),
+            "addenda": addenda,
         },
     )
 
 
-@login_required
+@role_required("Clinician", "Nurse", "Admin")
 def edit_encounter(request, pk):
     encounter = get_object_or_404(Encounter, pk=pk)
     if encounter.is_signed:
         messages.error(request, "Signed encounters are read-only — add an addendum instead.")
         return redirect(reverse("encounters:detail", args=[encounter.pk]))
-    form = EncounterForm(request.POST, instance=encounter)
-    if form.is_valid():
-        form.save()
-        messages.success(request, "Encounter updated.")
+    if request.method == "POST":
+        form = EncounterForm(request.POST, instance=encounter)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Encounter updated.")
+            return redirect(reverse("encounters:detail", args=[encounter.pk]))
     return redirect(reverse("encounters:detail", args=[encounter.pk]))
 
 

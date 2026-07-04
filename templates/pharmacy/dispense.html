@@ -26,7 +26,7 @@
             </div>
             <div>
                 <p class="text-xs font-bold text-ink-700 uppercase tracking-wider">Route</p>
-                <p class="text-sm font-semibold text-ink-900 mt-1">{{ prescription.get_route_display|default:"—" }}</p>
+                <p class="text-sm font-semibold text-ink-900 mt-1">{{ prescription.route|default:"—" }}</p>
             </div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -69,7 +69,7 @@
                 <h3 class="text-base font-semibold text-ink-900">Dispensing Details</h3>
             </div>
             {% include "components/_field.html" with field=form.quantity_dispensed %}
-            {% include "components/_field.html" with field=form.notes %}
+            {% include "components/_field.html" with field=form.stock_note %}
         </div>
 
         <div class="flex items-center justify-end gap-4 pt-6 pb-10">

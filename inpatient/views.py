@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.html import format_html
 
 from accounts.permissions import role_required
 from patients.services import get_patient_or_404
@@ -81,5 +82,5 @@ def patient_tab(request, patient_id):
 def beds_for_ward(request):
     ward_id = request.GET.get("ward")
     beds = Bed.objects.filter(ward_id=ward_id, is_occupied=False) if ward_id else Bed.objects.none()
-    options = "".join(f'<option value="{b.pk}">{b.label}</option>' for b in beds)
-    return HttpResponse(f'<select name="bed" class="w-full rounded-lg border-gray-200 text-sm"><option value="">— Assign later —</option>{options}</select>')
+    options = "".join(format_html('<option value="{}">{}</option>', b.pk, b.label) for b in beds)
+    return HttpResponse(format_html('<select name="bed" class="w-full rounded-lg border-gray-200 text-sm"><option value="">— Assign later —</option>{}</select>', options))
