@@ -64,6 +64,24 @@ The specs review (`docs/completed/specs_review.md`) audited every module against
 - *Problem:* §8.1.18 requires "ICD-10 or ICD-11 diagnosis coding readiness." Encounter had free-text diagnosis only — no structured code field.
 - *Fix:* Added `icd_code` (CharField 20) and `icd_display` (CharField 255) to Encounter. Added to form fields. 5 ICD-11 codes seeded in demo data: malaria (1F40), ANC (QA0Y), pneumonia (CA40), diabetes (5A11), threatened abortion (JA00.0). Migration applied.
 
+### P2 — Error Handling / UX Hardening (Security)
+
+**Custom error pages** (`templates/404.html`, `templates/403.html`, `templates/500.html`, `templates/400.html`, `config/error_views.py`)
+- *Problem:* Django's DEBUG-mode 404 page exposes URL patterns, view paths, and file locations. Any mistyped URL (e.g. `/accounts/access`) shows the full routing table. §9.4 security requirements imply no internal path disclosure.
+- *Fix:* Created `templates/404.html`, `403.html`, `500.html`, `400.html` — all extend `base.html`, show friendly message with "Go to Dashboard" link. Custom `config/error_views.py` handlers override Django's default to always render these templates regardless of `DEBUG`.
+
+**Catch-all URL pattern** (`config/urls.py`)
+- *Problem:* `handler404` only takes effect when `DEBUG=False`. During development, Django's `technical_404_response` bypasses it for URL resolution failures (non-matching paths).
+- *Fix:* `path("<path:unmatched>", catch_all_404)` as the last entry in `urlpatterns`. Catches any path that doesn't match earlier patterns and renders the custom 404 template.
+
+**Logout GET 405 fix** (`accounts/views.py`, `accounts/urls.py`)
+- *Problem:* Django 5.x `LogoutView` accepts POST only. Navigating to `/accounts/logout/` in the address bar returned a bare 405 with no UI.
+- *Fix:* Replaced with custom `logout_view` — POST logs out and redirects to login; GET just redirects to login (harmless).
+
+**redirect_authenticated_user** (`accounts/urls.py`)
+- *Problem:* `LoginView` defaulted to `redirect_authenticated_user=False`. Logged-in users visiting `/accounts/login/` saw the login form (with stale CSRF token from the old anonymous session), then failed to logout with 403.
+- *Fix:* Added `redirect_authenticated_user=True`. Authenticated users are redirected to dashboard immediately.
+
 ### P3 — Sustainability / Requirements Compliance
 
 **LOINC code validation** (`laboratory/models.py`)
@@ -85,9 +103,9 @@ The specs review (`docs/completed/specs_review.md`) audited every module against
 ## Stats
 
 - **10 migrations** added: `pharmacy.0004`, `reporting.0003`, `laboratory.0003`, `encounters.0002`, `encounters.0003`, `patients.0002`, `patients.0003`, `vitals.0002`
-- **99 tests pass** — 98 baseline + 1 new LOINC validation test
+- **99 tests pass** — 98 baseline + 1 new LOINC validation test (no regressions from any session)
 - **1 pip-audit CVE** (pytest 8.4.2 — dev-only, ignored in CI)
-- **~600 lines changed** across 34 files
+- **~650 lines changed** across 39 files
 
 ## State
 
