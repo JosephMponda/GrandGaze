@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 
+from accounts.permissions import role_required
 from patients.models import Patient
 
 from .forms import InvoiceForm, LineItemFormSet, PaymentForm
@@ -9,7 +10,7 @@ from .models import Invoice, ServiceCatalogItem
 from .services import add_line_item, create_invoice, outstanding_balance, record_payment, unpaid_invoices_for
 
 
-@login_required
+@role_required("BillingOfficer", "Admin")
 def dashboard(request):
     recent = Invoice.objects.select_related("patient").order_by("-created_at")[:20]
     counts = Invoice.objects.aggregate(
@@ -38,7 +39,7 @@ def patient_tab(request, patient_id):
     return render(request, "billing/_patient_tab.html", {"patient": patient, "invoices": invoices})
 
 
-@login_required
+@role_required("BillingOfficer", "Admin")
 def create_invoice_view(request, patient_id):
     patient = get_object_or_404(Patient, pk=patient_id)
     if request.method == "POST":
@@ -56,7 +57,7 @@ def create_invoice_view(request, patient_id):
     return render(request, "billing/create_invoice.html", {"patient": patient, "form": form, "formset": formset})
 
 
-@login_required
+@role_required("BillingOfficer", "Admin")
 def invoice_detail(request, invoice_id):
     invoice = get_object_or_404(Invoice.objects.prefetch_related("line_items__service_item", "payments"), pk=invoice_id)
     balance = outstanding_balance(invoice)

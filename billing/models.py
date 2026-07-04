@@ -1,4 +1,7 @@
+from decimal import Decimal
+
 from django.conf import settings
+from django.core.validators import MinValueValidator
 from django.db import models
 
 import simple_history.models
@@ -64,7 +67,9 @@ class Payment(models.Model):
         INSURANCE = "insurance", "Insurance"
 
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="payments")
-    amount_mwk = models.DecimalField(max_digits=12, decimal_places=2)
+    amount_mwk = models.DecimalField(
+        max_digits=12, decimal_places=2, validators=[MinValueValidator(Decimal("0.01"))]
+    )
     method = models.CharField(max_length=20, choices=Method.choices)
     reference = models.CharField(max_length=255, blank=True)
     received_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
@@ -72,6 +77,12 @@ class Payment(models.Model):
 
     class Meta:
         ordering = ["-received_at"]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(amount_mwk__gt=0),
+                name="payment_amount_mwk_positive",
+            )
+        ]
 
     def __str__(self):
         return f"{self.method} MWK {self.amount_mwk} on Invoice #{self.invoice.pk}"

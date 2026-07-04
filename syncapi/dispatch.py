@@ -6,11 +6,26 @@ Each handler receives (payload_json, submitted_by) and returns
 
 from django.db import transaction
 
-from patients.services import register_patient
+from patients.services import check_possible_duplicate, confirm_not_duplicate, register_patient
 
 
 def _handle_patient_registration(payload, submitted_by):
-    patient = register_patient(payload, registered_by=submitted_by)
+    # Same safety gate as the online registration view (patients/views.py) -
+    # register_patient() itself does NOT run this check, so every caller
+    # must. Skipping it here would let offline-synced registrations bypass
+    # duplicate-patient detection entirely.
+    confirmed_id = payload.get("confirmed_not_duplicate_of")
+    duplicates = check_possible_duplicate(payload)
+    confirmed = duplicates.filter(pk=confirmed_id).first() if confirmed_id else None
+    remaining = duplicates.exclude(pk=confirmed.pk) if confirmed else duplicates
+    if remaining.exists() or (confirmed_id and not confirmed):
+        candidates = ", ".join(p.patient_number for p in remaining[:5])
+        return None, f"Possible duplicate patient(s): {candidates}. Confirm on next sync."
+
+    patient_data = {k: v for k, v in payload.items() if k != "confirmed_not_duplicate_of"}
+    patient = register_patient(patient_data, registered_by=submitted_by)
+    if confirmed:
+        confirm_not_duplicate(patient, confirmed, confirmed_by=submitted_by)
     return patient, None
 
 

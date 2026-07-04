@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.db import transaction
 from django.db.models import Sum
 
@@ -19,7 +21,13 @@ def add_line_item(*, invoice, service_item, quantity=1) -> InvoiceLineItem:
 
 
 def record_payment(*, invoice, amount_mwk, method, received_by, reference="") -> Payment:
+    if amount_mwk is None or Decimal(amount_mwk) <= 0:
+        raise ValueError("Payment amount must be greater than zero.")
     with transaction.atomic():
+        # Lock the invoice row so two concurrent payments can't both read a
+        # stale total_paid and leave invoice.status wrong (e.g. stuck on
+        # "partially_paid" when the combined payments actually paid it off).
+        invoice = Invoice.objects.select_for_update().get(pk=invoice.pk)
         payment = Payment.objects.create(
             invoice=invoice,
             amount_mwk=amount_mwk,

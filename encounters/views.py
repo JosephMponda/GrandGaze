@@ -3,7 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from accounts.permissions import role_required
+from django.core.exceptions import PermissionDenied
+
+from accounts.permissions import has_role, role_required
 from patients.services import get_patient_or_404
 
 from . import services
@@ -11,7 +13,7 @@ from .forms import AllergyRecordForm, EncounterAddendumForm, EncounterForm
 from .models import Encounter
 
 
-@login_required
+@role_required("Clinician", "Nurse", "Admin")
 def new_encounter(request, patient_id):
     patient = get_patient_or_404(patient_id)
     if request.method == "POST":
@@ -30,6 +32,8 @@ def encounter_detail(request, pk):
     encounter = get_object_or_404(Encounter, pk=pk)
 
     if request.method == "POST" and "sign" in request.POST:
+        if not has_role(request.user, "Clinician", "Nurse", "Admin"):
+            raise PermissionDenied("Your role does not have access to this page.")
         if encounter.is_signed:
             messages.error(request, "This encounter is already signed.")
         else:
@@ -38,6 +42,8 @@ def encounter_detail(request, pk):
         return redirect(reverse("encounters:detail", args=[encounter.pk]))
 
     if request.method == "POST" and "add_addendum" in request.POST:
+        if not has_role(request.user, "Clinician", "Nurse", "Admin"):
+            raise PermissionDenied("Your role does not have access to this page.")
         # Signed encounters are read-only in the UI — further notes are
         # addenda, never a silent rewrite of signed clinical documentation.
         addendum_form = EncounterAddendumForm(request.POST)
