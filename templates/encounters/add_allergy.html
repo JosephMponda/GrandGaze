@@ -1,9 +1,57 @@
 {% extends "base.html" %}
+{% block title %}Record Allergy — {{ patient.full_name }} - MUST EMR{% endblock %}
+
 {% block content %}
-<h1>Record Allergy — {{ patient.full_name }}</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save</button>
-</form>
+<div class="max-w-2xl mx-auto py-6">
+    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight text-ink-900">Record Allergy</h1>
+            <p class="text-sm text-ink-500 mt-2">{{ patient.full_name }} &middot; {{ patient.patient_number }}</p>
+        </div>
+        <a href="{% url 'patients:profile' patient.pk %}" class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            Back to Patient
+        </a>
+    </div>
+
+    <div class="bg-red-50 border border-red-200 rounded-2xl p-5 mb-8 flex items-start gap-3">
+        <svg class="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        <div>
+            <p class="text-sm font-bold text-red-800">Patient Safety Record</p>
+            <p class="text-xs text-red-600 mt-0.5">Allergy records are permanently stored and surfaced on all future prescribing screens. Please verify details carefully before saving.</p>
+        </div>
+    </div>
+
+    <form method="post" class="space-y-8">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="space-y-2 mb-6">
+            {% for error in form.non_field_errors %}
+                {% include "components/_alert_banner.html" with message=error type="critical" %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 space-y-6">
+            <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
+                <span class="w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs font-bold">!</span>
+                <h3 class="text-base font-semibold text-ink-900">Allergy Details</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% include "components/_field.html" with field=form.allergen %}
+                {% include "components/_field.html" with field=form.severity %}
+            </div>
+            {% include "components/_field.html" with field=form.reaction %}
+        </div>
+
+        <div class="flex items-center justify-end gap-4 pt-2 pb-10">
+            <a href="{% url 'patients:profile' patient.pk %}" class="btn-secondary text-sm font-semibold py-3 px-6 hover:-translate-y-0.5 transition-all duration-200">Cancel</a>
+            <button type="submit" class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:shadow-brand/30 hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2">
+                Save Allergy Record
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
+        </div>
+    </form>
+</div>
 {% endblock %}

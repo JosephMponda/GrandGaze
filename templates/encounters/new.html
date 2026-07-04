@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% block title %}New Encounter — {{ patient.full_name }} - MUST EMR{% endblock %}
+{% block title %}New Encounter - {{ patient.full_name }} - MUST EMR{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto py-6">
+<div class="max-w-4xl mx-auto py-6">
     <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
         <div>
             <h1 class="text-3xl font-bold tracking-tight text-ink-900">New Encounter</h1>
@@ -25,17 +25,67 @@
         </div>
         {% endif %}
 
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 space-y-6">
+        <!-- Step 1: Basic Encounter Settings -->
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
             <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
                 <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold">1</span>
                 <h3 class="text-base font-semibold text-ink-900">Encounter Details</h3>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {% include "components/_field.html" with field=form.encounter_type %}
-                {% include "components/_field.html" with field=form.department %}
             </div>
-            {% include "components/_field.html" with field=form.chief_complaint %}
-            {% include "components/_field.html" with field=form.notes %}
+        </div>
+
+        <!-- Step 2: Presenting Complaint -->
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+            <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
+                <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold">2</span>
+                <h3 class="text-base font-semibold text-ink-900">Chief Complaint & History</h3>
+            </div>
+            <div class="space-y-6">
+                {% include "components/_field.html" with field=form.presenting_complaint %}
+                {% include "components/_field.html" with field=form.history_of_presenting_complaint %}
+            </div>
+        </div>
+
+        <!-- Step 3: Medical Background -->
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+            <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
+                <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold">3</span>
+                <h3 class="text-base font-semibold text-ink-900">Patient History Background</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% include "components/_field.html" with field=form.past_medical_history %}
+                {% include "components/_field.html" with field=form.past_surgical_history %}
+                {% include "components/_field.html" with field=form.medication_history %}
+                {% include "components/_field.html" with field=form.allergy_history %}
+                {% include "components/_field.html" with field=form.social_history %}
+                {% include "components/_field.html" with field=form.family_history %}
+            </div>
+        </div>
+
+        <!-- Step 4: Clinical Exam & Diagnosis -->
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+            <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
+                <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold">4</span>
+                <h3 class="text-base font-semibold text-ink-900">Clinical Evaluation</h3>
+            </div>
+            <div class="space-y-6">
+                {% include "components/_field.html" with field=form.examination_findings %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {% include "components/_field.html" with field=form.diagnosis %}
+                    {% include "components/_field.html" with field=form.differential_diagnosis %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5: Clinical Plan -->
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+            <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
+                <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold">5</span>
+                <h3 class="text-base font-semibold text-ink-900">Clinical Management Plan</h3>
+            </div>
+            {% include "components/_field.html" with field=form.clinical_plan %}
         </div>
 
         <div class="flex items-center justify-end gap-4 pt-6 pb-10">
