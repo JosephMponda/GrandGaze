@@ -63,6 +63,15 @@ def queue(request):
     return render(request, "pharmacy/queue.html", {"prescriptions": prescriptions})
 
 
+@login_required
+def cancel(request, pk):
+    prescription = get_object_or_404(Prescription, pk=pk)
+    if request.method == "POST":
+        services.cancel_prescription(prescription, request.user)
+        messages.success(request, "Prescription cancelled.")
+    return redirect(reverse("pharmacy:queue"))
+
+
 @role_required("Pharmacist", "Admin")
 def approve(request, pk):
     prescription = get_object_or_404(Prescription, pk=pk)

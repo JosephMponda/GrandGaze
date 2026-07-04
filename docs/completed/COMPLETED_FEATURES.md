@@ -18,7 +18,8 @@
 | Duplicate detection + merge | Trigram similarity (`pg_trgm`) + exact ID/phone match; blocking interstitial with logged override; merge workflow | `patients/services.py`, `patients/views.py` |
 | Visit/encounter history | `Encounter` FK'd to `Patient`; tab on profile | `encounters/` |
 | Referral tracking | `ReferralRecord` (source, destination, reason) | `patients/models.py` |
-| Consent flags | `consent_care/teaching/research` booleans | `patients/models.py` |
+| Consent flags | `consent_care/teaching/research/data_use` booleans | `patients/models.py` |
+| Patient edit view | `/patients/<pk>/edit/` reusing registration form | `patients/views.py` |
 | Audit trail | `django-simple-history` on `Patient` + `DuplicateConfirmation` log | `patients/` |
 
 ## §8.1.2 Appointment, Queue, Patient Flow — **NOT BUILT**
@@ -46,7 +47,7 @@ See §7.2 for scheduling / queue models.
 | Ward management | `Ward` (name, department, bed_count) + `Bed` (ward FK, label, occupancy) | `inpatient/models.py` |
 | Bed assignment | `assign_bed()` / `free_bed()` services | `inpatient/services.py` |
 | Transfer | `transfer_patient()` — frees old bed, assigns new | `inpatient/services.py` |
-| Discharge | `discharge()` — frees bed, timestamp + summary | `inpatient/services.py` |
+| Discharge + death documentation | `discharge()` — frees bed, timestamp + summary; `DEAD` status when disposition="dead" | `inpatient/services.py` |
 | Ward round notes | `WardRoundNote` with optional diagnosis/plan update | `inpatient/models.py` |
 | Bed board | `/inpatient/ward/<id>/` — color-coded occupancy grid | `inpatient/views.py` |
 | Inpatient dashboard | `/inpatient/dashboard/` — occupancy per ward + active admissions | `inpatient/views.py` |
@@ -100,7 +101,7 @@ This section covers generic order sets (CPOE) separate from lab/imaging/pharmacy
 | Specimen tracking | Specimen type on `LabTest`; `specimen_barcode` on `LabOrder` | `laboratory/models.py` |
 | Result entry + verification | `LabResult` with separate `entered_by`/`verified_by` (enforced different users) | `laboratory/models.py` |
 | Critical result alerts | `is_critical` auto-set; calls `raise_alert()` on save | `laboratory/views.py` |
-| LOINC-ready | `loinc_code` nullable field on `LabTest` | `laboratory/models.py` |
+| LOINC-ready | `loinc_code` on `LabTest`; 6 seeded tests with real codes (FBC 58410-2, Malaria RDT 87591-4, Creatinine 2160-0, HIV 75622-1, Glucose 2345-7, Urinalysis 24356-8) | `laboratory/models.py`, `laboratory/migrations/0003_seed_loinc_codes.py` |
 | Workload dashboard | `/labs/workload/` — pending/resulted counts, turnaround time | `laboratory/views.py` |
 
 ## §8.1.11 Pharmacy, Prescribing & Medication Safety — **COMPLETE**
@@ -109,10 +110,12 @@ This section covers generic order sets (CPOE) separate from lab/imaging/pharmacy
 |---|---|---|
 | Electronic prescribing | `Prescription` with dose/route/frequency/duration | `pharmacy/models.py` |
 | Allergy alerts | `check_prescription_safety()` queries `DrugAllergyMap` + `encounters.services.get_patient_allergies()` | `pharmacy/safety.py` |
+| Drug-drug interaction warnings | `Drug.interacting_drugs` M2M; `_check_drug_interaction()` queries active prescriptions for flagged interactions; critical-level block | `pharmacy/models.py`, `pharmacy/safety.py` |
+| Breastfeeding/lactation warning | `Drug.contraindicated_in_breastfeeding`; warns if flagged + patient sex is female | `pharmacy/models.py`, `pharmacy/safety.py` |
 | Duplicate therapy warning | Checks active prescriptions for same drug/generic_name | `pharmacy/safety.py` |
-| Pediatric dosing | `pediatric_max_dose_mg` on `Drug`; dose check against patient age | `pharmacy/safety.py` |
+| Pediatric dosing | `pediatric_max_dose_mg` on `Drug`; dose check against patient age; transparent warning if DOB missing | `pharmacy/safety.py` |
 | Pregnancy/renal contraindication | `contraindicated_in_pregnancy/renal` on `Drug`; checks patient vital status + diagnosis | `pharmacy/safety.py` |
-| Prescription approval workflow | `prescribed -> approved -> dispensed -> cancelled` with separate `approved_by` role | `pharmacy/views.py` |
+| Prescription approval workflow | `prescribed -> approved -> dispensed -> cancelled` with separate `approved_by` role; cancel view at `pharmacy/prescription/<pk>/cancel/` | `pharmacy/views.py` |
 | Override documentation | `safety_override_reason` required when bypassing critical alert | `pharmacy/models.py` |
 | Stock note | `stock_note` free-text on `DispensingRecord` | `pharmacy/models.py` |
 
@@ -162,7 +165,7 @@ See §7.3.
 
 | Requirement | Implementation | Location |
 |---|---|---|
-| Audit trail | `django-simple-history` on all clinical/PHI models (create/update/delete versioned) | `config/settings.py` |
+| Audit trail | `django-simple-history` on all clinical/PHI models (include `AlertEvent` — fixed P0 gap) | `config/settings.py` |
 | Audit viewer | `/accounts/admin/audit/` — role-gated (Admin/ICT only) | `accounts/views.py` |
 | Electronic signatures | `signed_by`/`signed_at` on Encounter, `verified_by` on LabResult | `encounters/`, `laboratory/` |
 | RBAC documentation | 8 groups fixture with permissions; `@role_required` decorator | `accounts/` |
@@ -201,13 +204,15 @@ Cross-module communication not yet formalized beyond the shared alert hub.
 
 ### §9.2 Patient Safety Framework
 - Allergy alerts (pharmacy prescribing time)
+- Drug-drug interaction warnings (M2M on Drug, critical-level block)
+- Breastfeeding/lactation warnings (contraindication flag + sex-based check)
 - Critical lab result alerts (auto-fire on save)
 - Abnormal vital sign triggers (hard thresholds)
-- Pediatric dosing safeguards (dose vs age check)
+- Pediatric dosing safeguards (dose vs age check; transparent when DOB unknown)
 - Duplicate patient record warning (trigram + exact match)
 - Time-stamped clinical notes (all Encounter/Lab orders)
 - Alert prioritization (critical vs warning levels; warnings can be acknowledged, critical blocks submit)
-- Audit logs on every PHI write
+- Audit logs on every PHI write (AlertEvent now historied)
 
 ### §9.3 Legal, Ethical, Compliance Requirements
 - Field-level encryption (Fernet-based, via `core/encrypted_fields.py`)

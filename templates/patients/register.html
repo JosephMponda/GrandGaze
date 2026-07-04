@@ -1,15 +1,15 @@
 {% extends "base.html" %}
-{% block title %}Register Patient - MUST EMR{% endblock %}
+{% block title %}{% if editing %}Edit{% else %}Register{% endif %} Patient - MUST EMR{% endblock %}
 
 {% block content %}
 <div class="max-w-4xl mx-auto py-6">
     <!-- Header -->
     <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
         <div>
-            <h1 class="text-3xl font-bold tracking-tight text-ink-900">Patient Registration</h1>
-            <p class="text-sm text-ink-500 mt-2">Add a new patient to the Master Patient Index (MPI). Fields marked with * are required.</p>
+            <h1 class="text-3xl font-bold tracking-tight text-ink-900">{% if editing %}Edit Patient{% else %}Patient Registration{% endif %}</h1>
+            <p class="text-sm text-ink-500 mt-2">{% if editing %}Update patient demographics and consents.{% else %}Add a new patient to the Master Patient Index (MPI). Fields marked with * are required.{% endif %}</p>
         </div>
-        <a href="{% url 'accounts:dashboard' %}" class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200">
+        <a href="{% if editing %}{% url 'patients:profile' patient.pk %}{% else %}{% url 'accounts:dashboard' %}{% endif %}" class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
             </svg>
@@ -112,7 +112,7 @@
                 Cancel
             </a>
             <button type="submit" class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:shadow-brand/30 hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2">
-                Register Patient
+                {% if editing %}Save Changes{% else %}Register Patient{% endif %}
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </button>
         </div>

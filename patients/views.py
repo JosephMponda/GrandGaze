@@ -42,6 +42,20 @@ def search_patients(request):
 
 
 @login_required
+def edit_patient(request, pk):
+    patient = services.get_patient_or_404(pk)
+    if request.method == "POST":
+        form = PatientRegistrationForm(request.POST, instance=patient)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Patient updated.")
+            return redirect(reverse("patients:profile", args=[patient.pk]))
+    else:
+        form = PatientRegistrationForm(instance=patient)
+    return render(request, "patients/register.html", {"form": form, "editing": True, "patient": patient})
+
+
+@login_required
 def patient_profile(request, pk):
     patient = services.get_patient_or_404(pk)
     tabs = [

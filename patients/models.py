@@ -71,6 +71,7 @@ class Patient(models.Model):
     consent_care = models.BooleanField(default=True)
     consent_teaching = models.BooleanField(default=False)
     consent_research = models.BooleanField(default=False)
+    consent_data_use = models.BooleanField(default=False)
 
     is_active = models.BooleanField(default=True)  # False once merged into another record
 

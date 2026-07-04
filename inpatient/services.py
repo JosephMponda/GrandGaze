@@ -38,7 +38,7 @@ def transfer_patient(admission: Admission, target_bed: Bed, reason: str = "") ->
 def discharge(admission: Admission, clinician, summary="", disposition="discharged") -> Admission:
     if admission.bed:
         free_bed(admission.bed)
-    admission.status = AdmissionStatus.DISCHARGED
+    admission.status = AdmissionStatus.DEAD if disposition == "dead" else AdmissionStatus.DISCHARGED
     admission.discharged_at = timezone.now()
     admission.discharge_summary = summary
     admission.discharge_disposition = disposition

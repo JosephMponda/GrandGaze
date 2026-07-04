@@ -21,7 +21,9 @@ class Drug(models.Model):
     is_controlled = models.BooleanField(default=False)
     pediatric_max_dose_mg = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     contraindicated_in_pregnancy = models.BooleanField(default=False)
+    contraindicated_in_breastfeeding = models.BooleanField(default=False)
     contraindicated_in_renal = models.BooleanField(default=False)
+    interacting_drugs = models.ManyToManyField("self", symmetrical=True, blank=True)
 
     class Meta:
         ordering = ["generic_name", "name"]

@@ -6,26 +6,24 @@
 |---|---|
 | `AGENTS.md` | Global stack decisions, module boundaries, security baseline (root of repo) |
 | `ALLOWED_PACKAGES.md` | Allowlisted dependencies (root of repo) |
-| `docs/COMPLETED_FEATURES.md` | Traceability matrix: every feature mapped to brief §8.1.x |
 | `docs/REFERENCE_ALIGNMENT.md` | Comparison to OpenMRS, FHIR, LOINC, DICOM, ICD-11 references |
-| `docs/phase-2/` | Next-sprint feature specs (inpatient, emergency, appointments) |
+| `docs/reference-systems-review.md` | Review of GrandGaze vs. reference platforms (OpenMRS, FHIR, DICOM, LOINC, ICD-11, DHIS2, MaHIS) |
+| `docs/sprint-summary-phase-3.md` | Current sprint: specs review, safety gaps closed, UX polish, audit fix (THIS SPRINT) |
+| `docs/phase-2/` | Feature specs (inpatient, emergency, appointments) |
 
-## Phase 1 — Completed (archived in `docs/completed/`)
+## Completed (archived in `docs/completed/`)
 
-| Path | Original Owner |
+| Path | Content |
 |---|---|
-| `docs/completed/backend/engineer-A-core-identity/` | Engineer A — `accounts`, `patients`. Module spec, build plan, agent instructions |
-| `docs/completed/backend/engineer-B-clinical-encounters/` | Engineer B — `encounters`, `vitals` |
-| `docs/completed/backend/engineer-C-diagnostics/` | Engineer C — `laboratory`, `imaging` |
-| `docs/completed/backend/engineer-D-pharmacy/` | Engineer D — `pharmacy` |
-| `docs/completed/backend/engineer-E-billing-dialysis-reporting/` | Engineer E — `billing`, `reporting`, `syncapi`, `interop` |
-| `docs/completed/frontend/` | Frontend team — design system, architecture, build plan, agent instructions |
-| `docs/completed/README.md` | (same as this file, superseded) |
+| `docs/completed/specs_review.md` | Full system-vs-brief audit (571 lines), all action items now addressed |
+| `docs/completed/sprint-summary-phase-2.md` | Phase 2 sprint: emergency, inpatient, dialysis, stock built |
+| `docs/completed/COMPLETED_FEATURES.md` | Traceability matrix: every feature mapped to brief §8.1.x |
+| `docs/completed/backend/engineer-*-*/` | Phase 1 module specs, build plans, agent instructions |
+| `docs/completed/frontend/` | Phase 1 design system, architecture, build plan |
+| `docs/completed/README.md` | (superseded by this file) |
 
 ## Cross-cutting
 
 | File | Content |
 |---|---|
-| `FRONTEND_INTEGRATION.md` | Guide for frontend engineers: field names, form wiring, HTMX contracts |
-| `CHANGES_SUMMARY.md` | Historical notes on engineering decisions (encryption swap, bugs found) |
-| `README.md` | Running locally, migration, test instructions |
+| `README.md` | Running locally, migration, test instructions (repo root) |

@@ -38,6 +38,12 @@ def active_prescriptions_for(patient) -> QuerySet[Prescription]:
     )
 
 
+def cancel_prescription(prescription: Prescription, cancelled_by) -> Prescription:
+    prescription.status = PrescriptionStatus.CANCELLED
+    prescription.save(update_fields=["status"])
+    return prescription
+
+
 def check_stock(drug: Drug) -> tuple[int, bool]:
     level = StockLevel.objects.filter(drug=drug).first()
     qty = level.quantity if level else 0

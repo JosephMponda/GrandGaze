@@ -35,6 +35,7 @@ class PatientRegistrationForm(forms.ModelForm):
             "consent_care",
             "consent_teaching",
             "consent_research",
+            "consent_data_use",
         ]
         widgets = {
             "date_of_birth": forms.DateInput(attrs={"type": "date"}),
