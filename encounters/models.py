@@ -69,6 +69,8 @@ class EncounterAddendum(models.Model):
     note = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
+    history = HistoricalRecords()
+
     class Meta:
         ordering = ["created_at"]
 
@@ -94,6 +96,8 @@ class AllergyRecord(models.Model):
     severity = models.CharField(max_length=10, choices=Severity.choices)
     recorded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     recorded_at = models.DateTimeField(auto_now_add=True)
+
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["-recorded_at"]

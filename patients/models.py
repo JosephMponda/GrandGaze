@@ -108,6 +108,8 @@ class NextOfKin(models.Model):
     relationship = models.CharField(max_length=100)
     phone_number = EncryptedCharField(max_length=32, blank=True)
 
+    history = HistoricalRecords()
+
     def __str__(self):
         return f"{self.name} ({self.relationship}) - NOK of {self.patient.patient_number}"
 
