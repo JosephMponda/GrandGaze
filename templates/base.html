@@ -28,7 +28,7 @@
                             {% endif %}
                             {% if user.is_superuser or user.profile.role == 'ADMIN' or user.profile.role == 'ICT' %}
                                 <a href="{% url 'accounts:audit_trail' %}" class="px-3 py-2 rounded-md text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'accounts:audit_trail' %}bg-gray-100 text-gray-900{% else %}text-gray-600 hover:text-gray-900 hover:bg-gray-50{% endif %}">Audit</a>
-                                <a href="{% url 'accounts:control_panel' %}" class="px-3 py-2 rounded-md text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'accounts:control_panel' %}bg-gray-100 text-gray-900{% else %}text-gray-600 hover:text-gray-900 hover:bg-gray-50{% endif %}">Config</a>
+                                <a href="{% url 'accounts:control_panel' %}" class="px-3 py-2 rounded-md text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'accounts:control_panel' %}bg-gray-100 text-gray-900{% else %}text-gray-600 hover:text-gray-900 hover:bg-gray-50{% endif %}">Admin</a>
                             {% endif %}
                         </nav>
                     {% endif %}
