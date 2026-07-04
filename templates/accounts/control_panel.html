@@ -54,7 +54,7 @@
             {% if wards %}
             <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-xl overflow-hidden">
                 {% for w in wards %}
-                <a href="{% url 'inpatient:ward_dashboard' w.pk %}" class="flex items-center justify-between p-4 hover:bg-paper/40 transition-colors group">
+                <a href="{% url 'inpatient:ward' w.pk %}" class="flex items-center justify-between p-4 hover:bg-paper/40 transition-colors group">
                     <div>
                         <p class="text-sm font-semibold text-ink-900">{{ w.name }}</p>
                         <p class="text-xs text-ink-500">{{ w.department|default:"General Medicine" }}</p>
