@@ -55,7 +55,7 @@
                     <div class="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
                         <div>
                             <p class="text-gray-500 text-xs font-medium">Age / Sex</p>
-                            <p class="text-gray-900 font-semibold">{{ encounter.patient.age|default:"—" }} yrs / {{ encounter.patient.get_sex_display }}</p>
+                            <p class="text-gray-900 font-semibold">{{ encounter.patient.age|default:"-" }} yrs / {{ encounter.patient.get_sex_display }}</p>
                         </div>
                         <div>
                             <p class="text-gray-500 text-xs font-medium">Category</p>
@@ -63,7 +63,7 @@
                         </div>
                         <div class="col-span-2">
                             <p class="text-gray-500 text-xs font-medium">Location</p>
-                            <p class="text-gray-900 font-semibold truncate">{{ encounter.patient.district|default:"—" }}, TA {{ encounter.patient.traditional_authority|default:"—" }}</p>
+                            <p class="text-gray-900 font-semibold truncate">{{ encounter.patient.district|default:"-" }}, TA {{ encounter.patient.traditional_authority|default:"-" }}</p>
                         </div>
                     </div>
                 </div>

@@ -38,7 +38,7 @@ def encounter_detail(request, pk):
         return redirect(reverse("encounters:detail", args=[encounter.pk]))
 
     if request.method == "POST" and "add_addendum" in request.POST:
-        # Signed encounters are read-only in the UI — further notes are
+        # Signed encounters are read-only in the UI - further notes are
         # addenda, never a silent rewrite of signed clinical documentation.
         addendum_form = EncounterAddendumForm(request.POST)
         if addendum_form.is_valid():
@@ -68,7 +68,7 @@ def encounter_detail(request, pk):
 def edit_encounter(request, pk):
     encounter = get_object_or_404(Encounter, pk=pk)
     if encounter.is_signed:
-        messages.error(request, "Signed encounters are read-only — add an addendum instead.")
+        messages.error(request, "Signed encounters are read-only - add an addendum instead.")
         return redirect(reverse("encounters:detail", args=[encounter.pk]))
     if request.method == "POST":
         form = EncounterForm(request.POST, instance=encounter)

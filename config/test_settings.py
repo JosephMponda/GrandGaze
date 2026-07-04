@@ -1,4 +1,4 @@
-"""Test-only settings — SQLite in-memory, no PostgreSQL dependency."""
+"""Test-only settings - SQLite in-memory, no PostgreSQL dependency."""
 import os
 import sys
 
@@ -82,7 +82,7 @@ STATIC_URL = "/static/"
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Session — 15 min idle timeout
+# Session - 15 min idle timeout
 SESSION_COOKIE_AGE = 900
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True

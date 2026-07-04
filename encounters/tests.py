@@ -52,7 +52,7 @@ def test_signed_encounter_is_read_only_addendum_required(client, clinician_user,
     # Attempting to edit directly must not change signed content.
     client.post(reverse("encounters:edit", args=[encounter.pk]), {"presenting_complaint": "REWRITTEN"})
     encounter.refresh_from_db()
-    assert encounter.presenting_complaint == "Cough"  # unchanged — edit was rejected
+    assert encounter.presenting_complaint == "Cough"  # unchanged - edit was rejected
 
     client.post(reverse("encounters:detail", args=[encounter.pk]), {"add_addendum": "1", "note": "Follow-up note"})
     assert encounter.addenda.count() == 1

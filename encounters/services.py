@@ -21,7 +21,7 @@ def sign_encounter(encounter: Encounter, clinician) -> Encounter:
 
 
 def get_patient_allergies(patient) -> QuerySet[AllergyRecord]:
-    """The cross-module safety contract — Pharmacy (Engineer D) calls this
+    """The cross-module safety contract - Pharmacy (Engineer D) calls this
     at prescribing time. Patient-level, not encounter-level (Engineer B spec §1).
     """
     return AllergyRecord.objects.filter(patient=patient)

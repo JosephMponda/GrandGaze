@@ -11,7 +11,7 @@ class Severity(models.TextChoices):
 
 class AlertEvent(models.Model):
     """Central alert hub. Brief §9.2 (critical result alerts, abnormal vital
-    triggers). Owned by Engineer E per AGENTS.md module map — this is the
+    triggers). Owned by Engineer E per AGENTS.md module map - this is the
     minimal slice (model + raise_alert()) that Engineer B's vitals module
     hard-depends on; the rest of `reporting` (dashboards etc.) is Engineer E's.
     """

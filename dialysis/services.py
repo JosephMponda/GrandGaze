@@ -35,7 +35,7 @@ def active_prescriptions_for(patient) -> QuerySet[DialysisPrescription]:
 def missed_sessions(prescription: DialysisPrescription, grace_days: int = 1) -> list[date]:
     """Returns dates where a session was expected but not recorded.
 
-    ponytail: naive heuristic — checks if any session exists per expected
+    ponytail: naive heuristic - checks if any session exists per expected
     day this week. Doesn't track rolling schedules or missed-yet-made-up.
     Good enough for a dashboard flag.
     """

@@ -1,4 +1,4 @@
-"""FHIR-inspired serializers — read-only export, not a certified FHIR server."""
+"""FHIR-inspired serializers - read-only export, not a certified FHIR server."""
 
 from rest_framework import serializers
 

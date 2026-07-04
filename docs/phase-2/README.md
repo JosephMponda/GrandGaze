@@ -1,4 +1,4 @@
-# Phase 2 — Feature Development
+# Phase 2 - Feature Development
 
 > Next-sprint features mapped from the MUST–GSL EMR Innovation Challenge Brief.
 > Each feature folder follows the same structure: `01_FEATURE_SPEC.md`,
@@ -25,7 +25,7 @@
 
 See `AGENTS.md` for the full stack decisions. Key Phase 2 rules:
 
-1. **No SPA frameworks** — server-rendered Django + HTMX + Alpine + Tailwind
+1. **No SPA frameworks** - server-rendered Django + HTMX + Alpine + Tailwind
 2. **No new dependencies** without allowlist entry in `ALLOWED_PACKAGES.md`
 3. **`django-simple-history`** on every new clinical/PHI model
 4. **`core/encrypted_fields.py`** for any new PII/PHI fields
@@ -40,6 +40,6 @@ See `AGENTS.md` for the full stack decisions. Key Phase 2 rules:
 
 Each feature folder (`docs/phase-2/<feature-name>/`) contains:
 
-- `01_FEATURE_SPEC.md` — Data model, services interface, views, acceptance criteria
-- `02_BUILD_PLAN.md` — Implementation order, dependencies, milestones
-- `03_AGENT_INSTRUCTIONS.md` — Module-specific AI agent rules, non-negotiables
+- `01_FEATURE_SPEC.md` - Data model, services interface, views, acceptance criteria
+- `02_BUILD_PLAN.md` - Implementation order, dependencies, milestones
+- `03_AGENT_INSTRUCTIONS.md` - Module-specific AI agent rules, non-negotiables

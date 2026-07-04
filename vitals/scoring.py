@@ -5,7 +5,7 @@ NEWS-style banding (respiratory rate, SpO2, temperature, systolic BP, pulse,
 consciousness level), each contributing 0-3 points.
 
 # TODO: pediatric-adjusted variant, Phase 2 (brief §8.1.7 "pediatric
-# age-adjusted vital sign alerts" is explicitly future scope — this is
+# age-adjusted vital sign alerts" is explicitly future scope - this is
 # adult-only, don't claim otherwise).
 """
 
@@ -19,7 +19,7 @@ EWS_BANDS = {
 
 RISK_LEVEL_BANDS = [(2, "low"), (5, "medium"), (8, "high"), (None, "critical")]
 
-# Hard safety thresholds — outside these, fire an immediate alert regardless
+# Hard safety thresholds - outside these, fire an immediate alert regardless
 # of total EWS score (a single badly abnormal value matters on its own).
 HARD_ALERT_THRESHOLDS = {
     "oxygen_saturation": ("lt", 90, "SpO2 below 90%"),

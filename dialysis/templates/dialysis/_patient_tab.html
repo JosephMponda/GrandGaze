@@ -27,7 +27,7 @@
                     <p class="text-xs text-ink-500">{{ rx.get_vascular_access_display }}</p>
                 </div>
                 <div class="flex items-center gap-2">
-                    <span class="text-xs text-ink-400">Target: {{ rx.target_fluid_removal_l|default:"—" }} L</span>
+                    <span class="text-xs text-ink-400">Target: {{ rx.target_fluid_removal_l|default:"-" }} L</span>
                     <a href="{% url 'dialysis:record_session' rx.pk %}" class="btn-primary text-xs font-semibold py-1.5 px-3">Record Session</a>
                 </div>
             </div>

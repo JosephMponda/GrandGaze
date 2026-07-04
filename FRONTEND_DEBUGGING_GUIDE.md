@@ -163,8 +163,8 @@ All fragment templates and views are **already correctly implemented**:
 
 ### Views ✅
 All views correctly distinguish and return:
-- **Tab Fragment** (HTMX): `render(..., "_patient_tab.html", ...)` — NO header/footer
-- **Full Page** (direct nav): `render(..., "detail.html", ...)` — extends base.html
+- **Tab Fragment** (HTMX): `render(..., "_patient_tab.html", ...)` - NO header/footer
+- **Full Page** (direct nav): `render(..., "detail.html", ...)` - extends base.html
 
 ### URL Routing ✅
 All modules configured:

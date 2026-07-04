@@ -12,7 +12,7 @@ from .models import TriageCategory, TriageEncounter
 class TriageForm(forms.Form):
     triage_category = forms.ChoiceField(choices=TriageCategory.choices, label="Triage Category")
     presenting_condition = forms.CharField(widget=forms.Textarea(attrs={"rows": 3}), label="Presenting Condition / Complaint")
-    outcome = forms.ChoiceField(choices=[("", "———")] + list(TriageEncounter._meta.get_field("outcome").flatchoices), required=False, label="Outcome (optional)")
+    outcome = forms.ChoiceField(choices=[("", "---")] + list(TriageEncounter._meta.get_field("outcome").flatchoices), required=False, label="Outcome (optional)")
     disposition_note = forms.CharField(widget=forms.Textarea(attrs={"rows": 2, "placeholder": "e.g. referred to surgical team"}), required=False, label="Disposition Note (optional)")
 
     def save(self, patient, triaged_by) -> TriageEncounter:

@@ -72,7 +72,7 @@ def _check_drug_interaction(patient, drug):
         status__in=[PrescriptionStatus.PRESCRIBED, PrescriptionStatus.APPROVED, PrescriptionStatus.DISPENSED],
     ).exclude(drug=drug).values_list("drug_id", flat=True)
     interacting = drug.interacting_drugs.filter(pk__in=active_ids)
-    # ponytail: symmetrical M2M — Django auto-manages both sides
+    # ponytail: symmetrical M2M - Django auto-manages both sides
     return [SafetyWarning("critical", "drug_interaction", f"Interaction: {drug.generic_name} may interact with an active prescription.") for _ in interacting]
 
 
@@ -93,8 +93,8 @@ def _check_pediatric_dose(patient, drug, dose):
     if drug.pediatric_max_dose_mg is None:
         return []
     if not patient.date_of_birth:
-        # ponytail: common Malawi scenario — DOB unknown, warn transparently
-        return [SafetyWarning("warning", "pediatric_dose", f"Patient age unknown — pediatric dose check for {drug.generic_name} cannot be verified.")]
+        # ponytail: common Malawi scenario - DOB unknown, warn transparently
+        return [SafetyWarning("warning", "pediatric_dose", f"Patient age unknown - pediatric dose check for {drug.generic_name} cannot be verified.")]
     today = date.today()
     age = today.year - patient.date_of_birth.year - ((today.month, today.day) < (patient.date_of_birth.month, patient.date_of_birth.day))
     if age >= 12:

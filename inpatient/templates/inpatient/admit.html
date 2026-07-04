@@ -27,7 +27,7 @@
                 <label class="block text-xs font-bold text-ink-700 uppercase tracking-wider mb-1">Ward</label>
                 <select name="ward" class="w-full rounded-lg border-gray-200 text-sm focus:border-brand focus:ring-brand"
                         hx-get="/inpatient/beds-for-ward/" hx-target="#bed-select" hx-trigger="change">
-                    <option value="">— Select ward —</option>
+                    <option value="">- Select ward -</option>
                     {% for ward in wards %}
                         <option value="{{ ward.pk }}">{{ ward.name }}</option>
                     {% endfor %}
@@ -36,7 +36,7 @@
             <div id="bed-select">
                 <label class="block text-xs font-bold text-ink-700 uppercase tracking-wider mb-1">Bed (optional)</label>
                 <select name="bed" class="w-full rounded-lg border-gray-200 text-sm focus:border-brand focus:ring-brand">
-                    <option value="">— Assign later —</option>
+                    <option value="">- Assign later -</option>
                 </select>
             </div>
         </div>

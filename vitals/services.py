@@ -18,7 +18,7 @@ def vitals_trend(patient, limit=10) -> QuerySet[VitalSignSet]:
 @transaction.atomic
 def record_vitals(encounter, recorded_by, data: dict) -> VitalSignSet:
     """Create a VitalSignSet, compute BMI (via model.save()) + EWS, and fire
-    an alert for any hard-threshold abnormal value — all within the same
+    an alert for any hard-threshold abnormal value - all within the same
     request/response cycle (Engineer B spec §2, no polling delay).
     """
     vitals = VitalSignSet.objects.create(encounter=encounter, patient=encounter.patient, recorded_by=recorded_by, **data)

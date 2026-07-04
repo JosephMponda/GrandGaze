@@ -1,4 +1,4 @@
-# Specs Review — GrandGaze vs. MUST–GSL EMR Brief v31'05'2026
+# Specs Review - GrandGaze vs. MUST–GSL EMR Brief v31'05'2026
 
 > **Unbiased, no-sugarcoating system review.** Every claim tested against the brief.
 > Similar = matches brief. Different = diverges. Gap = missing entirely.
@@ -52,7 +52,7 @@
 |---|---|---|
 | Django app separation | **Similar** | 11 modular apps with bounded contexts. |
 | Cross-app via services.py only | **Similar** | Internal service functions in each app's `services.py`. Violations exist (emergency imports `_generate_patient_number`). |
-| No async queue for scalability | **Different** | Brief doesn't mandate background jobs. Our Celery is "week-2 if capacity allows" — acceptable for MVP. |
+| No async queue for scalability | **Different** | Brief doesn't mandate background jobs. Our Celery is "week-2 if capacity allows" - acceptable for MVP. |
 
 ### §7.5 Interoperability
 **Brief:** "DHIS2, HL7 FHIR, DICOM, LOINC, MaHIS, HIE API, 'One patient, one record.'"
@@ -86,9 +86,9 @@
 | Aspect | Verdict | Detail |
 |---|---|---|
 | Free-tier-first hosting | **Similar** | Render + Neon + Upstash. |
-| Open-source stack | **Similar** | Django, PostgreSQL, Python — maintainable by local devs. |
+| Open-source stack | **Similar** | Django, PostgreSQL, Python - maintainable by local devs. |
 | Docker Compose deployment | **Similar** | Single-laptop bundle. |
-| No dedicated sustainability plan | **Gap** | §19.6 requires a sustainability document. No standalone document exists — only implicit in AGENTS.md. |
+| No dedicated sustainability plan | **Gap** | §19.6 requires a sustainability document. No standalone document exists - only implicit in AGENTS.md. |
 | Training/adoption plan | **Gap** | No training strategy documented. §19.6 requires training plan. |
 
 ---
@@ -103,7 +103,7 @@
 | Patient number (MUST-YYYYMM-NNNNN) | **Similar** | Race-safe via `select_for_update` + `PatientNumberSequence`. |
 | National ID (encrypted + HMAC lookup) | **Similar** | Fernet encryption + HMAC blind index. |
 | Name, sex, DOB, age, phone, address | **Similar** | All present. |
-| Guardian/next-of-kin | **Different** | `NextOfKin` model exists BUT profile template references `patient.guardian_name` and `patient.guardian_phone` — attributes that DO NOT EXIST on Patient. Template bug. |
+| Guardian/next-of-kin | **Different** | `NextOfKin` model exists BUT profile template references `patient.guardian_name` and `patient.guardian_phone` - attributes that DO NOT EXIST on Patient. Template bug. |
 | Village, TA, district, region | **Similar** | All 4 present. |
 | Occupation/school | **Similar** | `occupation_or_school` single field. |
 | Patient category (8 choices) | **Similar** | All 8 from brief exactly. |
@@ -114,7 +114,7 @@
 | Referral source/destination | **Different** | `ReferralRecord` model exists but is admin-only. No UI, no workflow, no status tracking. |
 | Consent: care, teaching, research | **Similar** | All 3 present. |
 | Consent: data use | **Gap** | Missing. |
-| Age computation property | **Gap** | No `age` property on Patient model. Template references `patient.age_is_estimated` — model field is `age_estimated`. Template bug. |
+| Age computation property | **Gap** | No `age` property on Patient model. Template references `patient.age_is_estimated` - model field is `age_estimated`. Template bug. |
 | Patient edit/update view | **Gap** | No way to update demographics after registration. |
 
 ### §8.1.2 Appointment, Queue, Patient Flow
@@ -144,7 +144,7 @@
 |---|---|---|
 | Admission + diagnosis | **Similar** | `Admission` model with `admission_diagnosis`, status (active/transferred/discharged/dead). |
 | Ward + bed allocation | **Similar** | `Ward` + `Bed` models. `assign_bed()`, `free_bed()`, transfer service. |
-| Transfers | **Similar** | `transfer_patient()` — frees old bed, assigns new. |
+| Transfers | **Similar** | `transfer_patient()` - frees old bed, assigns new. |
 | Ward round notes | **Similar** | `WardRoundNote` with `diagnosis_update`, `plan_update`. BUT missing `signed_by`/`signed_at` from feature spec. |
 | Nursing care plans | **Gap** | Not implemented. |
 | Fluid balance / I/O monitoring | **Gap** | Not implemented. |
@@ -166,7 +166,7 @@
 | Triage queue | **Similar** | Sorted by severity, unresolved only. |
 | Emergency outcome (4 options) | **Similar** | discharged/admitted/referred/dead. |
 | Vital signs + emergency alerts | **Gap** | No integration with vitals app. No `EmergencyVitalSet` bridge model (despite being in feature spec). `raise_alert()` is never called from emergency. |
-| Resuscitation notes | **Gap** | `ResuscitationNote` model from feature spec — not implemented. |
+| Resuscitation notes | **Gap** | `ResuscitationNote` model from feature spec - not implemented. |
 | Time-critical event recording | **Gap** | Not implemented. |
 | Structured referral (theatre/ICU/imaging/lab/ward) | **Partial** | Free-text `disposition_note` only. No auto-creation of LabOrder, ImagingRequest, or Admission. |
 | Outcome → admission workflow | **Gap** | "Admitted" outcome doesn't auto-create an inpatient `Admission`. |
@@ -205,7 +205,7 @@
 | Progress Notes | **Gap** | No dedicated progress note type. |
 | Consultation Notes | **Gap** | No consultation type. |
 | Procedure Notes | **Gap** | No procedure note model. |
-| Discharge Summaries | **Partial** | `discharge_summary` on Admission model — not a standalone encounter type. |
+| Discharge Summaries | **Partial** | `discharge_summary` on Admission model - not a standalone encounter type. |
 | Medication Reconciliation | **Gap** | No structured reconciliation workflow. |
 
 ### §8.1.9 Provider Workflow Integration
@@ -213,7 +213,7 @@
 
 | Aspect | Verdict | Detail |
 |---|---|---|
-| Order entry from encounter | **Gap** | Encounter detail page has mock/placeholder buttons ("Add Prescription", "Order Labs") — no HTMX hooks, no backend integration. |
+| Order entry from encounter | **Gap** | Encounter detail page has mock/placeholder buttons ("Add Prescription", "Order Labs") - no HTMX hooks, no backend integration. |
 | Diagnostic result review | **Gap** | No encounter-level result review view. |
 | Interdisciplinary communication | **Gap** | No messaging, task assignment, or referral mechanism. |
 | Escalation workflow | **Gap** | Alerts fire (vitals/lab/imaging) but no structured escalation (e.g., "notify senior if EWS > 5"). |
@@ -227,7 +227,7 @@
 | Specimen barcode | **Similar** | Visual CSS barcode rendering. |
 | Result entry + separate verification | **Similar** | Service-layer enforcement of different users (no DB-level constraint). |
 | Critical result alerts | **Similar** | `raise_alert()` on save if outside range. Tested with boundary values. |
-| LOINC codes on tests | **Different** | Field exists but only 2/7 seeded tests have codes. REFERENCE_ALIGNMENT.md claims codes for 5 — docs ≠ code. |
+| LOINC codes on tests | **Different** | Field exists but only 2/7 seeded tests have codes. REFERENCE_ALIGNMENT.md claims codes for 5 - docs ≠ code. |
 | Workload dashboard | **Similar** | 3 metrics (pending, resulted, avg turnaround). Missing per-test-type, per-user, overdue views. |
 | Quality control documentation | **Gap** | No QC models. |
 | Reagent inventory | **Gap** | No reagent models. |
@@ -247,7 +247,7 @@
 | Pediatric dosing | **Partial** | mg-only, age < 12, regex `_parse_mg()` only matches "NNN mg". No weight-based, no age-banded, no liquid concentration. Bypassed if DOB missing (common Malawi). |
 | Pregnancy warning | **Partial** | Requires latest vitals pregnancy_status==PREGNANT. Uses `contraindicated_in_pregnancy` boolean. Warning-level only. |
 | Breastfeeding warning | **Gap** | No lactation check, no Drug field, no vitals field. |
-| Renal dose adjustment | **Partial** | Keyword-only check on first 5 encounter diagnoses. No eGFR/Cr data, no dose recommendation. Concept-level only — which the spec says it is. |
+| Renal dose adjustment | **Partial** | Keyword-only check on first 5 encounter diagnoses. No eGFR/Cr data, no dose recommendation. Concept-level only - which the spec says it is. |
 | Prescription approval workflow (4 states) | **Similar** | prescribed → approved → dispensed or cancelled. Status transitions not enforced at model level. Cancel has no view/UI. |
 | Stock availability indicator | **Similar** | `StockLevel` model, check/adjust services, dispense guard, stock.html UI. |
 | Controlled medicines tracking | **Different** | `Drug.is_controlled` field exists but: never set in seed data, no workflow, no UI, no dual-sign-off, no register. Stub only. |
@@ -283,7 +283,7 @@
 | Invoice + line items (snapshot pricing) | **Similar** | Correct snapshot-at-billing pattern. |
 | Payment recording (4 methods) | **Similar** | Cash, mobile_money, bank, insurance. |
 | Mobile money reference | **Similar** | `reference` CharField on Payment. |
-| Revenue dashboard | **Partial** | Count metrics only — no MWK totals, no charts, no aging. |
+| Revenue dashboard | **Partial** | Count metrics only - no MWK totals, no charts, no aging. |
 | Unpaid bills report | **Partial** | Per-patient only (`unpaid_invoices_for`). No system-wide report. |
 | Insurance/institutional payer | **Partial** | `payer_type` field exists. No provider model, no policy number, no authorization code. |
 | Waiver/exemption workflow | **Gap** | WAIVED status exists but no approval model, no workflow, no UI to set it. |
@@ -309,7 +309,7 @@
 | Aspect | Verdict | Detail |
 |---|---|---|
 | Electronic signatures | **Similar** | `signed_by`/`signed_at` on Encounter, `verified_by` on LabResult. |
-| Audit trails | **Partial** | `django-simple-history` on all PHI models. BUT `AlertEvent` itself is NOT historied — alert acknowledgements invisible. |
+| Audit trails | **Partial** | `django-simple-history` on all PHI models. BUT `AlertEvent` itself is NOT historied - alert acknowledgements invisible. |
 | Documentation compliance | **Gap** | No compliance-checking views. |
 | Regulatory/accreditation views | **Gap** | No regulatory dashboard. |
 
@@ -502,7 +502,7 @@
 
 | Bonus Area | Status | Detail |
 |---|---|---|
-| Strong UI design | **Similar** | Tailwind-based, clean, responsive. Subjective — judges may or may not agree. |
+| Strong UI design | **Similar** | Tailwind-based, clean, responsive. Subjective - judges may or may not agree. |
 | Offline-first architecture | **Similar** | Full queue-and-replay pattern + service worker. |
 | Strong accessibility | **Partial** | Basic form labels, semantic HTML. No explicit WCAG audit. |
 | FHIR-aware data model | **Similar** | FHIR-Bundle export endpoint. |
@@ -536,8 +536,8 @@
 
 | Priority | Issue | Section | Impact |
 |---|---|---|---|
-| **P0** | Drug-drug interaction checking absent | §8.1.11, §9.2 | Patient Safety (20%) judging criterion — medication safety is core. |
-| **P0** | AlertEvent not covered by django-simple-history | §8.1.16, §8.1.19 | Audit trail gap — alert acknowledgements invisible. |
+| **P0** | Drug-drug interaction checking absent | §8.1.11, §9.2 | Patient Safety (20%) judging criterion - medication safety is core. |
+| **P0** | AlertEvent not covered by django-simple-history | §8.1.16, §8.1.19 | Audit trail gap - alert acknowledgements invisible. |
 | **P1** | No workflow diagrams anywhere | §11, §19.3 | Explicit deliverable requirement. |
 | **P1** | No CI/CD configuration | §5 (AGENTS.md) | pip-audit requirement unenforceable without CI. |
 | **P1** | Breastfeeding/lactation warning absent | §8.1.11, §9.2 | Patient Safety gap. |
@@ -545,11 +545,11 @@
 | **P2** | Death documentation: discharge() always sets DISCHARGED, never DEAD | §8.1.4 | Bug in inpatient service. |
 | **P2** | No MFA concept | §9.4 | Cybersecurity requirement. |
 | **P2** | No idle-timer (13 min warning) | AGENTS.md §7 | Promised in architecture doc, not implemented. |
-| **P2** | Profile template: references non-existent guardian_name/guardian_phone | §8.1.1 | Template bug — silent failure. |
+| **P2** | Profile template: references non-existent guardian_name/guardian_phone | §8.1.1 | Template bug - silent failure. |
 | **P2** | No patient edit/update view | §8.1.1 | Once registered, data is immutable through UI. |
 | **P3** | Allergy check ignores severity (mild = critical block) | §9.2 | Should differentiate mild vs anaphylaxis. |
 | **P3** | LOINC codes: docs claim codes that aren't in seed data | §8.1.10 | Documentation inconsistency. |
-| **P3** | Encounter lacks structured Review of Systems field | §8.1.3 | Minor — clinicians use exam_findings. |
+| **P3** | Encounter lacks structured Review of Systems field | §8.1.3 | Minor - clinicians use exam_findings. |
 | **P3** | No biometric-ready design | §8.1.1 | Judging bonus item. |
 | **P3** | consent_data_use missing | §8.1.1 | Brief requires it. |
 | **P3** | No standalone sustainability plan or training plan | §19.6 | Explicit deliverables. |
@@ -566,6 +566,6 @@
 
 **What we do well:** The MVP chain is complete and well-integrated. Registration → encounter → vitals → labs → imaging → pharmacy → billing flows end-to-end. The offline sync architecture (service worker + IndexedDB + syncapi + conflict detection) is a genuine innovation differentiator. Malawi context fields (TA, village, age_estimated, mobile money) demonstrate real contextual awareness. 98 passing tests show engineering rigor.
 
-**What we need to fix before demo day:** Drug-drug interaction checking (P0 — judges WILL ask about medication safety) and AlertEvent audit trail (P0 — governance question). Workflow diagrams (P1 — explicit deliverable). Breastfeeding warning (P1 — gaps in medication safety). The death-documentation bug in inpatient discharge (P2 — looks sloppy if caught).
+**What we need to fix before demo day:** Drug-drug interaction checking (P0 - judges WILL ask about medication safety) and AlertEvent audit trail (P0 - governance question). Workflow diagrams (P1 - explicit deliverable). Breastfeeding warning (P1 - gaps in medication safety). The death-documentation bug in inpatient discharge (P2 - looks sloppy if caught).
 
 **What judges will notice:** The strong offline story, the clean HTMX frontend (fast, no SPA overhead), the dialysis module (bonus points, well-implemented), the audit trail coverage. They will also notice: no drug interaction checking, no MFA (concept only), no diagrams, no CI/CD.

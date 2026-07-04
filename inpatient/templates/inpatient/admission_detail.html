@@ -17,7 +17,7 @@
             </div>
             <div>
                 <span class="text-xs text-ink-500">Ward / Bed</span>
-                <p class="text-sm font-semibold">{{ admission.bed.ward.name|default:"—" }} / {{ admission.bed.label|default:"—" }}</p>
+                <p class="text-sm font-semibold">{{ admission.bed.ward.name|default:"-" }} / {{ admission.bed.label|default:"-" }}</p>
             </div>
             <div>
                 <span class="text-xs text-ink-500">Admitted</span>
@@ -43,9 +43,9 @@
                     {% csrf_token %}
                     <input type="hidden" name="action" value="transfer">
                     <select name="bed" required class="w-full rounded-lg border-gray-200 text-sm">
-                        <option value="">— Select target bed —</option>
+                        <option value="">- Select target bed -</option>
                         {% for bed in available %}
-                            <option value="{{ bed.pk }}">{{ bed.ward.name }} — {{ bed.label }}</option>
+                            <option value="{{ bed.pk }}">{{ bed.ward.name }} - {{ bed.label }}</option>
                         {% endfor %}
                     </select>
                     <input type="text" name="reason" placeholder="Reason for transfer" class="w-full rounded-lg border-gray-200 text-sm">

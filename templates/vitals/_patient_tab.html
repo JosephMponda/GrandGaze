@@ -1,4 +1,4 @@
-<!-- Vitals Patient Tab Partial — loaded via HTMX into patient profile -->
+<!-- Vitals Patient Tab Partial - loaded via HTMX into patient profile -->
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <h2 class="text-xl font-bold text-ink-900">Vitals History</h2>
@@ -19,7 +19,7 @@
                             {% if v.ews.risk_level == 'high' or v.ews.risk_level == 'critical' %}bg-red-100 text-red-700
                             {% elif v.ews.risk_level == 'medium' %}bg-amber-100 text-amber-700
                             {% else %}bg-green-100 text-green-700{% endif %}">
-                            NEWS2: {{ v.ews.score }} — {{ v.ews.get_risk_level_display }}
+                            NEWS2: {{ v.ews.score }} - {{ v.ews.get_risk_level_display }}
                         </span>
                     {% endif %}
                 </div>
@@ -35,7 +35,7 @@
                 {% if v.blood_pressure_systolic %}
                 <div>
                     <dt class="text-[10px] font-bold text-ink-400 uppercase tracking-wider">BP</dt>
-                    <dd class="font-semibold text-ink-900">{{ v.blood_pressure_systolic }}/{{ v.blood_pressure_diastolic|default:"—" }}</dd>
+                    <dd class="font-semibold text-ink-900">{{ v.blood_pressure_systolic }}/{{ v.blood_pressure_diastolic|default:"-" }}</dd>
                 </div>
                 {% endif %}
                 {% if v.pulse_rate %}

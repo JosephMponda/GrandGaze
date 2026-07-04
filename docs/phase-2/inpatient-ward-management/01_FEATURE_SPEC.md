@@ -1,4 +1,4 @@
-# Phase 2 — Inpatient Admission & Ward Management
+# Phase 2 - Inpatient Admission & Ward Management
 
 **Brief traceability:** §8.1.4 (Inpatient and Ward Management)
 **Dependencies:** `patients.Patient`, `encounters.Encounter`, `accounts` RBAC (all built)
@@ -54,11 +54,11 @@ def active_admissions() -> QuerySet[Admission]
 
 ## 3. Views
 
-- `/inpatient/admit/<patient_id>/` — admission form with bed picker
-- `/inpatient/ward/<ward_id>/` — ward dashboard (bed board)
-- `/inpatient/admission/<id>/` — admission detail (transfer/discharge actions)
-- `/inpatient/admission/<id>/ward-round/` — ward round note entry
-- `/inpatient/dashboard/` — bed occupancy summary (dashboard widget)
+- `/inpatient/admit/<patient_id>/` - admission form with bed picker
+- `/inpatient/ward/<ward_id>/` - ward dashboard (bed board)
+- `/inpatient/admission/<id>/` - admission detail (transfer/discharge actions)
+- `/inpatient/admission/<id>/ward-round/` - ward round note entry
+- `/inpatient/dashboard/` - bed occupancy summary (dashboard widget)
 
 ## 4. Patient Profile Tab
 

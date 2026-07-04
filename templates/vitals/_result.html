@@ -1,4 +1,4 @@
-<!-- Vitals HTMX result fragment — injected into #vitals-result after form submit -->
+<!-- Vitals HTMX result fragment - injected into #vitals-result after form submit -->
 <div class="mt-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
 
     <!-- EWS Score Card -->
@@ -8,7 +8,7 @@
         {% else %}border-green-300 bg-green-50/30{% endif %}">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-xs font-bold text-ink-500 uppercase tracking-wider mb-1">NEWS2 Score — Recorded</p>
+                <p class="text-xs font-bold text-ink-500 uppercase tracking-wider mb-1">NEWS2 Score - Recorded</p>
                 <p class="text-xs text-ink-400">{{ vitals.recorded_at|date:"d M Y, H:i" }}</p>
             </div>
             {% if vitals.ews %}
@@ -31,7 +31,7 @@
         {% if vitals.ews.risk_level == 'high' or vitals.ews.risk_level == 'critical' %}
         <div class="mt-4 flex items-center gap-2 text-red-700 bg-red-100 rounded-xl px-4 py-2.5">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-            <p class="text-sm font-semibold">⚠ Abnormal vitals — clinical escalation recommended. Check the alert panel.</p>
+            <p class="text-sm font-semibold">⚠ Abnormal vitals - clinical escalation recommended. Check the alert panel.</p>
         </div>
         {% endif %}
     </div>
@@ -57,10 +57,10 @@
                         {% for v in trend %}
                         <tr class="hover:bg-gray-50/50 transition-colors {% if forloop.first %}font-semibold{% endif %}">
                             <td class="px-4 py-3 whitespace-nowrap text-xs text-gray-500 font-mono">{{ v.recorded_at|date:"d M, H:i" }}</td>
-                            <td class="px-4 py-3 whitespace-nowrap text-ink-900">{{ v.temperature_c|default:"—" }}{% if v.temperature_c %} °C{% endif %}</td>
-                            <td class="px-4 py-3 whitespace-nowrap text-ink-900">{{ v.blood_pressure_systolic|default:"—" }}/{{ v.blood_pressure_diastolic|default:"—" }}</td>
-                            <td class="px-4 py-3 whitespace-nowrap text-ink-900">{{ v.pulse_rate|default:"—" }}</td>
-                            <td class="px-4 py-3 whitespace-nowrap text-ink-900">{{ v.oxygen_saturation|default:"—" }}{% if v.oxygen_saturation %}%{% endif %}</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-ink-900">{{ v.temperature_c|default:"-" }}{% if v.temperature_c %} °C{% endif %}</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-ink-900">{{ v.blood_pressure_systolic|default:"-" }}/{{ v.blood_pressure_diastolic|default:"-" }}</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-ink-900">{{ v.pulse_rate|default:"-" }}</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-ink-900">{{ v.oxygen_saturation|default:"-" }}{% if v.oxygen_saturation %}%{% endif %}</td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 {% if v.ews %}
                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold
@@ -69,7 +69,7 @@
                                     {% else %}bg-green-100 text-green-700{% endif %}">
                                     {{ v.ews.score }}
                                 </span>
-                                {% else %}—{% endif %}
+                                {% else %}-{% endif %}
                             </td>
                         </tr>
                         {% endfor %}

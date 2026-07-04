@@ -328,7 +328,7 @@ def seed_demo_admission(patient, beds):
     bed = Bed.objects.filter(ward=ward, is_occupied=False).first()
     if not bed:
         return
-    admission = admit_patient(patient, clinician, "CKD Stage 4 — initiate hemodialysis", bed=bed)
+    admission = admit_patient(patient, clinician, "CKD Stage 4 - initiate hemodialysis", bed=bed)
     return admission
 
 

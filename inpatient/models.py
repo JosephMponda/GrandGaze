@@ -34,7 +34,7 @@ class Bed(models.Model):
         unique_together = [("ward", "label")]
 
     def __str__(self):
-        return f"{self.ward.name} — {self.label}"
+        return f"{self.ward.name} - {self.label}"
 
 
 class Admission(models.Model):
@@ -55,7 +55,7 @@ class Admission(models.Model):
         ordering = ["-admitted_at"]
 
     def __str__(self):
-        return f"{self.patient.patient_number} — {self.admission_diagnosis}"
+        return f"{self.patient.patient_number} - {self.admission_diagnosis}"
 
 
 class WardRoundNote(models.Model):
@@ -72,4 +72,4 @@ class WardRoundNote(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"Round note for {self.admission.patient.patient_number} — {self.created_at.date()}"
+        return f"Round note for {self.admission.patient.patient_number} - {self.created_at.date()}"

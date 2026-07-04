@@ -51,7 +51,7 @@ class Encounter(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"Encounter #{self.pk} — {self.patient.patient_number} ({self.get_status_display()})"
+        return f"Encounter #{self.pk} - {self.patient.patient_number} ({self.get_status_display()})"
 
     @property
     def is_signed(self) -> bool:
@@ -61,7 +61,7 @@ class Encounter(models.Model):
 class EncounterAddendum(models.Model):
     """A signed Encounter is read-only in the UI; further notes are addenda,
     not silent rewrites of signed clinical documentation (Engineer B spec §4
-    — governance requirement, not a nice-to-have).
+    - governance requirement, not a nice-to-have).
     """
 
     encounter = models.ForeignKey(Encounter, on_delete=models.CASCADE, related_name="addenda")
@@ -107,7 +107,7 @@ class AllergyRecord(models.Model):
 
 
 class ClinicalTemplate(models.Model):
-    """Structured templates for common clinics — brief §8.1.3."""
+    """Structured templates for common clinics - brief §8.1.3."""
 
     name = models.CharField(max_length=150)
     specialty = models.CharField(max_length=100, blank=True)

@@ -1,4 +1,4 @@
-# Phase 2 — Emergency & Triage Module
+# Phase 2 - Emergency & Triage Module
 
 **Brief traceability:** §8.1.5 (Emergency and Triage Module)
 **Dependencies:** `patients.Patient`, `vitals.VitalSignSet`, `accounts` RBAC (all built)
@@ -46,9 +46,9 @@ def triage_queue() -> QuerySet[TriageEncounter]
 
 ## 3. Views
 
-- `/emergency/triage/<patient_id>/` — triage assessment form
-- `/emergency/queue/` — triage queue (sorted by category severity)
-- `/emergency/rapid-register/` — minimal data registration for unstable patients
+- `/emergency/triage/<patient_id>/` - triage assessment form
+- `/emergency/queue/` - triage queue (sorted by category severity)
+- `/emergency/rapid-register/` - minimal data registration for unstable patients
 
 ## 4. Acceptance Criteria
 

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Record Vitals — {{ patient.full_name }} - MUST EMR{% endblock %}
+{% block title %}Record Vitals - {{ patient.full_name }} - MUST EMR{% endblock %}
 
 {% block content %}
 <div class="max-w-4xl mx-auto py-6"
@@ -80,7 +80,7 @@
                         'bg-amber-100 text-amber-700': news2Risk === 'medium',
                         'bg-red-100 text-red-700': news2Risk === 'high'
                      }">
-                    <span x-text="news2Risk === 'low' ? 'Low Risk' : news2Risk === 'medium' ? 'Medium Risk' : 'High Risk — Escalate'"></span>
+                    <span x-text="news2Risk === 'low' ? 'Low Risk' : news2Risk === 'medium' ? 'Medium Risk' : 'High Risk - Escalate'"></span>
                 </div>
             </div>
             <div x-show="news2Score === null" class="text-right text-ink-400 text-sm italic">
@@ -181,7 +181,7 @@
                         <label class="relative cursor-pointer">
                             <input type="radio" name="avpu_score" :value="opt[0]" x-model="avpu" @change="calcNEWS2()" class="sr-only peer">
                             <span class="px-4 py-2 rounded-xl border text-sm font-semibold transition-all peer-checked:bg-brand peer-checked:text-white peer-checked:border-brand border-gray-200 bg-white text-ink-700 hover:border-brand/50"
-                                  x-text="opt[0] + ' — ' + opt[1]"></span>
+                                  x-text="opt[0] + ' - ' + opt[1]"></span>
                         </label>
                     </template>
                 </div>

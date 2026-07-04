@@ -9,8 +9,8 @@
                     <p class="text-sm font-semibold">{{ admission.admission_diagnosis }}</p>
                     <p class="text-xs text-ink-500">
                         {{ admission.admitted_at|date:"d M Y" }}
-                        {% if admission.discharged_at %}— {{ admission.discharged_at|date:"d M Y" }}{% endif %}
-                        &middot; {{ admission.bed.ward.name|default:"—" }}
+                        {% if admission.discharged_at %}- {{ admission.discharged_at|date:"d M Y" }}{% endif %}
+                        &middot; {{ admission.bed.ward.name|default:"-" }}
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ml-2
                             {% if admission.status == 'active' %}bg-green-100 text-green-800
                             {% elif admission.status == 'discharged' %}bg-gray-100 text-gray-800
