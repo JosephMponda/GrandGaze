@@ -96,7 +96,7 @@
     </div>
 </div>
 
-<div x-data="{ activeTab: 'encounters' }">
+<div x-data="{ activeTab: window.location.hash ? window.location.hash.substring(1) : 'encounters' }">
 
     {# Tab Bar #}
     <div class="flex items-center gap-1 border-b border-gray-200 mb-6 overflow-x-auto">

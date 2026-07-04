@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
 </head>
 <body class="bg-paper text-ink min-h-screen flex flex-col font-sans antialiased" hx-boost="true">
-    {# Navigation Shell #}
-    <header class="bg-white border-b border-gray-200/80 shadow-xs sticky top-0 z-40" x-data="{ mobileMenuOpen: false }">
+    {# Navigation Shell — form templates can {% block nav %}{% endblock %} to hide #}
+    {% block nav %}<header class="bg-white border-b border-gray-200/80 shadow-xs sticky top-0 z-40" x-data="{ mobileMenuOpen: false }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center gap-8">
@@ -117,7 +117,7 @@
             </div>
         </div>
         {% endif %}
-    </header>
+    </header>{% endblock nav %}
 
     {% if messages %}
     <script>

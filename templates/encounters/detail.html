@@ -3,12 +3,13 @@
 {% block title %}Clinical Encounter - MUST EMR{% endblock %}
 
 {% block content %}
+{% block nav %}{% endblock %}
 <div class="h-[calc(100vh-8rem)] flex flex-col -mx-4 sm:-mx-6 lg:-mx-8 -mt-8">
     
     {# ── Encounter Header ─────────────────────────────────────────────────── #}
     <div class="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4 shrink-0 flex items-center justify-between">
         <div class="flex items-center gap-4">
-            <a href="{% url 'patients:profile' patient.pk|default:0 %}" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors">
+            <a href="{% url 'patients:profile' patient.pk|default:0 %}#encounters" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
             </a>
             <div>

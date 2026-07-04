@@ -1,13 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Record Dialysis Session{% endblock %}
 {% block content %}
+{% block nav %}{% endblock %}
 <div class="max-w-2xl mx-auto py-6">
     <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
         <div>
             <h1 class="text-3xl font-bold tracking-tight text-ink-900">Record Dialysis Session</h1>
             <p class="text-sm text-ink-500 mt-2">{{ prescription.patient.full_name }}</p>
         </div>
-        <a href="{% url 'patients:profile' prescription.patient.pk %}" class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200">
+        <a href="{% url 'patients:profile' prescription.patient.pk %}#dialysis" class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
             Back to Patient
         </a>
@@ -39,7 +40,7 @@
         </div>
 
         <div class="flex items-center justify-end gap-4">
-            <a href="{% url 'patients:profile' prescription.patient.pk %}" class="btn-secondary text-sm">Cancel</a>
+            <a href="{% url 'patients:profile' prescription.patient.pk %}#dialysis" class="btn-secondary text-sm">Cancel</a>
             <button type="submit" class="btn-primary text-sm">Record Session</button>
         </div>
     </form>
