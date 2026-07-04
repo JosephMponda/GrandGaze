@@ -28,6 +28,7 @@
                             {% endif %}
                             {% if user.is_superuser or user.profile.role == 'ADMIN' or user.profile.role == 'ICT' %}
                                 <a href="{% url 'accounts:audit_trail' %}" class="px-3 py-2 rounded-md text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'accounts:audit_trail' %}bg-gray-100 text-gray-900{% else %}text-gray-600 hover:text-gray-900 hover:bg-gray-50{% endif %}">Audit</a>
+                                <a href="{% url 'accounts:control_panel' %}" class="px-3 py-2 rounded-md text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'accounts:control_panel' %}bg-gray-100 text-gray-900{% else %}text-gray-600 hover:text-gray-900 hover:bg-gray-50{% endif %}">Config</a>
                             {% endif %}
                         </nav>
                     {% endif %}
@@ -112,8 +113,9 @@
                 <a href="{% url 'pharmacy:queue' %}" class="block px-3 py-2 rounded-md text-base font-medium {% if request.resolver_match.view_name == 'pharmacy:queue' %}bg-brand-light text-brand{% else %}text-gray-700 hover:text-gray-900 hover:bg-gray-50{% endif %}">Pharmacy</a>
                 {% endif %}
                 {% if user.is_superuser or user.profile.role == 'ADMIN' or user.profile.role == 'ICT' %}
-                    <a href="{% url 'accounts:audit_trail' %}" class="block px-3 py-2 rounded-md text-base font-medium {% if request.resolver_match.view_name == 'accounts:audit_trail' %}bg-brand-light text-brand{% else %}text-gray-700 hover:text-gray-900 hover:bg-gray-50{% endif %}">Audit Trail</a>
-                {% endif %}
+                     <a href="{% url 'accounts:audit_trail' %}" class="block px-3 py-2 rounded-md text-base font-medium {% if request.resolver_match.view_name == 'accounts:audit_trail' %}bg-brand-light text-brand{% else %}text-gray-700 hover:text-gray-900 hover:bg-gray-50{% endif %}">Audit Trail</a>
+                     <a href="{% url 'accounts:control_panel' %}" class="block px-3 py-2 rounded-md text-base font-medium {% if request.resolver_match.view_name == 'accounts:control_panel' %}bg-brand-light text-brand{% else %}text-gray-700 hover:text-gray-900 hover:bg-gray-50{% endif %}">Control Panel</a>
+                 {% endif %}
             </div>
         </div>
         {% endif %}
@@ -212,7 +214,6 @@
         </template>
     </div>
 
-    {# Scripts — Alpine MUST load before app.js so the store is available #}
     <script>
         // Alpine toast store — defined before Alpine boots so it is ready immediately
         document.addEventListener('alpine:init', () => {
@@ -231,32 +232,33 @@
                     }, 250); // allow leave transition to finish
                 }
             });
+
+            Alpine.data('idleTimer', () => ({
+                showWarning: false,
+                remaining: 120,
+                timer: null,
+                warningTimer: null,
+                init() {
+                    this.reset();
+                },
+                reset() {
+                    this.showWarning = false;
+                    clearTimeout(this.timer);
+                    clearTimeout(this.warningTimer);
+                    this.warningTimer = setTimeout(() => {
+                        this.showWarning = true;
+                        this.remaining = 120;
+                        this.timer = setInterval(() => {
+                            this.remaining -= 1;
+                            if (this.remaining <= 0) {
+                                clearInterval(this.timer);
+                                window.location.href = "{% url 'accounts:logout' %}";
+                            }
+                        }, 1000);
+                    }, 13 * 60 * 1000);
+                }
+            }));
         });
-        Alpine.data('idleTimer', () => ({
-            showWarning: false,
-            remaining: 120,
-            timer: null,
-            warningTimer: null,
-            init() {
-                this.reset();
-            },
-            reset() {
-                this.showWarning = false;
-                clearTimeout(this.timer);
-                clearTimeout(this.warningTimer);
-                this.warningTimer = setTimeout(() => {
-                    this.showWarning = true;
-                    this.remaining = 120;
-                    this.timer = setInterval(() => {
-                        this.remaining -= 1;
-                        if (this.remaining <= 0) {
-                            clearInterval(this.timer);
-                            window.location.href = "{% url 'accounts:logout' %}";
-                        }
-                    }, 1000);
-                }, 13 * 60 * 1000);
-            }
-        }));
     </script>
     <script src="{% static 'js/alpinejs.min.js' %}" defer></script>
     <script src="{% static 'js/htmx.min.js' %}"></script>
