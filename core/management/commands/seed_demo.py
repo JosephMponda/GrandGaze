@@ -53,6 +53,8 @@ PATIENTS_DATA = [
                 "type": "outpatient",
                 "complaint": "Fever with chills for 2 days, headache, body aches",
                 "diagnosis": "Uncomplicated malaria",
+                "icd_code": "1F40",
+                "icd_display": "Malaria due to Plasmodium falciparum",
                 "plan": "Artemether Lumefantrine course, review in 3 days if no improvement",
                 "vitals": {
                     "temperature_c": Decimal("39.2"),
@@ -93,6 +95,8 @@ PATIENTS_DATA = [
                 "type": "outpatient",
                 "complaint": "Routine antenatal visit, feeling well",
                 "diagnosis": "Normal pregnancy, 24 weeks gestation",
+                "icd_code": "QA0Y",
+                "icd_display": "Antenatal care for normal pregnancy",
                 "plan": "Continue ANC, next visit in 4 weeks, FBC for baseline",
                 "vitals": {
                     "temperature_c": Decimal("36.8"),
@@ -127,6 +131,8 @@ PATIENTS_DATA = [
                 "type": "outpatient",
                 "complaint": "Cough and fever for 5 days, difficulty breathing",
                 "diagnosis": "Community-acquired pneumonia",
+                "icd_code": "CA40",
+                "icd_display": "Pneumonia due to bacteria",
                 "plan": "Amoxicillin 250mg 1 capsule TDS for 7 days, review if no improvement in 48 hours",
                 "allergies": [{"allergen": "Penicillin", "reaction": "Rash and itching", "severity": "moderate"}],
                 "vitals": {
@@ -187,6 +193,8 @@ PATIENTS_DATA = [
                 "type": "follow_up",
                 "complaint": "Diabetes follow-up, occasional dizziness",
                 "diagnosis": "Type 2 diabetes mellitus, poorly controlled",
+                "icd_code": "5A11",
+                "icd_display": "Type 2 diabetes mellitus",
                 "plan": "Increase Metformin to 500mg BD, review blood glucose, diet counselling",
                 "vitals": {
                     "temperature_c": Decimal("36.5"),
@@ -228,6 +236,8 @@ PATIENTS_DATA = [
                 "type": "emergency",
                 "complaint": "Lower abdominal pain for 1 day, vaginal spotting",
                 "diagnosis": "Threatened abortion, 10 weeks pregnant",
+                "icd_code": "JA00.0",
+                "icd_display": "Threatened abortion",
                 "plan": "Admit for observation, ultrasound to confirm viability, bed rest",
                 "vitals": {
                     "temperature_c": Decimal("37.1"),
@@ -361,6 +371,8 @@ class Command(BaseCommand):
                     "encounter_type": enc_data["type"],
                     "presenting_complaint": enc_data["complaint"],
                     "diagnosis": enc_data["diagnosis"],
+                    "icd_code": enc_data.get("icd_code", ""),
+                    "icd_display": enc_data.get("icd_display", ""),
                     "clinical_plan": enc_data["plan"],
                 },
             )

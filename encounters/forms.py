@@ -18,6 +18,8 @@ class EncounterForm(forms.ModelForm):
             "family_history",
             "examination_findings",
             "diagnosis",
+            "icd_code",
+            "icd_display",
             "differential_diagnosis",
             "clinical_plan",
         ]

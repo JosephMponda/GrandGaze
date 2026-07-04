@@ -34,6 +34,8 @@ class Encounter(models.Model):
     family_history = models.TextField(blank=True)
     examination_findings = models.TextField(blank=True)
     diagnosis = models.CharField(max_length=255, blank=True)
+    icd_code = models.CharField(max_length=20, blank=True)
+    icd_display = models.CharField(max_length=255, blank=True)
     differential_diagnosis = models.TextField(blank=True)
     clinical_plan = models.TextField(blank=True)
 

@@ -8,6 +8,8 @@ from encounters.models import Encounter
 from patients.models import Patient
 from reporting.models import AlertEvent
 
+from django.core.exceptions import ValidationError
+
 from .forms import LabResultForm
 from .models import LabOrderStatus, LabTest, SpecimenType
 from . import services
@@ -150,3 +152,12 @@ def test_abnormal_but_not_critical_when_flag_off(patient, clinician, labtech):
     assert result.is_critical is False
     # No alert should fire for non-critical abnormal
     assert not AlertEvent.objects.filter(patient=patient, source="lab").exists()
+
+
+def test_loinc_code_format_validation():
+    LabTest(name="Valid", loinc_code="58410-2", specimen_type=SpecimenType.BLOOD).full_clean()
+    LabTest(name="Empty OK", loinc_code="", specimen_type=SpecimenType.BLOOD).full_clean()
+    with pytest.raises(ValidationError):
+        LabTest(name="Bad", loinc_code="584102", specimen_type=SpecimenType.BLOOD).full_clean()
+    with pytest.raises(ValidationError):
+        LabTest(name="Bad2", loinc_code="not-a-loinc", specimen_type=SpecimenType.BLOOD).full_clean()
