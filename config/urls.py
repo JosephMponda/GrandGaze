@@ -4,9 +4,10 @@ from django.views.generic import RedirectView, TemplateView
 
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
-from config.error_views import page_not_found, permission_denied, server_error
+from config.error_views import bad_request, page_not_found, permission_denied, server_error
 from config.health_check import health_check
 
+handler400 = "config.error_views.bad_request"
 handler404 = "config.error_views.page_not_found"
 handler403 = "config.error_views.permission_denied"
 handler500 = "config.error_views.server_error"

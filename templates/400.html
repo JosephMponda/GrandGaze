@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Bad Request — MUST EMR{% endblock %}
+{% block content %}
+<div class="flex flex-col items-center justify-center py-20 px-4">
+    <div class="text-7xl font-bold text-gray-200 mb-4">400</div>
+    <h1 class="text-2xl font-bold text-ink-900 mb-2">Bad request</h1>
+    <p class="text-ink-500 mb-8 text-center max-w-md">The request could not be processed. This usually happens when your session has expired or the form was submitted incorrectly. Please go back and try again.</p>
+    <a href="{% url 'accounts:dashboard' %}" class="btn-primary px-6 py-2.5 text-sm font-semibold">Go to Dashboard</a>
+</div>
+{% endblock %}
