@@ -1,12 +1,18 @@
 from django.contrib import admin
+from django.shortcuts import render
 from django.urls import include, path
 from django.views.generic import RedirectView, TemplateView
 
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
-from config.error_views import page_not_found, permission_denied, server_error
+from config.error_views import bad_request, page_not_found, permission_denied, server_error
 from config.health_check import health_check
 
+
+def catch_all_404(request, unmatched=""):
+    return render(request, "404.html", status=404)
+
+handler400 = "config.error_views.bad_request"
 handler404 = "config.error_views.page_not_found"
 handler403 = "config.error_views.permission_denied"
 handler500 = "config.error_views.server_error"
@@ -32,4 +38,5 @@ urlpatterns = [
     path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
     path("health/", health_check, name="health_check"),
     path("", RedirectView.as_view(pattern_name="accounts:dashboard", permanent=False)),
+    path("<path:unmatched>", catch_all_404, name="catch_all"),
 ]

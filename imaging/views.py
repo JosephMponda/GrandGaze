@@ -20,7 +20,9 @@ def request_imaging(request, patient_id):
         if form.is_valid():
             imaging_request = services.create_request(patient, requested_by=request.user, **form.cleaned_data)
             messages.success(request, "Imaging request created.")
-            return redirect(reverse("imaging:report", args=[imaging_request.pk]))
+            if request.user.groups.filter(name__in=["Radiographer", "Admin"]).exists():
+                return redirect(reverse("imaging:report", args=[imaging_request.pk]))
+            return redirect(reverse("patients:profile", args=[patient.pk]))
     else:
         form = ImagingRequestForm()
         form.fields["encounter"].queryset = patient.encounters.all()

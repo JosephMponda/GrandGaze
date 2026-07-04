@@ -4,11 +4,11 @@ from .models import DispensingRecord, Drug, Prescription
 
 
 class PrescriptionForm(forms.ModelForm):
-    proceed_with_warnings = forms.BooleanField(required=False, widget=forms.HiddenInput)
+    proceed_with_warnings = forms.BooleanField(required=False, widget=forms.CheckboxInput)
 
     class Meta:
         model = Prescription
-        fields = ["encounter", "drug", "dose", "route", "frequency", "duration_days", "safety_override_reason"]
+        fields = ["encounter", "drug", "dose", "route", "frequency", "duration_days", "safety_override_reason", "notes"]
 
 
 class DispensingRecordForm(forms.ModelForm):

@@ -14,6 +14,12 @@ from .forms import StaffUserForm
 User = get_user_model()
 
 
+def logout_view(request):
+    if request.method == "POST":
+        auth_logout(request)
+    return redirect("accounts:login")
+
+
 @login_required
 def dashboard(request):
     """Role-aware landing page - MVP requirement (brief §12)."""

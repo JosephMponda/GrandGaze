@@ -222,12 +222,15 @@ Cross-module communication not yet formalized beyond the shared alert hub.
 - Default-deny access pattern
 
 ### §9.4 Cybersecurity Requirements
-- Secure login (`LoginView`, CSRF middleware)
+- Secure login (`LoginView` + CSRF middleware; `redirect_authenticated_user=True` prevents session confusion)
 - Role-based access control (decorators + permission classes)
-- Session timeout (15 min idle, configurable)
+- Session timeout (15 min idle, configurable, with 13 min warning via Alpine idle-timer)
 - Field-level encryption at rest
 - Failed login tracking + account lockout (`django-axes`, 5 attempts → 15 min lock)
 - Audit logging on all admin activity
+- Custom 404/403/400/500 pages — no internal path/URL pattern disclosure on error
+- Logout POST-only enforced; GET redirected safely to login (no bare 405)
+- Catch-all URL pattern prevents information leakage on mistyped paths (`/accounts/access` etc.)
 
 ### §9.5 Interoperability Standards
 - FHIR-inspired endpoint (`/api/interop/`)

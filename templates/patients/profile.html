@@ -96,12 +96,13 @@
     </div>
 </div>
 
-<div x-data="{ activeTab: 'encounters' }">
+<div x-data="{ activeTab: window.location.hash ? window.location.hash.substring(1) : 'encounters' }">
 
     {# Tab Bar #}
     <div class="flex items-center gap-1 border-b border-gray-200 mb-6 overflow-x-auto">
         {% for tab in tabs %}
-        <button @click="activeTab = '{{ tab.id }}'"
+        <button id="tab-btn-{{ tab.id }}"
+                @click="activeTab = '{{ tab.id }}'"
                 :class="activeTab === '{{ tab.id }}' ? 'border-brand text-brand bg-brand-light/50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'"
                 class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 rounded-t-md transition-all whitespace-nowrap -mb-px">
             {{ tab.label }}
@@ -110,9 +111,8 @@
         {% endfor %}
     </div>
 
-    {# Tab Panels — loaded via HTMX from each module's patient_tab endpoint #}
+    {# Tab Panels — active tab loads on page load; others lazy-load on first click via tab-btn trigger #}
     <div id="tp-encounters" x-show="activeTab === 'encounters'"
-         x-init="$nextTick(() => htmx.process($el))"
          hx-get="{% url 'encounters:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
          hx-boost="false"
          class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">

@@ -21,7 +21,9 @@ def order_test(request, patient_id):
         if form.is_valid():
             order = services.create_order(patient, form.cleaned_data["test"], request.user, form.cleaned_data.get("encounter"))
             messages.success(request, "Lab order created.")
-            return redirect(reverse("laboratory:collect", args=[order.pk]))
+            if request.user.groups.filter(name__in=["LabTech", "Admin"]).exists():
+                return redirect(reverse("laboratory:collect", args=[order.pk]))
+            return redirect(reverse("patients:profile", args=[patient.pk]))
     else:
         form = LabOrderForm()
         form.fields["encounter"].queryset = patient.encounters.all()
