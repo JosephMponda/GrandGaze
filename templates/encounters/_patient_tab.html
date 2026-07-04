@@ -1,19 +1,72 @@
-<h2>Encounters</h2>
-<p><a href="{% url 'encounters:new' patient.pk %}">+ New encounter</a> |
-   <a href="{% url 'encounters:add_allergy' patient.pk %}">+ Record allergy</a></p>
-<h3>Allergies</h3>
-<ul>
-    {% for a in patient.allergies.all %}
-        <li>{{ a.allergen }} — {{ a.get_severity_display }}{% if a.reaction %} ({{ a.reaction }}){% endif %}</li>
-    {% empty %}
-        <li>No known allergies recorded.</li>
-    {% endfor %}
-</ul>
-<h3>Encounter history</h3>
-<ul>
-    {% for e in encounters %}
-        <li><a href="{% url 'encounters:detail' e.pk %}">{{ e.created_at }} — {{ e.get_encounter_type_display }} ({{ e.get_status_display }})</a></li>
-    {% empty %}
-        <li>No encounters yet.</li>
-    {% endfor %}
-</ul>
+<!-- Encounters Patient Tab Partial — loaded via HTMX into patient profile -->
+<div class="space-y-6">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <h2 class="text-xl font-bold text-ink-900">Visits & Encounters</h2>
+        <div class="flex items-center gap-2">
+            <a href="{% url 'encounters:add_allergy' patient.pk %}" class="btn-secondary text-sm font-semibold py-2 px-3 hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                Record Allergy
+            </a>
+            <a href="{% url 'encounters:new' patient.pk %}" class="btn-primary text-sm font-semibold py-2 px-4 shadow-sm hover:-translate-y-0.5 transition-all duration-200">
+                + New Encounter
+            </a>
+        </div>
+    </div>
+
+    <!-- Allergies Banner -->
+    {% with allergies=patient.allergies.all %}
+    {% if allergies %}
+    <div class="bg-red-50 border border-red-200 rounded-2xl px-5 py-4">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-red-700 mb-3 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            Known Allergies
+        </h3>
+        <div class="flex flex-wrap gap-2">
+            {% for a in allergies %}
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold
+                {% if a.severity == 'severe' %}bg-red-200 text-red-900
+                {% elif a.severity == 'moderate' %}bg-orange-100 text-orange-800
+                {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                {{ a.allergen }}
+                {% if a.severity %}<span class="ml-1.5 text-xs opacity-70">({{ a.get_severity_display }})</span>{% endif %}
+            </span>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="bg-green-50 border border-green-100 rounded-2xl px-5 py-3 flex items-center gap-2 text-sm text-green-700">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        No known allergies recorded.
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Encounter History -->
+    <div>
+        <h3 class="text-sm font-bold text-ink-700 uppercase tracking-wider mb-3">Encounter History</h3>
+        {% if encounters %}
+        <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-2xl overflow-hidden">
+            {% for e in encounters %}
+            <a href="{% url 'encounters:detail' e.pk %}" class="flex items-center justify-between px-5 py-4 bg-white hover:bg-paper transition-colors duration-150 group">
+                <div class="flex items-center gap-4">
+                    <span class="flex-shrink-0 w-2 h-2 rounded-full
+                        {% if e.status == 'open' %}bg-green-400 animate-pulse
+                        {% else %}bg-gray-300{% endif %}">
+                    </span>
+                    <div>
+                        <p class="text-sm font-semibold text-ink-900">{{ e.get_encounter_type_display }}</p>
+                        <p class="text-xs text-ink-500">{{ e.created_at|date:"d M Y, H:i" }} &middot; {{ e.get_status_display }}</p>
+                    </div>
+                </div>
+                <span class="text-brand text-sm font-semibold group-hover:translate-x-0.5 transition-transform duration-200">&rarr;</span>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-sm text-ink-500 bg-paper border border-gray-200/60 rounded-2xl px-5 py-6 flex items-center gap-3">
+            <svg class="w-5 h-5 text-ink-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            No encounters yet. Click <strong>&ldquo;New Encounter&rdquo;</strong> to open the first visit.
+        </div>
+        {% endif %}
+    </div>
+</div>

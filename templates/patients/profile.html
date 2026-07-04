@@ -114,38 +114,55 @@
     {# Tab Panels — active tab loads on page load; others lazy-load on first click via tab-btn trigger #}
     <div id="tp-encounters" x-show="activeTab === 'encounters'"
          hx-get="{% url 'encounters:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         hx-boost="false"
          class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
     </div>
     <div id="tp-vitals" x-show="activeTab === 'vitals'" style="display:none"
-         hx-get="{% url 'vitals:patient_tab' patient.pk %}" hx-trigger="click from:#tab-btn-vitals once" hx-target="this"
+         x-init="$nextTick(() => htmx.process($el))"
+         hx-get="{% url 'vitals:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         hx-boost="false"
          class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
     </div>
     <div id="tp-labs" x-show="activeTab === 'labs'" style="display:none"
-         hx-get="{% url 'laboratory:patient_tab' patient.pk %}" hx-trigger="click from:#tab-btn-labs once" hx-target="this"
+         x-init="$nextTick(() => htmx.process($el))"
+         hx-get="{% url 'laboratory:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         hx-boost="false"
          class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
     </div>
     <div id="tp-imaging" x-show="activeTab === 'imaging'" style="display:none"
-         hx-get="{% url 'imaging:patient_tab' patient.pk %}" hx-trigger="click from:#tab-btn-imaging once" hx-target="this"
+         x-init="$nextTick(() => htmx.process($el))"
+         hx-get="{% url 'imaging:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         hx-boost="false"
          class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
     </div>
     <div id="tp-prescriptions" x-show="activeTab === 'prescriptions'" style="display:none"
-         hx-get="{% url 'pharmacy:patient_tab' patient.pk %}" hx-trigger="click from:#tab-btn-prescriptions once" hx-target="this"
+         x-init="$nextTick(() => htmx.process($el))"
+         hx-get="{% url 'pharmacy:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         hx-boost="false"
          class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
     </div>
     <div id="tp-billing" x-show="activeTab === 'billing'" style="display:none"
-         hx-get="{% url 'billing:patient_tab' patient.pk %}" hx-trigger="click from:#tab-btn-billing once" hx-target="this"
+         x-init="$nextTick(() => htmx.process($el))"
+         hx-get="{% url 'billing:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         hx-boost="false"
          class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
     </div>
     <div id="tp-triage" x-show="activeTab === 'triage'" style="display:none"
-         hx-get="{% url 'emergency:patient_tab' patient.pk %}" hx-trigger="click from:#tab-btn-triage once" hx-target="this"
+         x-init="$nextTick(() => htmx.process($el))"
+         hx-get="{% url 'emergency:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         hx-boost="false"
          class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
     </div>
     <div id="tp-dialysis" x-show="activeTab === 'dialysis'" style="display:none"
-         hx-get="{% url 'dialysis:patient_tab' patient.pk %}" hx-trigger="click from:#tab-btn-dialysis once" hx-target="this"
+         x-init="$nextTick(() => htmx.process($el))"
+         hx-get="{% url 'dialysis:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         hx-boost="false"
          class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
     </div>
     <div id="tp-inpatient" x-show="activeTab === 'inpatient'" style="display:none"
-         hx-get="{% url 'inpatient:patient_tab' patient.pk %}" hx-trigger="click from:#tab-btn-inpatient once" hx-target="this"
+         x-init="$nextTick(() => htmx.process($el))"
+         hx-get="{% url 'inpatient:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         hx-boost="false"
          class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
     </div>
 

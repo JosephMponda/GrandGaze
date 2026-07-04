@@ -1,29 +1,99 @@
 {% extends "base.html" %}
-{% block title %}New Encounter — {{ patient.full_name }} — MUST EMR{% endblock %}
+{% block title %}New Encounter - {{ patient.full_name }} - MUST EMR{% endblock %}
+
 {% block content %}
-{% block nav %}{% endblock %}
-<div class="max-w-2xl mx-auto py-6">
+<div class="max-w-4xl mx-auto py-6">
     <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
         <div>
             <h1 class="text-3xl font-bold tracking-tight text-ink-900">New Encounter</h1>
-            <p class="text-sm text-ink-500 mt-2">{{ patient.full_name }} · {{ patient.patient_number }}</p>
+            <p class="text-sm text-ink-500 mt-2">{{ patient.full_name }} &middot; {{ patient.patient_number }}</p>
         </div>
-        <a href="{% url 'patients:profile' patient.pk %}#encounters" class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200">
+        <a href="{% url 'patients:profile' patient.pk %}" class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
             Back to Patient
         </a>
     </div>
 
-    <form method="post" class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8">
+    <form method="post" class="space-y-8">
         {% csrf_token %}
-        <div class="space-y-4">
-            {% for field in form %}
-                {% include "components/_field.html" with field=field %}
+
+        {% if form.non_field_errors %}
+        <div class="space-y-2 mb-6">
+            {% for error in form.non_field_errors %}
+                {% include "components/_alert_banner.html" with message=error type="critical" %}
             {% endfor %}
         </div>
-        <div class="flex items-center justify-end gap-4 mt-6 pt-5 border-t border-gray-100">
-            <a href="{% url 'patients:profile' patient.pk %}#encounters" class="btn-secondary text-sm">Cancel</a>
-            <button type="submit" class="btn-primary text-sm">Create Encounter</button>
+        {% endif %}
+
+        <!-- Step 1: Basic Encounter Settings -->
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+            <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
+                <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold">1</span>
+                <h3 class="text-base font-semibold text-ink-900">Encounter Details</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% include "components/_field.html" with field=form.encounter_type %}
+            </div>
+        </div>
+
+        <!-- Step 2: Presenting Complaint -->
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+            <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
+                <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold">2</span>
+                <h3 class="text-base font-semibold text-ink-900">Chief Complaint & History</h3>
+            </div>
+            <div class="space-y-6">
+                {% include "components/_field.html" with field=form.presenting_complaint %}
+                {% include "components/_field.html" with field=form.history_of_presenting_complaint %}
+            </div>
+        </div>
+
+        <!-- Step 3: Medical Background -->
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+            <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
+                <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold">3</span>
+                <h3 class="text-base font-semibold text-ink-900">Patient History Background</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% include "components/_field.html" with field=form.past_medical_history %}
+                {% include "components/_field.html" with field=form.past_surgical_history %}
+                {% include "components/_field.html" with field=form.medication_history %}
+                {% include "components/_field.html" with field=form.allergy_history %}
+                {% include "components/_field.html" with field=form.social_history %}
+                {% include "components/_field.html" with field=form.family_history %}
+            </div>
+        </div>
+
+        <!-- Step 4: Clinical Exam & Diagnosis -->
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+            <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
+                <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold">4</span>
+                <h3 class="text-base font-semibold text-ink-900">Clinical Evaluation</h3>
+            </div>
+            <div class="space-y-6">
+                {% include "components/_field.html" with field=form.examination_findings %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {% include "components/_field.html" with field=form.diagnosis %}
+                    {% include "components/_field.html" with field=form.differential_diagnosis %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5: Clinical Plan -->
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+            <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
+                <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold">5</span>
+                <h3 class="text-base font-semibold text-ink-900">Clinical Management Plan</h3>
+            </div>
+            {% include "components/_field.html" with field=form.clinical_plan %}
+        </div>
+
+        <div class="flex items-center justify-end gap-4 pt-6 pb-10">
+            <a href="{% url 'patients:profile' patient.pk %}" class="btn-secondary text-sm font-semibold py-3 px-6 hover:-translate-y-0.5 transition-all duration-200">Cancel</a>
+            <button type="submit" class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:shadow-brand/30 hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2">
+                Open Encounter
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
         </div>
     </form>
 </div>

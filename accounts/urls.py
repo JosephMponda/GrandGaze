@@ -10,6 +10,9 @@ urlpatterns = [
     path("logout/", views.logout_view, name="logout"),
     path("dashboard/", views.dashboard, name="dashboard"),
     path("admin/audit/", views.audit_trail, name="audit_trail"),
+    path("admin/control-panel/", views.control_panel, name="control_panel"),
+    path("admin/users/add/", views.add_user, name="add_user"),
+    path("admin/wards/add/", views.add_ward, name="add_ward"),
     path(
         "password-reset/",
         auth_views.PasswordResetView.as_view(

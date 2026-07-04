@@ -14,22 +14,31 @@
             </a>
             <div>
                 <h1 class="text-xl font-bold text-gray-900 flex items-center gap-3">
-                    {{ patient.full_name|default:"John Doe" }}
-                    <span class="text-sm font-mono bg-gray-100 border border-gray-200 px-2 py-0.5 rounded text-gray-600 font-medium tracking-wide">{{ patient.patient_number|default:"PT-10042" }}</span>
+                    {{ encounter.patient.full_name }}
+                    <span class="text-sm font-mono bg-gray-100 border border-gray-200 px-2 py-0.5 rounded text-gray-600 font-medium tracking-wide">{{ encounter.patient.patient_number }}</span>
                 </h1>
-                <p class="text-sm text-gray-500 font-medium mt-0.5">Outpatient Visit &bull; {{ encounter.created_at|date:"F j, Y"|default:"Today" }}</p>
+                <p class="text-sm text-gray-500 font-medium mt-0.5">{{ encounter.get_encounter_type_display }} Visit &bull; {{ encounter.created_at|date:"F j, Y, H:i" }}</p>
             </div>
         </div>
 
         <div class="flex items-center gap-3">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold bg-green-50 text-green-700 border border-green-100 shadow-sm">
-                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                Encounter Active
-            </span>
-            <button form="encounter-form" type="submit" name="sign" class="btn-primary flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                Sign &amp; Complete
-            </button>
+            {% if encounter.is_signed %}
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 text-gray-700 border border-gray-200">
+                    Signed & Locked
+                </span>
+            {% else %}
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold bg-green-50 text-green-700 border border-green-100 shadow-sm">
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    Encounter Active
+                </span>
+                <form method="post" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" name="sign" class="btn-primary flex items-center gap-2 text-sm py-2 px-4 shadow-md shadow-brand/20 hover:shadow-lg">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Sign &amp; Lock
+                    </button>
+                </form>
+            {% endif %}
         </div>
     </div>
 
@@ -45,110 +54,128 @@
                     <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">Demographics</h3>
                     <div class="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
                         <div>
-                            <p class="text-gray-500 text-xs font-medium">Age</p>
-                            <p class="text-gray-900 font-semibold">42 yrs</p>
+                            <p class="text-gray-500 text-xs font-medium">Age / Sex</p>
+                            <p class="text-gray-900 font-semibold">{{ encounter.patient.age|default:"—" }} yrs / {{ encounter.patient.get_sex_display }}</p>
                         </div>
                         <div>
-                            <p class="text-gray-500 text-xs font-medium">Sex</p>
-                            <p class="text-gray-900 font-semibold">Male</p>
+                            <p class="text-gray-500 text-xs font-medium">Category</p>
+                            <p class="text-gray-900 font-semibold">{{ encounter.patient.get_patient_category_display }}</p>
                         </div>
                         <div class="col-span-2">
                             <p class="text-gray-500 text-xs font-medium">Location</p>
-                            <p class="text-gray-900 font-semibold truncate">Blantyre, TA Machinjiri</p>
+                            <p class="text-gray-900 font-semibold truncate">{{ encounter.patient.district|default:"—" }}, TA {{ encounter.patient.traditional_authority|default:"—" }}</p>
                         </div>
                     </div>
                 </div>
 
                 {# Latest Vitals / NEWS2 #}
                 <div class="bg-white rounded-xl border border-gray-200/80 p-4 shadow-sm relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
-                    <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500">Today's Vitals</h3>
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500 text-white uppercase tracking-wider shadow-sm">NEWS2: 6 (Med Risk)</span>
-                    </div>
-                    
-                    <div class="space-y-3 text-sm">
-                        <div class="flex justify-between items-center border-b border-gray-50 pb-2">
-                            <span class="text-gray-500 font-medium">Blood Pressure</span>
-                            <span class="font-bold text-gray-900">140 / 90 <span class="text-xs text-gray-400 font-normal">mmHg</span></span>
+                    {% with latest_vital=encounter.patient.vitals.first %}
+                    {% if latest_vital %}
+                        <div class="absolute top-0 left-0 w-1 h-full 
+                            {% if latest_vital.ews.risk_level == 'high' or latest_vital.ews.risk_level == 'critical' %}bg-red-500
+                            {% elif latest_vital.ews.risk_level == 'medium' %}bg-amber-500
+                            {% else %}bg-green-500{% endif %}"></div>
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500">Today's Vitals</h3>
+                            {% if latest_vital.ews %}
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-white
+                                {% if latest_vital.ews.risk_level == 'high' or latest_vital.ews.risk_level == 'critical' %}bg-red-600
+                                {% elif latest_vital.ews.risk_level == 'medium' %}bg-amber-500
+                                {% else %}bg-green-600{% endif %}">
+                                NEWS2: {{ latest_vital.ews.score }}
+                            </span>
+                            {% endif %}
                         </div>
-                        <div class="flex justify-between items-center border-b border-gray-50 pb-2">
-                            <span class="text-gray-500 font-medium">Heart Rate</span>
-                            <span class="font-bold text-amber-600">112 <span class="text-xs text-amber-600/70 font-normal">bpm</span></span>
+                        
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between items-center border-b border-gray-50 pb-2">
+                                <span class="text-gray-500 font-medium">Blood Pressure</span>
+                                <span class="font-bold text-gray-900">{{ latest_vital.blood_pressure_systolic }}/{{ latest_vital.blood_pressure_diastolic }} <span class="text-xs text-gray-400 font-normal">mmHg</span></span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-gray-50 pb-2">
+                                <span class="text-gray-500 font-medium">Heart Rate</span>
+                                <span class="font-bold text-gray-900">{{ latest_vital.pulse_rate }} <span class="text-xs text-gray-400 font-normal">bpm</span></span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-gray-50 pb-2">
+                                <span class="text-gray-500 font-medium">SpO2</span>
+                                <span class="font-bold text-gray-900">{{ latest_vital.oxygen_saturation }}% <span class="text-xs text-gray-400 font-normal">{% if latest_vital.supplemental_oxygen %}O2{% else %}RA{% endif %}</span></span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-gray-50 pb-2">
+                                <span class="text-gray-500 font-medium">Temperature</span>
+                                <span class="font-bold text-gray-900">{{ latest_vital.temperature_c }} <span class="text-xs text-gray-400 font-normal">°C</span></span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-500 font-medium">Resp. Rate</span>
+                                <span class="font-bold text-gray-900">{{ latest_vital.respiratory_rate }} <span class="text-xs text-gray-400 font-normal">/min</span></span>
+                            </div>
                         </div>
-                        <div class="flex justify-between items-center border-b border-gray-50 pb-2">
-                            <span class="text-gray-500 font-medium">SpO2</span>
-                            <span class="font-bold text-gray-900">96% <span class="text-xs text-gray-400 font-normal">Room Air</span></span>
+                    {% else %}
+                        <div class="text-center py-4 text-sm text-gray-500">
+                            No vitals recorded for this visit.
                         </div>
-                        <div class="flex justify-between items-center border-b border-gray-50 pb-2">
-                            <span class="text-gray-500 font-medium">Temperature</span>
-                            <span class="font-bold text-red-600">39.2 <span class="text-xs text-red-600/70 font-normal">°C</span></span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-500 font-medium">Resp. Rate</span>
-                            <span class="font-bold text-gray-900">18 <span class="text-xs text-gray-400 font-normal">bpm</span></span>
-                        </div>
-                    </div>
+                    {% endif %}
+                    {% endwith %}
 
-                    <button class="w-full mt-4 btn-secondary text-xs py-1.5 flex justify-center gap-1.5">
+                    <a href="{% url 'vitals:entry' encounter.patient.pk %}" class="w-full mt-4 btn-secondary text-xs py-1.5 flex justify-center gap-1.5">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-                        Add Retake
-                    </button>
+                        Record Vitals / NEWS2
+                    </a>
                 </div>
 
-                {# Quick History #}
+                {# Active Allergies #}
                 <div class="bg-white rounded-xl border border-gray-200/80 p-4 shadow-sm">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">Past History</h3>
-                    <ul class="space-y-3">
-                        <li class="text-sm">
-                            <div class="font-medium text-gray-900">Hypertension</div>
-                            <div class="text-xs text-gray-500">Diagnosed 2022</div>
-                        </li>
-                        <li class="text-sm">
-                            <div class="font-medium text-red-600 flex items-center gap-1.5">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                                Penicillin Allergy
-                            </div>
-                        </li>
-                    </ul>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">Allergies</h3>
+                    {% if encounter.patient.allergies.all %}
+                        <ul class="space-y-2">
+                            {% for a in encounter.patient.allergies.all %}
+                            <li class="text-sm font-semibold text-red-700 flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                                {{ a.allergen }} ({{ a.get_severity_display }})
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-xs text-gray-500">No known drug allergies recorded.</p>
+                    {% endif %}
                 </div>
 
             </div>
         </div>
 
-        {# Right Pane: Clinical Notes (70%) #}
+        {# Right Pane: Clinical Notes Workspace #}
         <div class="flex-1 flex flex-col bg-white overflow-hidden relative">
             <div class="flex-1 overflow-y-auto p-6 sm:p-8">
                 
-                <form id="encounter-form" method="post" data-offline-capable="true" data-form-type="encounter_note" class="max-w-3xl mx-auto space-y-8">
-                    {% csrf_token %}
-                    
-                    {# Chief Complaint #}
-                    <div>
-                        <label class="flex items-center gap-2 text-base font-bold text-gray-900 mb-2">
-                            <div class="w-6 h-6 rounded bg-brand/10 text-brand flex items-center justify-center text-xs">1</div>
-                            Chief Complaint
-                        </label>
-                        <input type="text" name="chief_complaint" class="form-input w-full rounded-xl border-gray-200 focus:border-brand focus:ring-brand" placeholder="e.g. Fever and headache for 3 days">
-                    </div>
+                {% if not encounter.is_signed %}
+                    {# Edit Mode #}
+                    <form id="encounter-form" method="post" action="{% url 'encounters:edit' encounter.pk %}" class="max-w-3xl mx-auto space-y-8">
+                        {% csrf_token %}
+                        <div class="space-y-6">
+                            <h2 class="text-lg font-bold text-gray-900 border-b pb-2">Clinical Consultation Form</h2>
+                            
+                            {% include "components/_field.html" with field=edit_form.encounter_type %}
+                            {% include "components/_field.html" with field=edit_form.presenting_complaint %}
+                            {% include "components/_field.html" with field=edit_form.history_of_presenting_complaint %}
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {% include "components/_field.html" with field=edit_form.past_medical_history %}
+                                {% include "components/_field.html" with field=edit_form.past_surgical_history %}
+                                {% include "components/_field.html" with field=edit_form.medication_history %}
+                                {% include "components/_field.html" with field=edit_form.allergy_history %}
+                                {% include "components/_field.html" with field=edit_form.social_history %}
+                                {% include "components/_field.html" with field=edit_form.family_history %}
+                            </div>
 
-                    {# History of Present Illness (HPI) #}
-                    <div>
-                        <label class="flex items-center gap-2 text-base font-bold text-gray-900 mb-2">
-                            <div class="w-6 h-6 rounded bg-brand/10 text-brand flex items-center justify-center text-xs">2</div>
-                            History of Present Illness (HPI)
-                        </label>
-                        <textarea name="hpi" rows="5" class="form-input w-full rounded-xl border-gray-200 focus:border-brand focus:ring-brand resize-y" placeholder="Detailed narrative of the patient's symptoms..."></textarea>
-                    </div>
+                            {% include "components/_field.html" with field=edit_form.examination_findings %}
 
-                    {# Objective / Examination #}
-                    <div>
-                        <label class="flex items-center gap-2 text-base font-bold text-gray-900 mb-2">
-                            <div class="w-6 h-6 rounded bg-brand/10 text-brand flex items-center justify-center text-xs">3</div>
-                            Physical Examination
-                        </label>
-                        <textarea name="examination" rows="4" class="form-input w-full rounded-xl border-gray-200 focus:border-brand focus:ring-brand resize-y" placeholder="General appearance, HEENT, CVS, Resp, etc..."></textarea>
-                    </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {% include "components/_field.html" with field=edit_form.diagnosis %}
+                                {% include "components/_field.html" with field=edit_form.differential_diagnosis %}
+                            </div>
+
+                            {% include "components/_field.html" with field=edit_form.clinical_plan %}
+                        </div>
 
                     {# Assessment & Plan #}
                     <div>
@@ -165,9 +192,71 @@
                         <div class="bg-gray-50 rounded-xl p-1 border border-gray-200">
                             <textarea name="plan" rows="6" class="w-full bg-transparent border-0 focus:ring-0 resize-y p-3" placeholder="1. Presumptive diagnosis...&#10;2. Orders...&#10;3. Follow up..."></textarea>
                         </div>
-                    </div>
+                    </form>
+                {% else %}
+                    {# Signed/Read-Only Mode #}
+                    <div class="max-w-3xl mx-auto space-y-6">
+                        <div class="bg-gray-50 border border-gray-200 rounded-2xl p-6">
+                            <h3 class="font-bold text-gray-900 mb-4">Signed Consultation Record</h3>
+                            
+                            <dl class="space-y-4 text-sm">
+                                <div>
+                                    <dt class="font-bold text-gray-500">Presenting Complaint</dt>
+                                    <dd class="text-gray-900 mt-1 whitespace-pre-line">{{ encounter.presenting_complaint }}</dd>
+                                </div>
+                                {% if encounter.history_of_presenting_complaint %}
+                                <div>
+                                    <dt class="font-bold text-gray-500">History of Presenting Complaint</dt>
+                                    <dd class="text-gray-900 mt-1 whitespace-pre-line">{{ encounter.history_of_presenting_complaint }}</dd>
+                                </div>
+                                {% endif %}
+                                {% if encounter.examination_findings %}
+                                <div>
+                                    <dt class="font-bold text-gray-500">Examination Findings</dt>
+                                    <dd class="text-gray-900 mt-1 whitespace-pre-line">{{ encounter.examination_findings }}</dd>
+                                </div>
+                                {% endif %}
+                                {% if encounter.diagnosis %}
+                                <div>
+                                    <dt class="font-bold text-gray-500">Diagnosis</dt>
+                                    <dd class="text-gray-900 mt-1 font-semibold text-brand">{{ encounter.diagnosis }}</dd>
+                                </div>
+                                {% endif %}
+                                {% if encounter.clinical_plan %}
+                                <div>
+                                    <dt class="font-bold text-gray-500">Clinical Management Plan</dt>
+                                    <dd class="text-gray-900 mt-1 whitespace-pre-line">{{ encounter.clinical_plan }}</dd>
+                                </div>
+                                {% endif %}
+                            </dl>
+                        </div>
 
-                </form>
+                        {# Addenda List #}
+                        {% if encounter.addenda.all %}
+                            <div class="space-y-4">
+                                <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Addenda to this Record</h4>
+                                {% for a in encounter.addenda.all %}
+                                <div class="bg-amber-50/50 border border-amber-100 rounded-xl p-4 text-sm">
+                                    <p class="text-xs text-gray-500 mb-1">By {{ a.author }} on {{ a.created_at|date:"d M Y, H:i" }}</p>
+                                    <p class="text-gray-900 whitespace-pre-line">{{ a.note }}</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        {# Add Addendum Form #}
+                        <form method="post" class="bg-white border border-gray-200/80 rounded-2xl p-6 space-y-4">
+                            {% csrf_token %}
+                            <h3 class="font-semibold text-gray-900">Add Clinical Addendum</h3>
+                            {% include "components/_field.html" with field=addendum_form.note %}
+                            <div class="flex justify-end">
+                                <button type="submit" name="add_addendum" class="btn-primary text-sm font-semibold py-2 px-4 shadow-sm">
+                                    Add Note
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                {% endif %}
 
                     {# ── Addenda ─────────────────────────────────────────── #}
                     <div class="max-w-3xl mx-auto mt-8 space-y-6">
@@ -199,5 +288,4 @@
 
     </div>
 </div>
-
 {% endblock %}
