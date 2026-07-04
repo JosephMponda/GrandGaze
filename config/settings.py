@@ -54,6 +54,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
     "axes.middleware.AxesMiddleware",
+    "config.middleware.PermissionDeniedMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"

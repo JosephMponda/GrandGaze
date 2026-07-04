@@ -101,7 +101,8 @@
     {# Tab Bar #}
     <div class="flex items-center gap-1 border-b border-gray-200 mb-6 overflow-x-auto">
         {% for tab in tabs %}
-        <button @click="activeTab = '{{ tab.id }}'"
+        <button id="tab-btn-{{ tab.id }}"
+                @click="activeTab = '{{ tab.id }}'"
                 :class="activeTab === '{{ tab.id }}' ? 'border-brand text-brand bg-brand-light/50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'"
                 class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 rounded-t-md transition-all whitespace-nowrap -mb-px">
             {{ tab.label }}
@@ -110,50 +111,41 @@
         {% endfor %}
     </div>
 
-    {# Tab Panels — loaded via HTMX from each module's patient_tab endpoint #}
+    {# Tab Panels — active tab loads on page load; others lazy-load on first click via tab-btn trigger #}
     <div id="tp-encounters" x-show="activeTab === 'encounters'"
-         x-init="$nextTick(() => htmx.process($el))"
          hx-get="{% url 'encounters:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
          class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
     </div>
     <div id="tp-vitals" x-show="activeTab === 'vitals'" style="display:none"
-         x-init="$nextTick(() => htmx.process($el))"
-         hx-get="{% url 'vitals:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         hx-get="{% url 'vitals:patient_tab' patient.pk %}" hx-trigger="click from:#tab-btn-vitals once" hx-target="this"
          class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
     </div>
     <div id="tp-labs" x-show="activeTab === 'labs'" style="display:none"
-         x-init="$nextTick(() => htmx.process($el))"
-         hx-get="{% url 'laboratory:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         hx-get="{% url 'laboratory:patient_tab' patient.pk %}" hx-trigger="click from:#tab-btn-labs once" hx-target="this"
          class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
     </div>
     <div id="tp-imaging" x-show="activeTab === 'imaging'" style="display:none"
-         x-init="$nextTick(() => htmx.process($el))"
-         hx-get="{% url 'imaging:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         hx-get="{% url 'imaging:patient_tab' patient.pk %}" hx-trigger="click from:#tab-btn-imaging once" hx-target="this"
          class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
     </div>
     <div id="tp-prescriptions" x-show="activeTab === 'prescriptions'" style="display:none"
-         x-init="$nextTick(() => htmx.process($el))"
-         hx-get="{% url 'pharmacy:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         hx-get="{% url 'pharmacy:patient_tab' patient.pk %}" hx-trigger="click from:#tab-btn-prescriptions once" hx-target="this"
          class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
     </div>
     <div id="tp-billing" x-show="activeTab === 'billing'" style="display:none"
-         x-init="$nextTick(() => htmx.process($el))"
-         hx-get="{% url 'billing:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         hx-get="{% url 'billing:patient_tab' patient.pk %}" hx-trigger="click from:#tab-btn-billing once" hx-target="this"
          class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
     </div>
     <div id="tp-triage" x-show="activeTab === 'triage'" style="display:none"
-         x-init="$nextTick(() => htmx.process($el))"
-         hx-get="{% url 'emergency:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         hx-get="{% url 'emergency:patient_tab' patient.pk %}" hx-trigger="click from:#tab-btn-triage once" hx-target="this"
          class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
     </div>
     <div id="tp-dialysis" x-show="activeTab === 'dialysis'" style="display:none"
-         x-init="$nextTick(() => htmx.process($el))"
-         hx-get="{% url 'dialysis:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         hx-get="{% url 'dialysis:patient_tab' patient.pk %}" hx-trigger="click from:#tab-btn-dialysis once" hx-target="this"
          class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
     </div>
     <div id="tp-inpatient" x-show="activeTab === 'inpatient'" style="display:none"
-         x-init="$nextTick(() => htmx.process($el))"
-         hx-get="{% url 'inpatient:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
+         hx-get="{% url 'inpatient:patient_tab' patient.pk %}" hx-trigger="click from:#tab-btn-inpatient once" hx-target="this"
          class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8">
     </div>
 
