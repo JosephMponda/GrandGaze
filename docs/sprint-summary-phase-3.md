@@ -100,12 +100,22 @@ The specs review (`docs/completed/specs_review.md`) audited every module against
 - *Problem:* §24 requires "MUST and GSL logos on every page and prototype screen." No logo image assets exist.
 - *Fix:* Text branding: `MUST · GSL | Malawi EMR Platform v1.0` in every page footer. Compliant with brief requirement without fake placeholder images.
 
+### Post-review bug fixes (found during manual testing)
+
+**403 traceback exposure** (`config/middleware.py`, `config/settings.py`)
+- *Problem:* `PermissionDenied` raised by `role_required` showed Django's debug traceback with full file paths when `DEBUG=True`. Same issue as the 404 debug page — internal path disclosure.
+- *Fix:* `PermissionDeniedMiddleware` catches `PermissionDenied` via `process_exception` and renders the custom `403.html` template before Django's WSGI handler can generate the debug page. Works in all environments, including dev.
+
+**HTMX tab infinite loop** (`templates/patients/profile.html`)
+- *Problem:* Patient profile page had 9 tab panels all with `hx-trigger="load"` + `x-init="$nextTick(() => htmx.process($el))"`. On page load, all 9 tabs fired simultaneously. Then `htmx.process()` re-fired all `load` triggers, causing an infinite cascade of requests (20+ per tab in the logs). Server load spike, no visible benefit.
+- *Fix:* Only the active tab (encounters) uses `hx-trigger="load"`. All other tabs use `hx-trigger="click from:#tab-btn-{id} once"` — lazy-load on first click, exactly once. Removed `x-init` from all panels.
+
 ## Stats
 
 - **10 migrations** added: `pharmacy.0004`, `reporting.0003`, `laboratory.0003`, `encounters.0002`, `encounters.0003`, `patients.0002`, `patients.0003`, `vitals.0002`
-- **99 tests pass** — 98 baseline + 1 new LOINC validation test (no regressions from any session)
+- **99 tests pass** — no regressions from any session
 - **1 pip-audit CVE** (pytest 8.4.2 — dev-only, ignored in CI)
-- **~650 lines changed** across 39 files
+- **~700 lines changed** across 42 files
 
 ## State
 
