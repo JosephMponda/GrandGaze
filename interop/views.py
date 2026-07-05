@@ -3,13 +3,14 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from accounts.permissions import HasRole
 from patients.models import Patient
 
 from .serializers import FHIRBundleSerializer
 
 
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, HasRole("Clinician", "Nurse", "Admin", "ICT")])
 def patient_bundle(request, patient_id):
     """Return a FHIR-Bundle-shaped document for the given patient.
     Read-only; no conformance claim beyond 'FHIR-inspired export'.

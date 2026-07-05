@@ -107,7 +107,7 @@
   // for forms to be offline-capable for interception everytime it is marked offline=true kinda ...
   // Only intercept forms marked with data-offline-capable="true"
   document.addEventListener('htmx:beforeRequest', async (event) => {
-    const form = event.detail.xhr.htmx?.target?.closest('[data-offline-capable="true"]');
+    const form = event.detail.elt?.closest('[data-offline-capable="true"]');
     if (!form) return;
 
     // Check if online

@@ -60,9 +60,16 @@
         </div>
 
         <div class="flex justify-end pt-4 border-t border-gray-100">
-            <a href="{% url 'patients:register' %}" class="btn-secondary text-sm font-semibold py-2 px-6">
-                Go Back &amp; Edit Form
-            </a>
+            <form method="post" action="{% url 'patients:register' %}">
+                {% csrf_token %}
+                {% for field in form %}
+                    <input type="hidden" name="{{ field.html_name }}" value="{{ field.value|default_if_none:'' }}">
+                {% endfor %}
+                <input type="hidden" name="back_to_edit" value="1">
+                <button type="submit" class="btn-secondary text-sm font-semibold py-2 px-6">
+                    Go Back &amp; Edit Form
+                </button>
+            </form>
         </div>
     </div>
 </div>
