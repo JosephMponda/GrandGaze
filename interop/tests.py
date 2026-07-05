@@ -46,3 +46,19 @@ def test_patient_bundle_requires_auth(api_client, patient):
     url = f"/api/interop/patient/{patient.pk}/bundle/"
     response = api_client.get(url)
     assert response.status_code == 403
+
+
+def test_patient_bundle_denies_non_clinical_role(api_client, patient):
+    """Regression test: this endpoint bulk-exports patient PHI (demographics +
+    encounters). It was previously gated by IsAuthenticated only, so any
+    authenticated account - including non-clinical roles with no continuity-
+    of-care need - could enumerate patient_id and harvest records hospital-wide."""
+    Group.objects.get_or_create(name="BillingOfficer")
+    billing_user = User.objects.create_user("billing1", password="TestPass123!")
+    Profile.objects.create(user=billing_user, role=Role.BILLING_OFFICER)
+    billing_user.groups.add(Group.objects.get(name="BillingOfficer"))
+
+    api_client.force_authenticate(user=billing_user)
+    url = f"/api/interop/patient/{patient.pk}/bundle/"
+    response = api_client.get(url)
+    assert response.status_code == 403

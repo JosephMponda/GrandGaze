@@ -1,24 +1,24 @@
 <div class="form-field mb-4">
     {% if field.label %}
         <label for="{{ field.id_for_label }}">
-            {{ field.label }} {% if field.field.required %}<span class="text-red-600">*</span>{% endif %}
+            {{ field.label }} {% if field.field.required %}<span class="text-red-600" aria-hidden="true">*</span>{% endif %}
         </label>
     {% endif %}
     
     {% if field.field.widget.input_type == 'checkbox' or field.field.widget.input_type == 'radio' %}
         <div class="flex items-center gap-2 mt-2">
             {{ field }}
-            <span class="text-sm text-gray-700">{{ field.help_text|safe }}</span>
+            <span class="text-sm text-gray-700">{{ field.help_text }}</span>
         </div>
     {% else %}
         {{ field }}
         {% if field.help_text %}
-            <p class="text-xs text-gray-500 mt-1">{{ field.help_text|safe }}</p>
+            <p class="text-xs text-gray-500 mt-1">{{ field.help_text }}</p>
         {% endif %}
     {% endif %}
 
     {% if field.errors %}
-        <div class="error">
+        <div class="error" id="{{ field.id_for_label }}_error" role="alert">
             {% for error in field.errors %}
                 <p>{{ error }}</p>
             {% endfor %}
