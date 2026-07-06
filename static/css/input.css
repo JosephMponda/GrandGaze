@@ -5,9 +5,12 @@
 @theme {
   --color-ink: #111827;
   --color-paper: #fafaf9;
-  --color-brand: #0f766e; /* Deep desaturated teal */
-  --color-brand-hover: #115e59;
-  --color-brand-light: #f0fdfa;
+  --color-brand: #009FE3;
+  --color-brand-hover: #0077aa;
+  --color-brand-dark: #162B4A;
+  --color-brand-light: #EBF7FC;
+  --color-brand-accent: #009639;
+  --color-brand-silver: #C0C0C0;
 }
 
 @layer components {
