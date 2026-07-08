@@ -11,6 +11,11 @@ from .forms import PatientRegistrationForm
 def register_patient(request):
     if request.method == "POST":
         form = PatientRegistrationForm(request.POST)
+        if request.POST.get("back_to_edit"):
+            # User hit "Go Back & Edit Form" from the duplicate-warning screen.
+            # Re-render with the same bound form so nothing they already typed
+            # is lost - a plain GET here would silently discard the submission.
+            return render(request, "patients/register.html", {"form": form})
         confirmed_candidate_id = request.POST.get("confirmed_not_duplicate_of")
         if form.is_valid():
             duplicates = services.check_possible_duplicate(form.cleaned_data)

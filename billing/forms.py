@@ -18,6 +18,7 @@ class PaymentForm(forms.ModelForm):
     class Meta:
         model = Payment
         fields = ["amount_mwk", "method", "reference"]
+        widgets = {"amount_mwk": forms.NumberInput(attrs={"min": "0.01", "step": "0.01"})}
 
 
 LineItemFormSet = forms.formset_factory(LineItemForm, extra=1, can_delete=False)

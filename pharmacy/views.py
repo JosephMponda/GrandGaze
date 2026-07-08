@@ -12,7 +12,7 @@ from .models import Prescription, PrescriptionStatus, StockLevel
 from .safety import CriticalSafetyBlock, check_prescription_safety
 
 
-@login_required
+@role_required("Clinician", "Nurse", "Admin")
 def prescribe(request, patient_id):
     patient = get_patient_or_404(patient_id)
     warnings = []

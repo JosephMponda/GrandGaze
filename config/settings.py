@@ -4,13 +4,16 @@ Django settings for the MUST-GSL EMR project.
 Stack decisions here follow AGENTS.md §2 exactly - do not add packages or
 patterns not already on ALLOWED_PACKAGES.md without a sign-off entry there.
 """
+import sys
 from pathlib import Path
 from decouple import config, Csv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = config("DJANGO_SECRET_KEY", default="dev-only-insecure-key-change-me")
-DEBUG = config("DEBUG", default=True, cast=bool)
+_INSECURE_DEFAULT_KEY = "dev-only-insecure-key-change-me"
+
+SECRET_KEY = config("DJANGO_SECRET_KEY", default=_INSECURE_DEFAULT_KEY)
+DEBUG = config("DEBUG", default=False, cast=bool)  # secure-by-default; local dev sets DEBUG=True via .env
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1", cast=Csv())
 
 INSTALLED_APPS = [
@@ -135,6 +138,16 @@ AXES_LOCKOUT_PARAMETERS = [["username", "ip_address"]]
 # --- django-cryptography: field-level encryption key, MUST be set via env
 # in any real deployment. Never commit a real key. ---
 CRYPTOGRAPHY_KEY = config("CRYPTOGRAPHY_KEY", default=SECRET_KEY)
+
+# Refuse to boot outside DEBUG if PHI would be encrypted (or the app would
+# run) with the well-known placeholder key/secret committed in this repo -
+# a forgotten env var must not silently downgrade PHI encryption to
+# "anyone with this source code can decrypt it".
+if not DEBUG:
+    if SECRET_KEY == _INSECURE_DEFAULT_KEY:
+        sys.exit("DJANGO_SECRET_KEY must be set to a real secret in production.")
+    if CRYPTOGRAPHY_KEY in (_INSECURE_DEFAULT_KEY, SECRET_KEY) and not config("CRYPTOGRAPHY_KEY", default=""):
+        sys.exit("CRYPTOGRAPHY_KEY must be explicitly set in production - refusing to encrypt PHI with a default key.")
 
 # --- Email: console backend for demo (password reset) ---
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

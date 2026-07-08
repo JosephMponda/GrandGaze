@@ -95,6 +95,29 @@ def test_forged_confirmation_id_does_not_bypass_duplicate_check(client, nurse_us
     assert Patient.objects.filter(national_id_lookup__isnull=False).count() == 1
 
 
+def test_go_back_to_edit_preserves_submitted_data(client, nurse_user):
+    """Regression test: clicking 'Go Back & Edit Form' from the duplicate-
+    warning screen must re-render the registration form with everything the
+    clinician already typed, not a blank form (previously a plain GET link
+    that silently discarded the submission)."""
+    client.force_login(nurse_user)
+    response = client.post(
+        reverse("patients:register"),
+        {
+            "first_name": "Grace",
+            "last_name": "Banda",
+            "sex": "female",
+            "age_estimated": "on",
+            "national_id": "MW-777",
+            "back_to_edit": "1",
+        },
+    )
+    assert response.status_code == 200
+    assert response.context["form"]["first_name"].value() == "Grace"
+    assert response.context["form"]["national_id"].value() == "MW-777"
+    assert Patient.objects.filter(national_id_lookup__isnull=False).count() == 0  # nothing was created
+
+
 def test_register_patient_advances_patient_number_sequence(nurse_user):
     patient = services.register_patient(dict(first_name="Grace", last_name="Banda", sex="female"), nurse_user)
     sequence = PatientNumberSequence.objects.get(prefix=patient.patient_number.rsplit("-", 1)[0] + "-")

@@ -7,6 +7,7 @@ from functools import wraps
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from rest_framework.permissions import BasePermission
 
 
 def has_role(user, *role_names: str) -> bool:
@@ -32,3 +33,20 @@ def role_required(*role_names: str):
         return _wrapped
 
     return decorator
+
+
+def HasRole(*role_names: str):
+    """DRF permission-class factory wrapping has_role(), for @api_view /
+    permission_classes use where role_required's login-redirect behaviour
+    doesn't fit a JSON API response.
+
+    Usage: @permission_classes([IsAuthenticated, HasRole("Admin", "ICT")])
+    """
+
+    class _HasRole(BasePermission):
+        message = "Your role does not have access to this endpoint."
+
+        def has_permission(self, request, view):
+            return has_role(request.user, *role_names)
+
+    return _HasRole

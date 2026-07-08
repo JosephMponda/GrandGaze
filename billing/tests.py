@@ -100,6 +100,31 @@ def test_invoice_detail_shows_balance(client, patient, billing_officer, service_
     assert "5000" in response.content.decode()
 
 
+def test_negative_payment_amount_rejected(patient, billing_officer, service_item):
+    inv = services.create_invoice(patient=patient, created_by=billing_officer)
+    services.add_line_item(invoice=inv, service_item=service_item, quantity=1)
+    with pytest.raises(ValueError):
+        services.record_payment(invoice=inv, amount_mwk=-5000, method="cash", received_by=billing_officer)
+
+
+def test_negative_payment_form_invalid():
+    from .forms import PaymentForm
+    form = PaymentForm(data={"amount_mwk": "-5000", "method": "cash", "reference": ""})
+    assert not form.is_valid()
+
+
+def test_non_billing_user_forbidden(client, patient):
+    Group.objects.get_or_create(name="Nurse")
+    nurse = User.objects.create_user("nurse2", password="TestPass123!")
+    Profile.objects.create(user=nurse, role=Role.NURSE)
+    nurse.groups.add(Group.objects.get(name="Nurse"))
+    client.force_login(nurse)
+
+    url = reverse("billing:create_invoice", args=[patient.pk])
+    response = client.get(url)
+    assert response.status_code == 403
+
+
 def test_payment_recording_updates_status(client, patient, billing_officer, service_item):
     client.force_login(billing_officer)
     inv = services.create_invoice(patient=patient, created_by=billing_officer)
