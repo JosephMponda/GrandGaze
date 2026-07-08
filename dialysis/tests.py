@@ -55,7 +55,7 @@ class TestServices:
         from datetime import date, timedelta
         today = date.today()
         week_start = today - timedelta(days=today.weekday())
-        # heuristic expects Mon/Tue/Wed for 3x/week — record one of them
+        # heuristic expects Mon/Tue/Wed for 3x/week - record one of them
         record_day = week_start  # Monday
         record_session(rx, clinician, {
             "session_date": record_day.isoformat(),

@@ -16,7 +16,7 @@ class ServiceCatalogItem(models.Model):
         ordering = ["name"]
 
     def __str__(self):
-        return f"{self.name} — MWK {self.price_mwk}"
+        return f"{self.name} - MWK {self.price_mwk}"
 
 
 class Invoice(models.Model):
@@ -46,7 +46,7 @@ class Invoice(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"Invoice #{self.pk} — {self.patient.full_name} ({self.status})"
+        return f"Invoice #{self.pk} - {self.patient.full_name} ({self.status})"
 
 
 class InvoiceLineItem(models.Model):
@@ -56,7 +56,7 @@ class InvoiceLineItem(models.Model):
     amount_mwk = models.DecimalField(max_digits=12, decimal_places=2)
 
     def __str__(self):
-        return f"{self.service_item.name} x{self.quantity} — MWK {self.amount_mwk}"
+        return f"{self.service_item.name} x{self.quantity} - MWK {self.amount_mwk}"
 
 
 class Payment(models.Model):

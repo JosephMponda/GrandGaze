@@ -57,11 +57,11 @@
                 </div>
                 <div>
                     <dt class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">District</dt>
-                    <dd class="mt-0.5 text-sm font-semibold text-gray-800">{{ patient.district|default:"—" }}</dd>
+                    <dd class="mt-0.5 text-sm font-semibold text-gray-800">{{ patient.district|default:"-" }}</dd>
                 </div>
                 <div>
                     <dt class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">T.A.</dt>
-                    <dd class="mt-0.5 text-sm font-semibold text-gray-800">{{ patient.traditional_authority|default:"—" }}</dd>
+                    <dd class="mt-0.5 text-sm font-semibold text-gray-800">{{ patient.traditional_authority|default:"-" }}</dd>
                 </div>
             </dl>
         </div>
@@ -71,7 +71,7 @@
     <div class="mt-6 pt-5 border-t border-gray-100 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 text-sm">
         <div>
             <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-0.5">Village</span>
-            <span class="text-gray-700 font-medium">{{ patient.village|default:"—" }}</span>
+            <span class="text-gray-700 font-medium">{{ patient.village|default:"-" }}</span>
         </div>
         {% if patient.phone_number %}
         <div>
@@ -111,7 +111,7 @@
         {% endfor %}
     </div>
 
-    {# Tab Panels — active tab loads on page load; others lazy-load on first click via tab-btn trigger #}
+    {# Tab Panels - active tab loads on page load; others lazy-load on first click via tab-btn trigger #}
     <div id="tp-encounters" x-show="activeTab === 'encounters'"
          hx-get="{% url 'encounters:patient_tab' patient.pk %}" hx-trigger="load" hx-target="this"
          hx-boost="false"

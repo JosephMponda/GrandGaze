@@ -1,10 +1,10 @@
-# Sprint Summary — Phase 2 (Jul 2–4, 2026)
+# Sprint Summary - Phase 2 (Jul 2–4, 2026)
 
 ## Built this sprint
 
 ### Emergency & Triage (§8.1.5)
 - `TriageEncounter` model with CTAS categories (5-level)
-- Rapid registration — minimal patient + triage in one step
+- Rapid registration - minimal patient + triage in one step
 - Severity-sorted queue view
 - Triage resolution (discharged/admitted/referred/dead)
 - Patient profile tab + dashboard widget
@@ -13,19 +13,19 @@
 ### Inventory / Stock Management (§8.1.15)
 - `StockLevel` model tied to `Drug` (OneToOneField)
 - Stock check + adjustment services
-- Dispense guard — blocks if stock = 0, deducts on success
+- Dispense guard - blocks if stock = 0, deducts on success
 - `/pharmacy/stock/` management UI with add-form + levels table
 - Stock badges on queue page + dashboard widget
 
 ### Dialysis & CKD (§8.1.12)
-- New `dialysis` app — CKD staging, dialysis prescribing, session recording
+- New `dialysis` app - CKD staging, dialysis prescribing, session recording
 - Auto-calculated fluid removal from pre/post weight
 - Missed session heuristic (naive weekday checker)
 - Patient tab, session log, today's dashboard
 - Dashboard widget + 8 tests
 
 ### Inpatient / Ward Management (§8.1.4)
-- New `inpatient` app — Ward, Bed, Admission, WardRoundNote models
+- New `inpatient` app - Ward, Bed, Admission, WardRoundNote models
 - Full admit/transfer/discharge workflow with bed assignment
 - Color-coded ward bed board (`/inpatient/ward/<id>/`)
 - Inpatient dashboard with occupancy cards

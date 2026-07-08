@@ -10,16 +10,16 @@
 | `docs/REFERENCE_ALIGNMENT.md` | Comparison to OpenMRS, FHIR, LOINC, DICOM, ICD-11 references |
 | `docs/phase-2/` | Next-sprint feature specs (inpatient, emergency, appointments) |
 
-## Phase 1 — Completed (archived in `docs/completed/`)
+## Phase 1 - Completed (archived in `docs/completed/`)
 
 | Path | Original Owner |
 |---|---|
-| `docs/completed/backend/engineer-A-core-identity/` | Engineer A — `accounts`, `patients`. Module spec, build plan, agent instructions |
-| `docs/completed/backend/engineer-B-clinical-encounters/` | Engineer B — `encounters`, `vitals` |
-| `docs/completed/backend/engineer-C-diagnostics/` | Engineer C — `laboratory`, `imaging` |
-| `docs/completed/backend/engineer-D-pharmacy/` | Engineer D — `pharmacy` |
-| `docs/completed/backend/engineer-E-billing-dialysis-reporting/` | Engineer E — `billing`, `reporting`, `syncapi`, `interop` |
-| `docs/completed/frontend/` | Frontend team — design system, architecture, build plan, agent instructions |
+| `docs/completed/backend/engineer-A-core-identity/` | Engineer A - `accounts`, `patients`. Module spec, build plan, agent instructions |
+| `docs/completed/backend/engineer-B-clinical-encounters/` | Engineer B - `encounters`, `vitals` |
+| `docs/completed/backend/engineer-C-diagnostics/` | Engineer C - `laboratory`, `imaging` |
+| `docs/completed/backend/engineer-D-pharmacy/` | Engineer D - `pharmacy` |
+| `docs/completed/backend/engineer-E-billing-dialysis-reporting/` | Engineer E - `billing`, `reporting`, `syncapi`, `interop` |
+| `docs/completed/frontend/` | Frontend team - design system, architecture, build plan, agent instructions |
 | `docs/completed/README.md` | (same as this file, superseded) |
 
 ## Cross-cutting

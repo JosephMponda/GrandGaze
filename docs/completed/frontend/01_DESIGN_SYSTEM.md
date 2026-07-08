@@ -21,7 +21,12 @@ Functional, restrained palette - define as Tailwind theme tokens, don't hardcode
 |---|---|---|
 | `ink` (near-black, e.g. `#111827`) | Primary text | Never pure `#000` - too harsh on long reading. |
 | `paper` (off-white, e.g. `#FAFAF9`) | Page background | Never pure `#FFF` - reduces glare on low-quality/reused screens common in low-resource settings. |
-| `brand` (a single deep, desaturated blue or teal - pick one, commit to it) | Primary actions, links, active nav | This is your one "personality" color - everything else stays neutral so this reads clearly. |
+| `brand` (deep, bright clinical blue `#009FE3`) | Primary actions, links, active nav | This is your one personality color - everything else stays neutral so the UI reads clearly. |
+| `brand-hover` (`#0077aa`) | Hover/focus state for primary actions and links | Use only for active interaction states, not for static text. |
+| `brand-dark` (`#162B4A`) | Headings, strong labels, dark accents | Reserve for heavier emphasis and text on light backgrounds. |
+| `brand-light` (`#EBF7FC`) | Subtle surfaces, form backgrounds, softly highlighted UI panels | Use sparingly for large background areas to keep contrast calm. |
+| `brand-accent` (`#009639`) | Success/positive accent states | Use for genuine positive status only, not for primary action branding. |
+| `brand-silver` (`#C0C0C0`) | Neutral UI borders, disabled states, low-emphasis text | Should be used for quiet UI structure rather than semantic meaning. |
 | `neutral-100…900` (grayscale ramp) | Borders, secondary text, backgrounds, disabled states | Most of the UI lives here. |
 | `success` (muted green) | Confirmations, "resulted"/"paid"/"verified" statuses | Not used for anything except genuine positive status. |
 | `warning` (amber) | Non-critical alerts, "pending", duplicate-therapy warnings | |

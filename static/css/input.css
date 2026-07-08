@@ -5,23 +5,30 @@
 @theme {
   --color-ink: #111827;
   --color-paper: #fafaf9;
-  --color-brand: #0f766e; /* Deep desaturated teal */
-  --color-brand-hover: #115e59;
-  --color-brand-light: #f0fdfa;
+  --color-brand: #009FE3;
+  --color-brand-hover: #0077aa;
+  --color-brand-dark: #162B4A;
+  --color-brand-light: #EBF7FC;
+  --color-brand-accent: #009639;
+  --color-brand-silver: #C0C0C0;
 }
 
 @layer components {
   /* Button variants */
   .btn-primary {
-    @apply px-4 py-2 bg-brand text-white rounded font-medium hover:bg-brand-hover transition-colors cursor-pointer;
+    @apply block w-full sm:inline-flex sm:w-auto items-center justify-center gap-2 min-w-0 px-3 py-2 sm:px-4 sm:py-2 bg-brand text-white rounded font-medium hover:bg-brand-hover transition-colors cursor-pointer;
   }
 
   .btn-secondary {
-    @apply px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded font-medium hover:bg-gray-50 transition-colors cursor-pointer;
+    @apply block w-full sm:inline-flex sm:w-auto items-center justify-center gap-2 min-w-0 px-3 py-2 sm:px-4 sm:py-2 border border-gray-300 bg-white text-gray-700 rounded font-medium hover:bg-gray-50 transition-colors cursor-pointer;
   }
 
   .btn-destructive {
-    @apply px-4 py-2 bg-red-600 text-white rounded font-medium hover:bg-red-700 transition-colors cursor-pointer;
+    @apply block w-full sm:inline-flex sm:w-auto items-center justify-center gap-2 min-w-0 px-3 py-2 sm:px-4 sm:py-2 bg-red-600 text-white rounded font-medium hover:bg-red-700 transition-colors cursor-pointer;
+  }
+
+  .stack-sm {
+    @apply flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between;
   }
 
   /* Form field styling */
@@ -98,6 +105,11 @@
 
   .empty-state-text {
     @apply text-gray-600 text-sm;
+  }
+
+  /* Responsive header helper */
+  .responsive-header {
+    @apply flex flex-col gap-4 md:flex-row md:items-center md:justify-between;
   }
 
   /* Table styling */

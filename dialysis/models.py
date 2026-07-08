@@ -37,7 +37,7 @@ class CKDDiagnosis(models.Model):
         ordering = ["-diagnosed_at"]
 
     def __str__(self):
-        return f"{self.patient.patient_number} — {self.get_stage_display()}"
+        return f"{self.patient.patient_number} - {self.get_stage_display()}"
 
 
 class DialysisPrescription(models.Model):
@@ -55,7 +55,7 @@ class DialysisPrescription(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.patient.patient_number} — {self.frequency_per_week}x/week"
+        return f"{self.patient.patient_number} - {self.frequency_per_week}x/week"
 
     @property
     def expected_sessions_per_week(self) -> int:
@@ -79,7 +79,7 @@ class DialysisSession(models.Model):
         ordering = ["-session_date"]
 
     def __str__(self):
-        return f"{self.prescription.patient.patient_number} — {self.session_date}"
+        return f"{self.prescription.patient.patient_number} - {self.session_date}"
 
     def save(self, *args, **kwargs):
         if self.fluid_removed_l is None and self.pre_weight_kg and self.post_weight_kg:

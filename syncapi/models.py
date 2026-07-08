@@ -23,7 +23,7 @@ class SyncSubmission(models.Model):
         ordering = ["-received_at"]
 
     def __str__(self):
-        return f"{self.form_type} ({self.client_uuid[:12]}…) — {self.status}"
+        return f"{self.form_type} ({self.client_uuid[:12]}…) - {self.status}"
 
 
 class SyncConflict(models.Model):

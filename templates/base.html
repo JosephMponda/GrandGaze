@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
 </head>
 <body class="bg-paper text-ink min-h-screen flex flex-col font-sans antialiased" hx-boost="true">
-    {# Navigation Shell — form templates can {% block nav %}{% endblock %} to hide #}
+    {# Navigation Shell - form templates can {% block nav %}{% endblock %} to hide #}
     {% block nav %}<header class="bg-white border-b border-gray-200/80 shadow-xs sticky top-0 z-40" x-data="{ mobileMenuOpen: false }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
@@ -66,12 +66,12 @@
                     </div>
 
                     {% if user.is_authenticated %}
-                    {# Session Idle Timer — warns at 13min, session dies at 15min #}
+                    {# Session Idle Timer - warns at 13min, session dies at 15min #}
                     <div x-data="idleTimer()" x-init="init()"
                          @click="reset()" @keydown="reset()" @mousemove="reset()">
                         <div x-show="showWarning" x-transition
                              class="fixed top-4 right-4 z-[9999] bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-xl shadow-lg text-xs font-medium">
-                            Session idle — will lock in <span x-text="remaining"></span>s
+                            Session idle - will lock in <span x-text="remaining"></span>s
                         </div>
                     </div>
                     {% endif %}
@@ -215,7 +215,7 @@
     </div>
 
     <script>
-        // Alpine toast store — defined before Alpine boots so it is ready immediately
+        // Alpine toast store - defined before Alpine boots so it is ready immediately
         document.addEventListener('alpine:init', () => {
             Alpine.store('toasts', {
                 items: [],

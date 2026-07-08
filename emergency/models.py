@@ -48,4 +48,4 @@ class TriageEncounter(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.patient} — {self.get_triage_category_display()}"
+        return f"{self.patient} - {self.get_triage_category_display()}"

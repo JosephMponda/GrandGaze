@@ -83,4 +83,4 @@ def beds_for_ward(request):
     ward_id = request.GET.get("ward")
     beds = Bed.objects.filter(ward_id=ward_id, is_occupied=False) if ward_id else Bed.objects.none()
     options = "".join(format_html('<option value="{}">{}</option>', b.pk, b.label) for b in beds)
-    return HttpResponse(format_html('<select name="bed" class="w-full rounded-lg border-gray-200 text-sm"><option value="">— Assign later —</option>{}</select>', options))
+    return HttpResponse(format_html('<select name="bed" class="w-full rounded-lg border-gray-200 text-sm"><option value="">- Assign later -</option>{}</select>', options))
