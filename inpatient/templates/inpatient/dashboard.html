@@ -1,49 +1,77 @@
 {% extends "base.html" %}
 {% block title %}Inpatient Dashboard{% endblock %}
 {% block content %}
-<div class="max-w-4xl mx-auto py-6">
-    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
-        <div>
-            <h1 class="text-3xl font-bold tracking-tight text-ink-900">Inpatient Dashboard</h1>
-            <p class="text-sm text-ink-500 mt-2">Bed occupancy and active admissions</p>
+<div class="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <!-- Responsive Header -->
+    <div class="border-b border-gray-200 pb-5 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <!-- Left: Title -->
+            <div class="min-w-0 flex-1">
+                <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink-900 truncate">Inpatient Dashboard</h1>
+                <p class="text-sm text-ink-500 mt-2">Bed occupancy and active admissions</p>
+            </div>
+            
+            <!-- Right: Back button -->
+            <div class="flex-shrink-0">
+                <a href="{% url 'accounts:dashboard' %}" 
+                   class="btn-secondary text-sm font-semibold inline-flex items-center justify-center gap-1.5 py-2 px-4 w-full sm:w-auto">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    Back to Dashboard
+                </a>
+            </div>
         </div>
-        <a href="{% url 'accounts:dashboard' %}" class="btn-secondary text-sm font-semibold inline-flex items-center gap-1.5">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-            Back to Dashboard
-        </a>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {% for ward, occ in ward_data %}
-            <a href="{% url 'inpatient:ward' ward.pk %}" class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow">
-                <p class="text-sm font-bold text-ink-900">{{ ward.name }}</p>
-                <p class="text-2xl font-bold {% if occ.occupied_beds > 0 %}text-amber-600{% else %}text-green-600{% endif %}">
-                    {{ occ.occupied_beds }}/{{ occ.total_beds }}
-                </p>
-                <p class="text-xs text-ink-500">beds occupied</p>
-            </a>
-        {% empty %}
+    <!-- Ward Occupancy Cards -->
+    {% if ward_data %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+            {% for ward, occ in ward_data %}
+                <a href="{% url 'inpatient:ward' ward.pk %}" 
+                   class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-6 hover:shadow-md transition-shadow group">
+                    <p class="text-sm font-bold text-ink-900 truncate">{{ ward.name }}</p>
+                    <p class="text-xl sm:text-2xl font-bold mt-1 {% if occ.occupied_beds > 0 %}text-amber-600{% else %}text-green-600{% endif %}">
+                        {{ occ.occupied_beds }}/{{ occ.total_beds }}
+                    </p>
+                    <p class="text-xs text-ink-500 mt-0.5">beds occupied</p>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 text-center mb-6 sm:mb-8">
             <p class="text-sm text-ink-500">No wards configured.</p>
-        {% endfor %}
-    </div>
+        </div>
+    {% endif %}
 
+    <!-- Active Admissions -->
     {% if admissions %}
         <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-2xl overflow-hidden bg-white shadow-sm">
-            <div class="px-6 py-3 bg-gray-50 border-b border-gray-100">
+            <div class="px-4 sm:px-6 py-3 bg-gray-50 border-b border-gray-100">
                 <p class="text-xs font-bold text-ink-700 uppercase tracking-wider">Active Admissions</p>
             </div>
             {% for admission in admissions %}
-                <div class="px-6 py-4 flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-semibold">{{ admission.patient.full_name }}</p>
-                        <p class="text-xs text-ink-500">{{ admission.admission_diagnosis }} &middot; {{ admission.bed.ward.name|default:"-" }} / {{ admission.bed.label|default:"-" }}</p>
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 sm:px-6 py-3 sm:py-4">
+                    <!-- Patient Info -->
+                    <div class="min-w-0 flex-1">
+                        <p class="text-sm font-semibold text-ink-900 truncate">{{ admission.patient.full_name }}</p>
+                        <p class="text-xs text-ink-500 truncate">
+                            {{ admission.admission_diagnosis }} &middot; {{ admission.bed.ward.name|default:"-" }} / {{ admission.bed.label|default:"-" }}
+                        </p>
                     </div>
-                    <a href="{% url 'inpatient:admission_detail' admission.pk %}" class="btn-secondary text-xs">View</a>
+                    
+                    <!-- View Button -->
+                    <div class="flex-shrink-0 self-start sm:self-center">
+                        <a href="{% url 'inpatient:admission_detail' admission.pk %}" 
+                           class="btn-secondary text-xs font-semibold py-1.5 px-3 w-full sm:w-auto text-center inline-block">
+                            View
+                        </a>
+                    </div>
                 </div>
             {% endfor %}
         </div>
     {% else %}
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 text-center">
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 text-center">
             <p class="text-sm text-ink-500">No active admissions.</p>
         </div>
     {% endif %}

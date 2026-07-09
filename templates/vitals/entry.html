@@ -2,7 +2,7 @@
 {% block title %}Record Vitals - {{ patient.full_name }} - MUST EMR{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto py-6"
+<div class="max-w-4xl mx-auto py-4 sm:py-6 px-4"
      x-data="{
         temp: null, pulse: null, sbp: null, dbp: null, rr: null, spo2: null,
         avpu: 'A',
@@ -49,32 +49,42 @@
         }
      }">
 
-    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
-        <div>
-            <h1 class="text-3xl font-bold tracking-tight text-ink-900">Record Vitals</h1>
-            <p class="text-sm text-ink-500 mt-2">{{ patient.full_name }} &middot; {{ patient.patient_number }}</p>
-        </div>
-        <a href="{% url 'patients:profile' patient.pk %}" class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-            Back to Patient
+    <!-- Header Block -->
+<div class="flex items-center justify-between gap-6 mb-6 sm:mb-8 border-b border-gray-200 pb-5 w-full">
+    
+    <div class="min-w-0 flex-1">
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink-900">Record Vitals</h1>
+        <p class="text-sm text-ink-500 mt-1 sm:mt-2">
+            {{ patient.full_name }} &middot; <span class="text-ink-400 font-mono text-xs">{{ patient.patient_number }}</span>
+        </p>
+    </div>
+    
+    <div class="flex-shrink-0">
+        <a href="{% url 'patients:profile' patient.pk %}" 
+           class="btn-secondary text-sm font-semibold inline-flex items-center justify-center gap-2 px-4 py-2 hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap">
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            <span>Back to Patient</span>
         </a>
     </div>
-
-    <!-- NEWS2 Live Score Badge -->
-    <div class="mb-8 bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
-        <div class="flex items-center justify-between">
+    
+</div>
+    <!-- NEWS2 Live Score Badge layout adjustments -->
+    <div class="mb-6 sm:mb-8 bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
                 <h3 class="text-xs font-bold uppercase tracking-wider text-ink-500 mb-1">NEWS2 Score (Live)</h3>
                 <p class="text-xs text-ink-400">Fills in as you enter values below</p>
             </div>
-            <div x-show="news2Score !== null" class="text-right">
-                <div class="text-4xl font-black"
+            <div x-show="news2Score !== null" class="flex sm:block items-center justify-between sm:text-right border-t sm:border-t-0 pt-3 sm:pt-0 border-gray-100">
+                <div class="text-3xl sm:text-4xl font-black"
                      :class="{
                         'text-green-600': news2Risk === 'low',
                         'text-amber-500': news2Risk === 'medium',
                         'text-red-600': news2Risk === 'high'
                      }" x-text="news2Score"></div>
-                <div class="text-sm font-bold mt-1 px-3 py-0.5 rounded-full inline-block"
+                <div class="text-xs font-bold sm:mt-1 px-3 py-0.5 rounded-full inline-block"
                      :class="{
                         'bg-green-100 text-green-700': news2Risk === 'low',
                         'bg-amber-100 text-amber-700': news2Risk === 'medium',
@@ -83,23 +93,23 @@
                     <span x-text="news2Risk === 'low' ? 'Low Risk' : news2Risk === 'medium' ? 'Medium Risk' : 'High Risk - Escalate'"></span>
                 </div>
             </div>
-            <div x-show="news2Score === null" class="text-right text-ink-400 text-sm italic">
+            <div x-show="news2Score === null" class="sm:text-right text-ink-400 text-sm italic border-t sm:border-t-0 pt-3 sm:pt-0 border-gray-100">
                 Awaiting input...
             </div>
         </div>
     </div>
 
-    <form hx-post="{% url 'vitals:entry' patient.pk %}" hx-target="#vitals-result" hx-swap="innerHTML" class="space-y-8">
+    <form hx-post="{% url 'vitals:entry' patient.pk %}" hx-target="#vitals-result" hx-swap="innerHTML" class="space-y-6 sm:space-y-8">
         {% csrf_token %}
 
-        <!-- Primary Vitals -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 space-y-6">
+        <!-- Primary Vitals Card -->
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-8 space-y-6">
             <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
                 <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold">1</span>
                 <h3 class="text-base font-semibold text-ink-900">Primary Vitals</h3>
             </div>
             
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
                 <!-- Temperature -->
                 <div>
                     <label class="block text-sm font-medium text-ink-700 mb-1">Temperature</label>
@@ -173,14 +183,14 @@
                 </div>
             </div>
 
-            <!-- AVPU -->
+            <!-- AVPU Layout Adjustment -->
             <div>
                 <label class="block text-sm font-medium text-ink-700 mb-2">Consciousness (AVPU)</label>
                 <div class="flex flex-wrap gap-2" x-model="avpu" @change="calcNEWS2()">
                     <template x-for="opt in [['A','Alert'],['V','Voice'],['P','Pain'],['U','Unresponsive']]" :key="opt[0]">
-                        <label class="relative cursor-pointer">
+                        <label class="relative cursor-pointer grow sm:grow-0">
                             <input type="radio" name="avpu_score" :value="opt[0]" x-model="avpu" @change="calcNEWS2()" class="sr-only peer">
-                            <span class="px-4 py-2 rounded-xl border text-sm font-semibold transition-all peer-checked:bg-brand peer-checked:text-white peer-checked:border-brand border-gray-200 bg-white text-ink-700 hover:border-brand/50"
+                            <span class="block text-center px-3 py-2.5 sm:px-4 sm:py-2 rounded-xl border text-sm font-semibold transition-all peer-checked:bg-brand peer-checked:text-white peer-checked:border-brand border-gray-200 bg-white text-ink-700 hover:border-brand/50"
                                   x-text="opt[0] + ' - ' + opt[1]"></span>
                         </label>
                     </template>
@@ -188,14 +198,15 @@
             </div>
         </div>
 
-        <!-- Secondary Measurements -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 space-y-6">
+        <!-- Secondary Measurements Card -->
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-8 space-y-6">
             <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
                 <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold">2</span>
                 <h3 class="text-base font-semibold text-ink-900">Additional Measurements</h3>
                 <span class="text-xs text-ink-400">(Optional)</span>
             </div>
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
                 <div>
                     <label class="block text-sm font-medium text-ink-700 mb-1">Weight</label>
                     <div class="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:border-brand focus-within:ring-1 focus-within:ring-brand">
@@ -233,7 +244,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-ink-700 mb-1">Pregnancy Status</label>
-                    <select name="pregnancy_status" class="w-full rounded-xl border-gray-200 shadow-sm focus:border-brand focus:ring-brand sm:text-sm">
+                    <select name="pregnancy_status" class="w-full rounded-xl border-gray-200 shadow-sm focus:border-brand focus:ring-brand px-3 py-2 sm:text-sm bg-white">
                         <option value="n/a">N/A</option>
                         <option value="pregnant">Pregnant</option>
                         <option value="not_pregnant">Not Pregnant</option>
@@ -241,11 +252,20 @@
                     </select>
                 </div>
             </div>
+
+            <!-- Clinical Notes 3-Row Textarea -->
+            <div class="pt-2">
+                <label class="block text-sm font-medium text-ink-700 mb-1">Clinical Notes / Comments</label>
+                <textarea name="vitals_notes" rows="3" 
+                          class="w-full block px-3 py-2 rounded-xl border border-gray-200 shadow-sm focus:border-brand focus:ring-brand sm:text-sm bg-white placeholder-gray-400" 
+                          placeholder="Describe any observable custom conditions, anomalies, or situational details here..."></textarea>
+            </div>
         </div>
 
-        <div class="flex items-center justify-end gap-4 pt-2 pb-10">
-            <a href="{% url 'patients:profile' patient.pk %}" class="btn-secondary text-sm font-semibold py-3 px-6 hover:-translate-y-0.5 transition-all duration-200">Cancel</a>
-            <button type="submit" class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:shadow-brand/30 hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2">
+        <!-- Compact Submissions Stack on Desktop, Full Width Stack on Mobile -->
+        <div class="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 pt-2 pb-10">
+            <a href="{% url 'patients:profile' patient.pk %}" class="w-full sm:w-auto text-center btn-secondary text-sm font-semibold py-3 px-6 hover:-translate-y-0.5 transition-all duration-200">Cancel</a>
+            <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:shadow-brand/30 hover:-translate-y-0.5 transition-all duration-200">
                 Save Vitals
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </button>

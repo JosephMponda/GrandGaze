@@ -2,43 +2,61 @@
 {% block title %}Specimen Collection - MUST EMR{% endblock %}
 {% block content %}
 {% block nav %}{% endblock %}
-<div class="max-w-4xl mx-auto py-6">
-    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
-        <div>
-            <h1 class="text-3xl font-bold tracking-tight text-ink-900">Specimen Collection</h1>
-            <p class="text-sm text-ink-500 mt-2">{{ order.test }} &middot; {{ order.patient.full_name }} &middot; {{ order.patient.patient_number }}</p>
+<div class="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <!-- Responsive Header -->
+    <div class="border-b border-gray-200 pb-5 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <!-- Left: Title -->
+            <div class="min-w-0 flex-1">
+                <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink-900 truncate">Specimen Collection</h1>
+                <p class="text-sm text-ink-500 mt-2 truncate">{{ order.test }} &middot; {{ order.patient.full_name }} &middot; {{ order.patient.patient_number }}</p>
+            </div>
+            
+            <!-- Right: Back button -->
+            <div class="flex-shrink-0">
+                <a href="{% url 'laboratory:workload' %}" 
+                   class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200 w-full sm:w-auto justify-center">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Back to Workload
+                </a>
+            </div>
         </div>
-        <a href="{% url 'laboratory:workload' %}" class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-            </svg>
-            Back to Workload
-        </a>
     </div>
 
-    <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 space-y-6">
+    <!-- Main Content Card -->
+    <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
         {% if order.specimen_barcode %}
-        <div class="bg-paper border border-gray-200/60 rounded-xl p-6 text-center space-y-4">
+        <!-- Barcode Display -->
+        <div class="bg-paper border border-gray-200/60 rounded-xl p-4 sm:p-6 text-center space-y-4">
             <p class="text-xs font-bold text-ink-700 uppercase tracking-wider">Specimen Barcode</p>
-            <p class="text-lg font-mono font-bold text-ink-900">{{ order.specimen_barcode }}</p>
-            <div class="flex justify-center gap-[2px] items-end h-16" aria-label="Specimen barcode {{ order.specimen_barcode }}">
+            <p class="text-base sm:text-lg font-mono font-bold text-ink-900 break-all">{{ order.specimen_barcode }}</p>
+            <div class="flex justify-center gap-[2px] items-end h-12 sm:h-16 overflow-x-auto" aria-label="Specimen barcode {{ order.specimen_barcode }}">
                 {% for char in order.specimen_barcode %}
-                    <span style="{% cycle 'width:3px;height:56px;background:#111827' 'width:2px;height:40px;background:#111827' %}"></span>
+                    <span class="flex-shrink-0" style="{% cycle 'width:3px;height:40px;background:#111827' 'width:2px;height:28px;background:#111827' %} sm:{% cycle 'width:3px;height:56px;background:#111827' 'width:2px;height:40px;background:#111827' %}"></span>
                 {% endfor %}
             </div>
         </div>
         {% endif %}
 
-        <form method="post">
+        <!-- Collection Form -->
+        <form method="post" class="space-y-4">
             {% csrf_token %}
-            <button type="submit" class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:shadow-brand/30 hover:-translate-y-0.5 transition-all duration-200">
+            <button type="submit" 
+                    class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:shadow-brand/30 hover:-translate-y-0.5 transition-all duration-200 w-full sm:w-auto">
                 Mark Specimen Collected
             </button>
         </form>
 
+        <!-- Result Link -->
         <div class="pt-4 border-t border-gray-100">
-            <a href="{% url 'laboratory:enter_result' order.pk %}" class="text-sm font-semibold text-brand hover:text-brand-dark transition-colors duration-200">
-                Enter result &rarr;
+            <a href="{% url 'laboratory:enter_result' order.pk %}" 
+               class="text-sm font-semibold text-brand hover:text-brand-dark transition-colors duration-200 inline-flex items-center gap-1">
+                Enter result
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                </svg>
             </a>
         </div>
     </div>

@@ -1,29 +1,43 @@
 {% extends "base.html" %}
 {% block title %}Lab Result Detail - MUST EMR{% endblock %}
 {% block content %}
-<div class="max-w-4xl mx-auto py-6">
-    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
-        <div>
-            <h1 class="text-3xl font-bold tracking-tight text-ink-900">Lab Result</h1>
-            <p class="text-sm text-ink-500 mt-2">{{ result.order.test }} &middot; {{ result.order.patient.full_name }}</p>
+<div class="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <!-- Responsive Header -->
+    <div class="border-b border-gray-200 pb-5 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <!-- Left: Title -->
+            <div class="min-w-0 flex-1">
+                <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink-900 truncate">Lab Result</h1>
+                <p class="text-sm text-ink-500 mt-2 truncate">{{ result.order.test }} &middot; {{ result.order.patient.full_name }}</p>
+            </div>
+            
+            <!-- Right: Back button -->
+            <div class="flex-shrink-0">
+                <a href="{% url 'patients:profile' result.order.patient.pk %}#labs" 
+                   class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200 w-full sm:w-auto justify-center">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Back to Patient
+                </a>
+            </div>
         </div>
-        <a href="{% url 'patients:profile' result.order.patient.pk %}#labs" class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-            </svg>
-            Back to Patient
-        </a>
     </div>
 
-    <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Result Detail Card -->
+    <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+        <!-- Result Info Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+            <!-- Result Value -->
             <div>
                 <p class="text-xs font-bold text-ink-700 uppercase tracking-wider">Result</p>
-                <p class="text-2xl font-bold text-ink-900 mt-1">{{ result.display_value }}</p>
+                <p class="text-xl sm:text-2xl font-bold text-ink-900 mt-1 break-words">{{ result.display_value }}</p>
             </div>
+            
+            <!-- Status -->
             <div>
                 <p class="text-xs font-bold text-ink-700 uppercase tracking-wider">Status</p>
-                <p class="mt-1">
+                <div class="mt-1">
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                         {% if result.order.status == 'resulted' or result.order.status == 'verified' %}
                             bg-green-100 text-green-800
@@ -34,11 +48,13 @@
                         {% endif %}">
                         {{ result.order.get_status_display }}
                     </span>
-                </p>
+                </div>
             </div>
+            
+            <!-- Flags -->
             <div>
                 <p class="text-xs font-bold text-ink-700 uppercase tracking-wider">Flags</p>
-                <div class="flex gap-2 mt-1">
+                <div class="flex flex-wrap gap-2 mt-1">
                     {% if result.is_critical %}
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Critical</span>
                     {% elif result.is_abnormal %}
@@ -50,14 +66,18 @@
             </div>
         </div>
 
+        <!-- Verification Section -->
         {% if result.verified_by %}
             <div class="bg-paper border border-gray-200/60 rounded-xl p-4 text-sm text-ink-600">
-                Verified by <strong>{{ result.verified_by }}</strong> at <strong>{{ result.verified_at }}</strong>
+                <p class="break-words">
+                    Verified by <strong>{{ result.verified_by }}</strong> at <strong>{{ result.verified_at }}</strong>
+                </p>
             </div>
         {% else %}
-            <form method="post" action="{% url 'laboratory:verify_result' result.pk %}">
+            <form method="post" action="{% url 'laboratory:verify_result' result.pk %}" class="pt-2">
                 {% csrf_token %}
-                <button type="submit" class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:shadow-brand/30 hover:-translate-y-0.5 transition-all duration-200">
+                <button type="submit" 
+                        class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:shadow-brand/30 hover:-translate-y-0.5 transition-all duration-200 w-full sm:w-auto">
                     Verify Result
                 </button>
             </form>

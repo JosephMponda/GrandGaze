@@ -1,20 +1,30 @@
 {% extends "base.html" %}
 {% block title %}Pharmacy Queue - MUST EMR{% endblock %}
 {% block content %}
-<div class="max-w-4xl mx-auto py-6">
-    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
-        <div>
-            <h1 class="text-3xl font-bold tracking-tight text-ink-900">Pharmacy Queue</h1>
-            <p class="text-sm text-ink-500 mt-2">Prescriptions awaiting pharmacy action</p>
-        </div>
-        <div class="flex items-center gap-3">
-            <a href="{% url 'accounts:dashboard' %}" class="btn-secondary text-sm font-semibold inline-flex items-center gap-1.5">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                Back to Dashboard
-            </a>
-            <a href="{% url 'pharmacy:stock' %}" class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200">
-                Stock
-            </a>
+<div class="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <!-- Responsive Header -->
+    <div class="border-b border-gray-200 pb-5 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <!-- Left: Title -->
+            <div class="min-w-0 flex-1">
+                <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink-900 truncate">Pharmacy Queue</h1>
+                <p class="text-sm text-ink-500 mt-2">Prescriptions awaiting pharmacy action</p>
+            </div>
+            
+            <!-- Right: Action buttons -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 flex-shrink-0">
+                <a href="{% url 'accounts:dashboard' %}" 
+                   class="btn-secondary text-sm font-semibold inline-flex items-center justify-center gap-1.5 py-2 px-4 order-2 sm:order-1">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    Back to Dashboard
+                </a>
+                <a href="{% url 'pharmacy:stock' %}" 
+                   class="btn-secondary text-sm font-semibold flex items-center justify-center gap-2 py-2 px-4 hover:-translate-y-0.5 transition-all duration-200 order-1 sm:order-2">
+                    Stock
+                </a>
+            </div>
         </div>
     </div>
 
@@ -22,38 +32,50 @@
         <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-2xl overflow-hidden bg-white shadow-sm">
             {% for prescription in prescriptions %}
                 {% with stock=prescription.stock %}
-                <div class="flex items-center justify-between px-6 py-4 hover:bg-paper transition-colors duration-150">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 sm:px-6 py-3 sm:py-4 hover:bg-paper transition-colors duration-150">
+                    <!-- Patient & Prescription Info -->
                     <div class="flex-1 min-w-0">
-                        <p class="text-sm font-semibold text-ink-900">{{ prescription.patient.full_name }}</p>
-                        <p class="text-sm text-ink-500">{{ prescription.drug }} {{ prescription.dose }}</p>
+                        <p class="text-sm font-semibold text-ink-900 truncate">{{ prescription.patient.full_name }}</p>
+                        <p class="text-sm text-ink-500 truncate">{{ prescription.drug }} {{ prescription.dose }}</p>
                         {% if stock %}
-                            <p class="text-xs {% if stock.is_low %}text-red-500 font-medium{% else %}text-ink-400{% endif %}">
+                            <p class="text-xs {% if stock.is_low %}text-red-500 font-medium{% else %}text-ink-400{% endif %} mt-0.5">
                                 Stock: {{ stock.quantity }}
                             </p>
                         {% endif %}
                     </div>
-                    <div class="flex items-center gap-3 ml-4 shrink-0">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                    
+                    <!-- Status & Actions -->
+                    <div class="flex items-center justify-between sm:justify-end gap-2 sm:gap-3 flex-shrink-0">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap
                             {% if prescription.status == 'prescribed' %}bg-yellow-100 text-yellow-800
                             {% elif prescription.status == 'approved' %}bg-blue-100 text-blue-800
                             {% elif prescription.status == 'dispensed' %}bg-green-100 text-green-800
                             {% else %}bg-gray-100 text-gray-800{% endif %}">
                             {{ prescription.get_status_display }}
                         </span>
-                        {% if prescription.status == "prescribed" %}
-                            <form method="post" action="{% url 'pharmacy:approve' prescription.pk %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn-secondary text-xs font-semibold py-1.5 px-3 hover:-translate-y-0.5 transition-all duration-200">Approve</button>
-                            </form>
-                        {% endif %}
-                        <a href="{% url 'pharmacy:dispense' prescription.pk %}" class="btn-primary text-xs font-semibold py-1.5 px-3 shadow-sm hover:-translate-y-0.5 transition-all duration-200">Dispense</a>
+                        
+                        <div class="flex items-center gap-2">
+                            {% if prescription.status == "prescribed" %}
+                                <form method="post" action="{% url 'pharmacy:approve' prescription.pk %}">
+                                    {% csrf_token %}
+                                    <button type="submit" 
+                                            class="btn-secondary text-xs font-semibold py-1.5 px-3 hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap">
+                                        Approve
+                                    </button>
+                                </form>
+                            {% endif %}
+                            <a href="{% url 'pharmacy:dispense' prescription.pk %}" 
+                               class="btn-primary text-xs font-semibold py-1.5 px-3 shadow-sm hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap">
+                                Dispense
+                            </a>
+                        </div>
                     </div>
                 </div>
                 {% endwith %}
             {% endfor %}
         </div>
     {% else %}
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 text-center">
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 text-center">
             <p class="text-sm text-ink-500">No prescriptions awaiting pharmacy action.</p>
         </div>
     {% endif %}

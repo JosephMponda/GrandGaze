@@ -1,107 +1,157 @@
 {% extends "base.html" %}
 {% block title %}Admission Detail{% endblock %}
 {% block content %}
-<div class="max-w-4xl mx-auto py-6">
-    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
-        <div class="flex items-center gap-4">
-            <a href="{% url 'patients:profile' admission.patient.pk %}#inpatient" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-            </a>
-            <div>
-                <h1 class="text-3xl font-bold tracking-tight text-ink-900">Admission Detail</h1>
-                <p class="text-sm text-ink-500 mt-2">{{ admission.patient.full_name }} &middot; {{ admission.get_status_display }}</p>
+<div class="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <!-- Responsive Header -->
+    <div class="border-b border-gray-200 pb-5 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <!-- Left: Back button + Title -->
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <a href="{% url 'patients:profile' admission.patient.pk %}#inpatient" 
+                   class="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
+                   aria-label="Back to patient profile">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                </a>
+                <div class="min-w-0 flex-1">
+                    <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink-900 truncate">Admission Detail</h1>
+                    <p class="text-sm text-ink-500 mt-2 truncate">{{ admission.patient.full_name }} &middot; {{ admission.get_status_display }}</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 mb-6">
+    <!-- Admission Info Card -->
+    <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-6 mb-6">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
                 <span class="text-xs text-ink-500">Diagnosis</span>
-                <p class="text-sm font-semibold">{{ admission.admission_diagnosis }}</p>
+                <p class="text-sm font-semibold mt-0.5">{{ admission.admission_diagnosis }}</p>
             </div>
             <div>
                 <span class="text-xs text-ink-500">Ward / Bed</span>
-                <p class="text-sm font-semibold">{{ admission.bed.ward.name|default:"-" }} / {{ admission.bed.label|default:"-" }}</p>
+                <p class="text-sm font-semibold mt-0.5">{{ admission.bed.ward.name|default:"-" }} / {{ admission.bed.label|default:"-" }}</p>
             </div>
             <div>
                 <span class="text-xs text-ink-500">Admitted</span>
-                <p class="text-sm font-semibold">{{ admission.admitted_at|date:"d M Y H:i" }}</p>
+                <p class="text-sm font-semibold mt-0.5">{{ admission.admitted_at|date:"d M Y H:i" }}</p>
             </div>
             <div>
                 <span class="text-xs text-ink-500">Status</span>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                    {% if admission.status == 'active' %}bg-green-100 text-green-800
-                    {% elif admission.status == 'discharged' %}bg-gray-100 text-gray-800
-                    {% else %}bg-yellow-100 text-yellow-800{% endif %}">
-                    {{ admission.get_status_display }}
-                </span>
+                <div class="mt-0.5">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                        {% if admission.status == 'active' %}bg-green-100 text-green-800
+                        {% elif admission.status == 'discharged' %}bg-gray-100 text-gray-800
+                        {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                        {{ admission.get_status_display }}
+                    </span>
+                </div>
             </div>
         </div>
     </div>
 
     {% if admission.status == "active" %}
+        <!-- Transfer & Discharge Forms -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
+            <!-- Transfer Form -->
+            <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-6">
                 <h3 class="text-sm font-bold text-ink-900 mb-4">Transfer</h3>
                 <form method="post" class="space-y-3">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="transfer">
-                    <select name="bed" required class="w-full rounded-lg border-gray-200 text-sm">
-                        <option value="">- Select target bed -</option>
-                        {% for bed in available %}
-                            <option value="{{ bed.pk }}">{{ bed.ward.name }} - {{ bed.label }}</option>
-                        {% endfor %}
-                    </select>
-                    <input type="text" name="reason" placeholder="Reason for transfer" class="w-full rounded-lg border-gray-200 text-sm">
-                    <button type="submit" class="btn-secondary text-sm">Transfer</button>
+                    <div>
+                        <select name="bed" required 
+                                class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-colors">
+                            <option value="">- Select target bed -</option>
+                            {% for bed in available %}
+                                <option value="{{ bed.pk }}">{{ bed.ward.name }} - {{ bed.label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <input type="text" name="reason" placeholder="Reason for transfer" 
+                               class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-colors">
+                    </div>
+                    <button type="submit" 
+                            class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold text-sm py-2.5 px-5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200">
+                        Transfer Patient
+                    </button>
                 </form>
             </div>
 
-            <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
+            <!-- Discharge Form -->
+            <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-6">
                 <h3 class="text-sm font-bold text-ink-900 mb-4">Discharge</h3>
                 <form method="post" class="space-y-3">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="discharge">
-                    <select name="disposition" class="w-full rounded-lg border-gray-200 text-sm">
-                        <option value="discharged">Discharged home</option>
-                        <option value="transferred">Transferred to another facility</option>
-                        <option value="abscond">Left against advice</option>
-                        <option value="dead">Died</option>
-                    </select>
-                    <textarea name="summary" rows="3" placeholder="Discharge summary" class="w-full rounded-lg border-gray-200 text-sm"></textarea>
-                    <button type="submit" class="btn-primary text-sm">Discharge</button>
+                    <div>
+                        <select name="disposition" 
+                                class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-colors">
+                            <option value="discharged">Discharged home</option>
+                            <option value="transferred">Transferred to another facility</option>
+                            <option value="abscond">Left against advice</option>
+                            <option value="dead">Died</option>
+                        </select>
+                    </div>
+                    <div>
+                        <textarea name="summary" rows="3" placeholder="Discharge summary" 
+                                  class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-colors resize-y"></textarea>
+                    </div>
+                    <button type="submit" 
+                            class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-semibold text-sm py-2.5 px-5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200">
+                        Discharge Patient
+                    </button>
                 </form>
             </div>
         </div>
     {% endif %}
 
-    <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 mb-6">
+    <!-- Ward Round Note Form -->
+    <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-6 mb-6">
         <h3 class="text-sm font-bold text-ink-900 mb-4">Add Ward Round Note</h3>
         <form method="post" class="space-y-3">
             {% csrf_token %}
             <input type="hidden" name="action" value="ward_round">
-            <textarea name="note" rows="3" required placeholder="Clinical note" class="w-full rounded-lg border-gray-200 text-sm"></textarea>
-            <div class="grid grid-cols-2 gap-4">
-                <input type="text" name="diagnosis_update" placeholder="Diagnosis update (optional)" class="rounded-lg border-gray-200 text-sm">
-                <input type="text" name="plan_update" placeholder="Plan update (optional)" class="rounded-lg border-gray-200 text-sm">
+            <div>
+                <textarea name="note" rows="3" required placeholder="Clinical note" 
+                          class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-colors resize-y"></textarea>
             </div>
-            <button type="submit" class="btn-secondary text-sm">Add Note</button>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div>
+                    <input type="text" name="diagnosis_update" placeholder="Diagnosis update (optional)" 
+                           class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-colors">
+                </div>
+                <div>
+                    <input type="text" name="plan_update" placeholder="Plan update (optional)" 
+                           class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-colors">
+                </div>
+            </div>
+            <button type="submit" 
+                    class="w-full sm:w-auto btn-primary text-white font-semibold text-sm py-2.5 px-5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200">
+                Add Note
+            </button>
         </form>
     </div>
 
+    <!-- Ward Round Notes List -->
     {% if admission.ward_rounds.exists %}
         <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-2xl overflow-hidden bg-white shadow-sm">
-            <div class="px-6 py-3 bg-gray-50 border-b border-gray-100">
+            <div class="px-4 sm:px-6 py-3 bg-gray-50 border-b border-gray-100">
                 <p class="text-xs font-bold text-ink-700 uppercase tracking-wider">Ward Round Notes</p>
             </div>
             {% for note in admission.ward_rounds.all %}
-                <div class="px-6 py-4">
-                    <p class="text-sm text-ink-900">{{ note.note }}</p>
+                <div class="px-4 sm:px-6 py-4">
+                    <p class="text-sm text-ink-900 whitespace-pre-wrap break-words">{{ note.note }}</p>
                     {% if note.diagnosis_update or note.plan_update %}
-                        <div class="mt-2 text-xs text-ink-500">
-                            {% if note.diagnosis_update %}Diagnosis: {{ note.diagnosis_update }}{% endif %}
-                            {% if note.plan_update %}{% if note.diagnosis_update %} &middot; {% endif %}Plan: {{ note.plan_update }}{% endif %}
+                        <div class="mt-2 text-xs text-ink-500 flex flex-col sm:flex-row sm:flex-wrap gap-x-2">
+                            {% if note.diagnosis_update %}
+                                <span>Diagnosis: {{ note.diagnosis_update }}</span>
+                            {% endif %}
+                            {% if note.plan_update %}
+                                <span>Plan: {{ note.plan_update }}</span>
+                            {% endif %}
                         </div>
                     {% endif %}
                     <p class="text-xs text-ink-400 mt-1">{{ note.clinician.get_full_name|default:note.clinician }} &middot; {{ note.created_at|date:"d M Y H:i" }}</p>

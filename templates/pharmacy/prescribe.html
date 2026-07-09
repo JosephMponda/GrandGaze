@@ -1,104 +1,139 @@
 {% extends "base.html" %}
+
 {% block title %}Prescribe Medication - MUST EMR{% endblock %}
+
 {% block content %}
 {% block nav %}{% endblock %}
-<div class="max-w-4xl mx-auto py-6">
-    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
-        <div>
-            <h1 class="text-3xl font-bold tracking-tight text-ink-900">Prescribe Medication</h1>
-            <p class="text-sm text-ink-500 mt-2">{{ patient.full_name }} &middot; {{ patient.patient_number }}</p>
+<div class="min-h-screen flex flex-col -mx-4 sm:-mx-6 lg:-mx-8 -mt-8 pb-12 bg-gray-50/50">
+    
+    {# ── Prescribe Medication Header ─────────────────────────────────────── #}
+    <div class="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4 shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0">
+            <a href="{% url 'patients:profile' patient.pk %}#prescriptions" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors mt-0.5 sm:mt-0 shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+            </a>
+            <div class="min-w-0">
+                <h1 class="text-lg sm:text-xl font-bold text-gray-900 flex flex-wrap items-center gap-2 sm:gap-3 leading-tight">
+                    <span>Prescribe Medication</span>
+                </h1>
+                <p class="text-xs sm:text-sm text-gray-500 font-medium mt-1 flex items-center gap-2">
+                    <span class="font-semibold text-gray-700">{{ patient.full_name }}</span>
+                    <span class="text-xs font-mono bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded text-gray-600 font-medium tracking-wide">{{ patient.patient_number }}</span>
+                </p>
+            </div>
         </div>
-        <a href="{% url 'patients:profile' patient.pk %}#prescriptions" class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-            </svg>
-            Back to Patient
-        </a>
+
+        <div class="flex items-center gap-2 sm:gap-3 sm:justify-end">
+            <a href="{% url 'patients:profile' patient.pk %}#prescriptions" class="btn-secondary text-xs sm:text-sm py-2 px-3 sm:px-4 flex items-center gap-1.5 whitespace-nowrap">
+                Back to Patient
+            </a>
+        </div>
     </div>
 
-    {% if blocked %}
-        <div class="bg-red-50 border border-red-300 rounded-2xl p-6 mb-8 space-y-4">
-            <div class="flex items-center gap-3">
-                <span class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-lg font-bold">!</span>
-                <h3 class="text-base font-bold text-red-900">Prescription Blocked - Critical Safety Warning</h3>
-            </div>
-            <p class="text-sm text-red-800">This prescription cannot be submitted from this form. Critical warnings below cannot be overridden here - choose a different medication, or escalate to the prescribing clinician for a documented clinical decision outside this workflow.</p>
-            <ul class="space-y-2">
-                {% for warning in warnings %}
-                    <li class="flex items-start gap-2 text-sm text-red-800">
-                        <span class="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0"></span>
-                        <strong>{{ warning.level }}:</strong> {{ warning.message }}
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-    {% elif warnings %}
-        <div class="bg-red-50 border border-red-200 rounded-2xl p-6 mb-8 space-y-4">
-            <div class="flex items-center gap-3">
-                <span class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-lg font-bold">!</span>
-                <h3 class="text-base font-bold text-red-800">Medication Safety Warnings</h3>
-            </div>
-            <ul class="space-y-2">
-                {% for warning in warnings %}
-                    <li class="flex items-start gap-2 text-sm text-red-700">
-                        <span class="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 shrink-0"></span>
-                        <strong>{{ warning.level }}:</strong> {{ warning.message }}
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
-
-    {% if not blocked %}
-    <form method="post" class="space-y-8">
-        {% csrf_token %}
-
-        {% if form.non_field_errors %}
-            <div class="space-y-2 mb-6">
-                {% for error in form.non_field_errors %}
-                    {% include "components/_alert_banner.html" with message=error type="critical" %}
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 space-y-6">
-            <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
-                <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/10">1</span>
-                <h3 class="text-base font-semibold text-ink-900">Prescription Details</h3>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {% include "components/_field.html" with field=form.drug %}
-                {% include "components/_field.html" with field=form.dose %}
-                {% include "components/_field.html" with field=form.route %}
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {% include "components/_field.html" with field=form.frequency %}
-                {% include "components/_field.html" with field=form.duration_days %}
-            </div>
-            {% include "components/_field.html" with field=form.encounter %}
-            {% include "components/_field.html" with field=form.notes %}
-            {% if warnings %}
-                <div class="bg-paper border border-gray-200/60 rounded-xl p-4 space-y-4">
-                    <p class="text-xs font-bold text-ink-700 uppercase tracking-wider mb-2">Override</p>
-                    <p class="text-sm text-ink-600">Checking this box confirms you have documented a clinical reason for overriding the warnings.</p>
-                    {% include "components/_field.html" with field=form.proceed_with_warnings %}
-                    {% include "components/_field.html" with field=form.safety_override_reason %}
+    {# ── Scrollable Workspace Body ────────────────────────────────────────── #}
+    <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        <div class="max-w-3xl mx-auto">
+            
+            {# ── Safety Warning Sub-system ── #}
+            {% if blocked %}
+                <div class="bg-red-50 border border-red-300 rounded-2xl p-6 mb-6 space-y-4 shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-lg font-bold shadow-sm">!</span>
+                        <h3 class="text-base font-bold text-red-900">Prescription Blocked - Critical Safety Warning</h3>
+                    </div>
+                    <p class="text-sm text-red-800">This prescription cannot be submitted from this form. Critical warnings below cannot be overridden here - choose a different medication, or escalate to the prescribing clinician for a documented clinical decision outside this workflow.</p>
+                    <ul class="space-y-2">
+                        {% for warning in warnings %}
+                            <li class="flex items-start gap-2 text-sm text-red-800">
+                                <span class="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0"></span>
+                                <span><strong>{{ warning.level }}:</strong> {{ warning.message }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% elif warnings %}
+                <div class="bg-red-50 border border-red-200 rounded-2xl p-6 mb-6 space-y-4 shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-lg font-bold">!</span>
+                        <h3 class="text-base font-bold text-red-800">Medication Safety Warnings</h3>
+                    </div>
+                    <ul class="space-y-2">
+                        {% for warning in warnings %}
+                            <li class="flex items-start gap-2 text-sm text-red-700">
+                                <span class="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 shrink-0"></span>
+                                <span><strong>{{ warning.level }}:</strong> {{ warning.message }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
                 </div>
             {% endif %}
-        </div>
 
-        <div class="flex items-center justify-end gap-4 pt-6 pb-10">
-            <a href="{% url 'patients:profile' patient.pk %}#prescriptions" class="btn-secondary text-sm font-semibold py-3 px-6 hover:-translate-y-0.5 transition-all duration-200">Cancel</a>
-            <button type="submit" class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:shadow-brand/30 hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2">
-                {% if warnings %}Proceed with documented reason{% else %}Create Prescription{% endif %}
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-            </button>
+            {# ── Main Ordering Flow ── #}
+            {% if not blocked %}
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="space-y-2 mb-6">
+                            {% for error in form.non_field_errors %}
+                                {% include "components/_alert_banner.html" with message=error type="critical" %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+                        <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
+                            <span class="w-6 h-6 rounded-full bg-brand/10 text-brand flex items-center justify-center text-xs font-bold shadow-sm">1</span>
+                            <h3 class="text-base font-bold text-gray-900">Prescription Details</h3>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {% include "components/_field.html" with field=form.drug %}
+                            {% include "components/_field.html" with field=form.dose %}
+                            {% include "components/_field.html" with field=form.route %}
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {% include "components/_field.html" with field=form.frequency %}
+                            {% include "components/_field.html" with field=form.duration_days %}
+                        </div>
+                        
+                        <div class="space-y-6 pt-2">
+                            {% include "components/_field.html" with field=form.encounter %}
+                            {% include "components/_field.html" with field=form.notes %}
+                        </div>
+
+                        {% if warnings %}
+                            <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 sm:p-5 space-y-4">
+                                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Override Protocol</p>
+                                <p class="text-sm text-gray-600 font-medium">Checking this box confirms you have documented a clinical reason for overriding the warnings.</p>
+                                {% include "components/_field.html" with field=form.proceed_with_warnings %}
+                                {% include "components/_field.html" with field=form.safety_override_reason %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    {# Active Form Footer Actions #}
+                    <div class="flex items-center justify-end gap-3 pt-2">
+                        <a href="{% url 'patients:profile' patient.pk %}#prescriptions" class="btn-secondary text-sm font-semibold py-2 px-5">Cancel</a>
+                        <button type="submit" class="btn-primary text-sm font-semibold py-2 px-6 shadow-md shadow-brand/20 hover:shadow-lg hover:shadow-brand/30 flex items-center gap-2">
+                            {% if warnings %}Proceed with documented reason{% else %}Create Prescription{% endif %}
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+            {% else %}
+                {# Blocked Status Back Navigation #}
+                <div class="flex items-center justify-end gap-3 pt-2">
+                    <a href="{% url 'patients:profile' patient.pk %}#prescriptions" class="btn-secondary text-sm font-semibold py-2 px-5">Back to Patient</a>
+                </div>
+            {% endif %}
+
         </div>
-    </form>
-    {% else %}
-    <div class="flex items-center justify-end gap-4 pt-2 pb-10">
-        <a href="{% url 'patients:profile' patient.pk %}#prescriptions" class="btn-secondary text-sm font-semibold py-3 px-6 hover:-translate-y-0.5 transition-all duration-200">Back to Patient</a>
     </div>
-    {% endif %}
 </div>
 {% endblock %}
