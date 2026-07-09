@@ -28,6 +28,8 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "simple_history",
     "axes",
+    "django_otp",
+    "django_otp.plugins.otp_totp",
     # local apps
     "core",
     "accounts",
@@ -53,6 +55,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django_otp.middleware.OTPMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",

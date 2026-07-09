@@ -5,6 +5,9 @@ django-filter
 psycopg
 django-simple-history
 cryptography
+django-otp>=1.7
+qrcode>=8.0
+Pillow
 django-axes
 drf-spectacular
 gunicorn
