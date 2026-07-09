@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from accounts.permissions import role_required
+from accounts.permissions import has_role, role_required
 from patients.services import get_patient_or_404
 
 from . import services
@@ -20,7 +20,7 @@ def request_imaging(request, patient_id):
         if form.is_valid():
             imaging_request = services.create_request(patient, requested_by=request.user, **form.cleaned_data)
             messages.success(request, "Imaging request created.")
-            if request.user.groups.filter(name__in=["Radiographer", "Admin"]).exists():
+            if has_role(request.user, "Radiographer", "Admin"):
                 return redirect(reverse("imaging:report", args=[imaging_request.pk]))
             return redirect(reverse("patients:profile", args=[patient.pk]))
     else:

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Sign In - MUST EMR{% endblock %}
 
 {% block content %}
@@ -6,8 +7,10 @@
     <div class="max-w-md w-full">
         <!-- Logo and Heading -->
         <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand text-white font-bold text-3xl shadow-lg shadow-brand/20 mb-6">
-                M
+            <div class="inline-flex items-center justify-center gap-3 rounded-2xl bg-white border border-gray-200/80 px-4 py-3 shadow-lg shadow-ink/5 mb-6">
+                <img src="{% static 'img/must-logo.png' %}" alt="MUST logo" class="h-14 w-14 object-contain">
+                <span class="h-10 w-px bg-gray-200" aria-hidden="true"></span>
+                <img src="{% static 'img/gsl-logo.png' %}" alt="GSL logo" class="h-14 w-14 object-contain">
             </div>
             <h2 class="text-3xl font-bold tracking-tight text-ink-900">Sign in to MUST EMR</h2>
             <p class="mt-2 text-sm text-ink-500">Malawi Master Patient Index & Clinical Portal</p>
