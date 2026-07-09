@@ -2,7 +2,7 @@
 <div class="space-y-6">
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 class="text-xl font-bold text-ink-900">Vitals History</h2>
-        <a href="{% url 'vitals:entry' patient.pk %}" class="btn-primary text-sm font-semibold py-2 px-4 shadow-sm hover:-translate-y-0.5 transition-all duration-200">
+        <a href="{% url 'vitals:entry' patient.pk %}" class="btn-primary inline-flex w-full items-center justify-center text-sm font-semibold py-2 px-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 sm:w-auto">
             + Record Vitals
         </a>
     </div>
@@ -12,7 +12,7 @@
         {% for v in trend %}
         <div class="bg-white hover:bg-paper transition-colors duration-150 px-5 py-4">
             <div class="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <div class="flex items-center gap-3">
+                <div class="flex min-w-0 flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
                     <p class="text-xs font-bold text-ink-400 uppercase tracking-wider">{{ v.recorded_at|date:"d M Y, H:i" }}</p>
                     {% if v.ews %}
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold
@@ -23,41 +23,41 @@
                         </span>
                     {% endif %}
                 </div>
-                <p class="text-xs text-ink-400">by {{ v.recorded_by.get_full_name|default:v.recorded_by.username }}</p>
+                <p class="text-xs text-ink-400 sm:text-right">by {{ v.recorded_by.get_full_name|default:v.recorded_by.username }}</p>
             </div>
-            <dl class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-3 lg:grid-cols-6">
+            <dl class="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                 {% if v.temperature_c %}
-                <div>
+                <div class="rounded-xl bg-slate-50/80 px-3 py-2">
                     <dt class="text-[10px] font-bold text-ink-400 uppercase tracking-wider">Temp</dt>
                     <dd class="font-semibold text-ink-900">{{ v.temperature_c }}°C</dd>
                 </div>
                 {% endif %}
                 {% if v.blood_pressure_systolic %}
-                <div>
+                <div class="rounded-xl bg-slate-50/80 px-3 py-2">
                     <dt class="text-[10px] font-bold text-ink-400 uppercase tracking-wider">BP</dt>
                     <dd class="font-semibold text-ink-900">{{ v.blood_pressure_systolic }}/{{ v.blood_pressure_diastolic|default:"-" }}</dd>
                 </div>
                 {% endif %}
                 {% if v.pulse_rate %}
-                <div>
+                <div class="rounded-xl bg-slate-50/80 px-3 py-2">
                     <dt class="text-[10px] font-bold text-ink-400 uppercase tracking-wider">Pulse</dt>
                     <dd class="font-semibold text-ink-900">{{ v.pulse_rate }} bpm</dd>
                 </div>
                 {% endif %}
                 {% if v.respiratory_rate %}
-                <div>
+                <div class="rounded-xl bg-slate-50/80 px-3 py-2">
                     <dt class="text-[10px] font-bold text-ink-400 uppercase tracking-wider">Resp Rate</dt>
                     <dd class="font-semibold text-ink-900">{{ v.respiratory_rate }} br/min</dd>
                 </div>
                 {% endif %}
                 {% if v.oxygen_saturation %}
-                <div>
+                <div class="rounded-xl bg-slate-50/80 px-3 py-2">
                     <dt class="text-[10px] font-bold text-ink-400 uppercase tracking-wider">SpO2</dt>
                     <dd class="font-semibold text-ink-900">{{ v.oxygen_saturation }}%</dd>
                 </div>
                 {% endif %}
                 {% if v.bmi %}
-                <div>
+                <div class="rounded-xl bg-slate-50/80 px-3 py-2">
                     <dt class="text-[10px] font-bold text-ink-400 uppercase tracking-wider">BMI</dt>
                     <dd class="font-semibold text-ink-900">{{ v.bmi }}</dd>
                 </div>

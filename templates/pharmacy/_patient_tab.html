@@ -1,14 +1,14 @@
 <div class="space-y-6">
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 class="text-xl font-bold text-ink-900">Prescriptions</h2>
-        <a href="{% url 'pharmacy:prescribe' patient.pk %}" class="btn-primary text-sm font-semibold py-2 px-4 shadow-sm hover:-translate-y-0.5 transition-all duration-200">Prescribe Medication</a>
+        <a href="{% url 'pharmacy:prescribe' patient.pk %}" class="btn-primary inline-flex w-full items-center justify-center py-2 px-4 text-sm font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 sm:w-auto">Prescribe Medication</a>
     </div>
 
     {% if prescriptions %}
         <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-xl overflow-hidden">
             {% for prescription in prescriptions %}
-                <div class="flex flex-col gap-2 px-4 py-3 bg-white hover:bg-paper transition-colors duration-150 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
+                <div class="flex flex-col gap-2 px-4 py-3 bg-white transition-colors duration-150 hover:bg-paper sm:flex-row sm:items-center sm:justify-between">
+                    <div class="min-w-0">
                         <p class="text-sm font-semibold text-ink-900">{{ prescription.drug }} {{ prescription.dose }}</p>
                     </div>
                     <span class="inline-flex self-start items-center px-2.5 py-0.5 rounded-full text-xs font-medium

@@ -5,7 +5,7 @@
 <div class="mx-auto max-w-7xl space-y-6">
     <section class="rounded-[2rem] border border-slate-200/80 bg-white/90 p-6 shadow-sm backdrop-blur sm:p-8">
         <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-start">
+            <div class="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start">
                 <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-3xl bg-brand-light text-2xl font-black text-brand">
                     {{ patient.first_name|slice:":1"|upper }}{{ patient.last_name|slice:":1"|upper }}
                 </div>
@@ -19,9 +19,9 @@
                 </div>
             </div>
             <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-                <a href="{% url 'patients:edit' patient.pk %}" class="inline-flex items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 sm:w-auto">Edit</a>
-                <a href="{% url 'inpatient:admit' patient.pk %}" class="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand/20 transition-colors hover:bg-brand-hover sm:w-auto">Admit</a>
-                <a href="{% url 'accounts:dashboard' %}" class="inline-flex items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 sm:w-auto">Dashboard</a>
+                <a href="{% url 'patients:edit' patient.pk %}" class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 sm:w-auto">Edit</a>
+                <a href="{% url 'inpatient:admit' patient.pk %}" class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand/20 transition-colors hover:bg-brand-hover sm:w-auto">Admit</a>
+                <a href="{% url 'accounts:dashboard' %}" class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 sm:w-auto">Dashboard</a>
             </div>
         </div>
 
@@ -46,7 +46,7 @@
     </section>
 
     <section class="grid gap-6 xl:grid-cols-[1.1fr,0.9fr]">
-        <div class="rounded-[2rem] border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <div class="min-w-0 rounded-[2rem] border border-gray-200/80 bg-white p-4 shadow-sm sm:p-8">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                     <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Vitals trend</p>
@@ -54,11 +54,11 @@
                 </div>
                 <span class="rounded-full bg-brand-light px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-brand">Latest 6</span>
             </div>
-            <div class="mt-6 h-[20rem]">
+            <div class="mt-6 h-64 sm:h-[20rem]">
                 <canvas id="vitalsTrendChart"></canvas>
             </div>
             {% if latest_vitals %}
-            <div class="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div class="mt-6 grid gap-3 grid-cols-2 xl:grid-cols-4">
                 <div class="rounded-2xl border border-gray-200 bg-slate-50/70 px-4 py-4">
                     <p class="text-xs font-semibold uppercase tracking-[0.22em] text-gray-500">Temp</p>
                     <p class="mt-1 text-2xl font-black text-gray-900">{{ latest_vitals.temperature_c|default:"-" }}</p>
@@ -79,8 +79,8 @@
             {% endif %}
         </div>
 
-        <div class="space-y-6">
-            <section class="rounded-[2rem] border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <div class="space-y-6 min-w-0">
+            <section class="rounded-[2rem] border border-gray-200/80 bg-white p-4 shadow-sm sm:p-8">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                         <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Recent labs</p>
@@ -104,7 +104,7 @@
                 </div>
             </section>
 
-            <section class="rounded-[2rem] border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+            <section class="rounded-[2rem] border border-gray-200/80 bg-white p-4 shadow-sm sm:p-8">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                         <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Recent imaging</p>
@@ -129,7 +129,7 @@
     </section>
 
     <section class="grid gap-6 xl:grid-cols-[0.85fr,1.15fr]">
-        <div class="rounded-[2rem] border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <div class="min-w-0 rounded-[2rem] border border-gray-200/80 bg-white p-4 shadow-sm sm:p-8">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                     <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Alerts</p>
@@ -156,11 +156,11 @@
             </div>
         </div>
 
-        <div>
+        <div class="min-w-0">
             <div x-data="{ activeTab: window.location.hash ? window.location.hash.substring(1) : 'encounters' }"
                  x-init="$nextTick(() => { const el = document.getElementById('tp-' + activeTab); if (el) htmx.process(el); })"
-                 class="rounded-[2rem] border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
-                <div role="tablist" class="flex items-center gap-1 overflow-x-auto border-b border-gray-200 pb-2">
+                 class="rounded-[2rem] border border-gray-200/80 bg-white p-4 shadow-sm sm:p-8">
+                <div role="tablist" class="flex items-center gap-1 overflow-x-auto border-b border-gray-200 pb-2 [-webkit-overflow-scrolling:touch]">
                     {% for tab in tabs %}
                     <button id="tab-btn-{{ tab.id }}" role="tab"
                             :aria-selected="activeTab === '{{ tab.id }}'"

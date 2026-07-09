@@ -3,11 +3,11 @@
     <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <h2 class="text-xl font-bold text-ink-900">Visits & Encounters</h2>
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <a href="{% url 'encounters:add_allergy' patient.pk %}" class="btn-secondary text-sm font-semibold py-2 px-3 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-1.5 sm:w-auto">
+            <a href="{% url 'encounters:add_allergy' patient.pk %}" class="btn-secondary inline-flex w-full items-center justify-center gap-1.5 py-2 px-3 text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5 sm:w-auto">
                 <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                 Record Allergy
             </a>
-            <a href="{% url 'encounters:new' patient.pk %}" class="btn-primary text-sm font-semibold py-2 px-4 shadow-sm hover:-translate-y-0.5 transition-all duration-200 sm:w-auto">
+            <a href="{% url 'encounters:new' patient.pk %}" class="btn-primary inline-flex w-full items-center justify-center py-2 px-4 text-sm font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 sm:w-auto">
                 + New Encounter
             </a>
         </div>
@@ -47,18 +47,18 @@
         {% if encounters %}
         <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-2xl overflow-hidden">
             {% for e in encounters %}
-            <a href="{% url 'encounters:detail' e.pk %}" class="flex items-center justify-between gap-3 px-5 py-4 bg-white hover:bg-paper transition-colors duration-150 group">
-                <div class="flex items-center gap-4">
+            <a href="{% url 'encounters:detail' e.pk %}" class="flex flex-col gap-3 px-4 py-4 bg-white transition-colors duration-150 hover:bg-paper group sm:flex-row sm:items-center sm:justify-between sm:px-5 md:px-6">
+                <div class="flex min-w-0 items-start gap-4">
                     <span class="flex-shrink-0 w-2 h-2 rounded-full
                         {% if e.status == 'open' %}bg-green-400 animate-pulse
                         {% else %}bg-gray-300{% endif %}">
                     </span>
-                    <div>
+                    <div class="min-w-0">
                         <p class="text-sm font-semibold text-ink-900">{{ e.get_encounter_type_display }}</p>
-                        <p class="text-xs text-ink-500">{{ e.created_at|date:"d M Y, H:i" }} &middot; {{ e.get_status_display }}</p>
+                        <p class="text-xs text-ink-500 break-words sm:whitespace-nowrap">{{ e.created_at|date:"d M Y, H:i" }} &middot; {{ e.get_status_display }}</p>
                     </div>
                 </div>
-                <span class="text-brand text-sm font-semibold group-hover:translate-x-0.5 transition-transform duration-200">&rarr;</span>
+                <span class="self-end text-brand text-sm font-semibold transition-transform duration-200 group-hover:translate-x-0.5 sm:self-auto">&rarr;</span>
             </a>
             {% endfor %}
         </div>
