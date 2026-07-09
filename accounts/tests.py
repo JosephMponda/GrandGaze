@@ -3,7 +3,9 @@ from django.contrib.auth.models import Group, User
 from django.test import override_settings
 from django.urls import reverse
 
+from accounts.forms import StaffUserForm
 from accounts.models import Profile, Role
+from patients import services as patient_services
 
 pytestmark = pytest.mark.django_db
 
@@ -83,6 +85,64 @@ def test_control_panel_renders_without_crash(client, nurse_user):
     response = client.get(reverse("accounts:control_panel"))
     assert response.status_code == 200
     assert "Control Panel" in response.content.decode()
+
+
+def test_staff_user_form_assigns_matching_group_for_every_role():
+    expected_groups = {
+        Role.NURSE: "Nurse",
+        Role.CLINICIAN: "Clinician",
+        Role.PHARMACIST: "Pharmacist",
+        Role.LAB_TECH: "LabTech",
+        Role.RADIOGRAPHER: "Radiographer",
+        Role.BILLING_OFFICER: "BillingOfficer",
+        Role.ADMIN: "Admin",
+        Role.ICT: "ICT",
+    }
+
+    for role, group_name in expected_groups.items():
+        form = StaffUserForm(
+            data={
+                "username": f"user_{role.lower()}",
+                "first_name": "Test",
+                "last_name": "User",
+                "email": f"{role.lower()}@example.test",
+                "password": "TestPass123!",
+                "role": role,
+                "department": "Demo",
+                "phone_number": "",
+            }
+        )
+        assert form.is_valid(), form.errors
+        user = form.save()
+
+        assert user.profile.role == role
+        assert user.groups.filter(name=group_name).exists()
+
+
+def test_form_created_clinician_can_open_new_encounter(client, nurse_user):
+    form = StaffUserForm(
+        data={
+            "username": "form_clinician",
+            "first_name": "Clinical",
+            "last_name": "User",
+            "email": "clinician@example.test",
+            "password": "TestPass123!",
+            "role": Role.CLINICIAN,
+            "department": "OPD",
+            "phone_number": "",
+        }
+    )
+    assert form.is_valid(), form.errors
+    clinician = form.save()
+    patient = patient_services.register_patient(
+        {"first_name": "Grace", "last_name": "Banda", "sex": "female"},
+        registered_by=nurse_user,
+    )
+
+    client.force_login(clinician)
+    response = client.get(reverse("encounters:new", args=[patient.pk]))
+
+    assert response.status_code == 200
 
 
 # --- validation-failure path ---

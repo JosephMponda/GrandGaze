@@ -18,15 +18,16 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center gap-8">
-                    <div class="flex items-center gap-2">
-                        {# Brief §1/§24: official AMS, MUST, and GSL logo files (organizer-supplied)
-                           must appear on every page. These are PLACEHOLDER marks, not the real
-                           logos - swap static/img/logos/{ams,must,gsl}.svg for the official files
-                           before submission; no template change will be needed when you do. #}
-                        <img src="{% static 'img/logos/ams.svg' %}" alt="AMS" class="h-7 w-auto">
-                        <img src="{% static 'img/logos/must.svg' %}" alt="MUST" class="h-7 w-auto">
-                        <img src="{% static 'img/logos/gsl.svg' %}" alt="GSL" class="h-7 w-auto">
-                        <span class="text-md font-bold tracking-tight text-gray-900 ml-1">MUST EMR</span>
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-8 h-8 rounded-lg bg-white border border-gray-200 shadow-sm flex items-center justify-center overflow-hidden">
+                                <img src="{% static 'img/must-logo.png' %}" alt="MUST logo" class="h-7 w-7 object-contain">
+                            </span>
+                            <span class="w-8 h-8 rounded-lg bg-white border border-gray-200 shadow-sm flex items-center justify-center overflow-hidden">
+                                <img src="{% static 'img/gsl-logo.png' %}" alt="GSL logo" class="h-7 w-7 object-contain">
+                            </span>
+                        </div>
+                        <span class="text-md font-bold tracking-tight text-gray-900">MUST EMR</span>
                     </div>
                     {% if user.is_authenticated %}
                         <nav aria-label="Main navigation" class="hidden md:flex items-center gap-1">

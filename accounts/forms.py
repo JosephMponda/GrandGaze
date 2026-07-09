@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm
 from django.db import transaction
-from .models import Profile, Role
+from .models import Profile, Role, assign_user_role_group
 
 
 class LoginForm(AuthenticationForm):
@@ -29,10 +29,12 @@ class StaffUserForm(forms.ModelForm):
         user.set_password(self.cleaned_data["password"])
         if commit:
             user.save()
+            role = self.cleaned_data["role"]
             Profile.objects.create(
                 user=user,
-                role=self.cleaned_data["role"],
+                role=role,
                 department=self.cleaned_data["department"],
                 phone_number=self.cleaned_data["phone_number"]
             )
+            assign_user_role_group(user, role)
         return user
