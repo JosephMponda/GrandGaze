@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.db import transaction
+from django.db.models import Count, Q
 
 from patients.models import Patient
 from inpatient.models import Ward, Bed
@@ -35,7 +36,26 @@ def audit_trail(request):
     Satisfies brief §19.4 as a visible feature, not just a DB table.
     """
     patient_history = Patient.history.all().order_by("-history_date")[:200]
-    return render(request, "accounts/audit_trail.html", {"patient_history": patient_history})
+    
+    # Calculate counts using database aggregation
+    total_count = patient_history.count()
+    
+    # Count by history type
+    history_counts = patient_history.aggregate(
+        created_count=Count('pk', filter=Q(history_type='+')),
+        modified_count=Count('pk', filter=Q(history_type='~')),
+        deleted_count=Count('pk', filter=Q(history_type='-')),
+    )
+    
+    context = {
+        "patient_history": patient_history,
+        "total_count": total_count,
+        "created_count": history_counts['created_count'],
+        "modified_count": history_counts['modified_count'],
+        "deleted_count": history_counts['deleted_count'],
+    }
+    
+    return render(request, "accounts/audit_trail.html", context)
 
 
 @role_required("Admin", "ICT")

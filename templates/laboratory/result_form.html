@@ -2,18 +2,27 @@
 {% block title %}Enter Lab Result - MUST EMR{% endblock %}
 {% block content %}
 {% block nav %}{% endblock %}
-<div class="max-w-4xl mx-auto py-6">
-    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
-        <div>
-            <h1 class="text-3xl font-bold tracking-tight text-ink-900">Enter Lab Result</h1>
-            <p class="text-sm text-ink-500 mt-2">{{ order.test }} &middot; {{ order.patient.full_name }} &middot; {{ order.patient.patient_number }}</p>
+<div class="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <!-- Responsive Header -->
+    <div class="border-b border-gray-200 pb-5 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <!-- Left: Title -->
+            <div class="min-w-0 flex-1">
+                <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink-900 truncate">Enter Lab Result</h1>
+                <p class="text-sm text-ink-500 mt-2 truncate">{{ order.test }} &middot; {{ order.patient.full_name }} &middot; {{ order.patient.patient_number }}</p>
+            </div>
+            
+            <!-- Right: Back button -->
+            <div class="flex-shrink-0">
+                <a href="{% url 'laboratory:collect' order.pk %}" 
+                   class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200 w-full sm:w-auto justify-center">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Back
+                </a>
+            </div>
         </div>
-        <a href="{% url 'laboratory:collect' order.pk %}" class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-            </svg>
-            Back
-        </a>
     </div>
 
     <form method="post" class="space-y-8">
@@ -27,23 +36,50 @@
             </div>
         {% endif %}
 
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 space-y-6">
+        <!-- Result Entry Section -->
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
             <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
-                <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/10">1</span>
+                <span class="w-6 h-6 flex-shrink-0 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/10">1</span>
                 <h3 class="text-base font-semibold text-ink-900">Result Entry</h3>
             </div>
+            
+            <!-- Numeric and Text Fields -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {% include "components/_field.html" with field=form.value_numeric %}
                 {% include "components/_field.html" with field=form.value_text %}
             </div>
-            {% include "components/_field.html" with field=form.notes %}
+            
+            <!-- Notes Field with reduced textarea -->
+            <div>
+                <label for="{{ form.notes.id_for_label }}" class="block text-sm font-semibold text-ink-700 mb-1.5">
+                    {{ form.notes.label|default:"Notes" }}
+                </label>
+                <textarea name="{{ form.notes.name }}" 
+                          id="{{ form.notes.id_for_label }}"
+                          rows="2"
+                          class="block w-full rounded-xl border border-gray-300 bg-white shadow-sm focus:border-brand focus:ring-2 focus:ring-brand/20 text-sm py-2.5 px-3.5 transition-colors resize-y"
+                          placeholder="Enter any relevant notes...">{{ form.notes.value|default:'' }}</textarea>
+                {% if form.notes.errors %}
+                    <p class="mt-1 text-xs text-red-600">{{ form.notes.errors|join:", " }}</p>
+                {% endif %}
+                {% if form.notes.help_text %}
+                    <p class="mt-1 text-xs text-ink-400">{{ form.notes.help_text }}</p>
+                {% endif %}
+            </div>
         </div>
 
-        <div class="flex items-center justify-end gap-4 pt-6 pb-10">
-            <a href="{% url 'laboratory:collect' order.pk %}" class="btn-secondary text-sm font-semibold py-3 px-6 hover:-translate-y-0.5 transition-all duration-200">Cancel</a>
-            <button type="submit" class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:shadow-brand/30 hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2">
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 pt-6 pb-10">
+            <a href="{% url 'laboratory:collect' order.pk %}" 
+               class="btn-secondary text-sm font-semibold py-3 px-6 hover:-translate-y-0.5 transition-all duration-200 text-center order-2 sm:order-1">
+                Cancel
+            </a>
+            <button type="submit" 
+                    class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:shadow-brand/30 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 order-1 sm:order-2">
                 Save Result
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                </svg>
             </button>
         </div>
     </form>

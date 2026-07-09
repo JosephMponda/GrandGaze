@@ -1,48 +1,63 @@
 {% extends "base.html" %}
 {% block title %}Stock Management - MUST EMR{% endblock %}
 {% block content %}
-<div class="max-w-4xl mx-auto py-6">
-    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
-        <div>
-            <h1 class="text-3xl font-bold tracking-tight text-ink-900">Stock Management</h1>
-            <p class="text-sm text-ink-500 mt-2">Add stock and view current levels</p>
+<div class="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <!-- Responsive Header -->
+    <div class="border-b border-gray-200 pb-5 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <!-- Left: Title -->
+            <div class="min-w-0 flex-1">
+                <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink-900 truncate">Stock Management</h1>
+                <p class="text-sm text-ink-500 mt-2">Add stock and view current levels</p>
+            </div>
+            
+            <!-- Right: Back button -->
+            <div class="flex-shrink-0">
+                <a href="{% url 'pharmacy:queue' %}" 
+                   class="btn-secondary text-sm font-semibold inline-flex items-center justify-center gap-1.5 py-2 px-4 w-full sm:w-auto">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    Back to Pharmacy Queue
+                </a>
+            </div>
         </div>
-        <a href="{% url 'pharmacy:queue' %}" class="btn-secondary text-sm font-semibold inline-flex items-center gap-1.5">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-            Back to Pharmacy Queue
-        </a>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8">
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+        <!-- Add Stock Form -->
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8">
             <h2 class="text-lg font-semibold text-ink-900 mb-6">Add Stock</h2>
             <form method="post" class="space-y-6">
                 {% csrf_token %}
                 {% include "components/_field.html" with field=form.drug %}
                 {% include "components/_field.html" with field=form.quantity %}
                 {% include "components/_field.html" with field=form.note %}
-                <button type="submit" class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:shadow-brand/30 hover:-translate-y-0.5 transition-all duration-200">
+                <button type="submit" 
+                        class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:shadow-brand/30 hover:-translate-y-0.5 transition-all duration-200 w-full sm:w-auto">
                     Add Stock
                 </button>
             </form>
         </div>
 
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8">
+        <!-- Current Stock Levels -->
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8">
             <h2 class="text-lg font-semibold text-ink-900 mb-6">Current Levels</h2>
             {% if stock_levels %}
-                <div class="divide-y divide-gray-100">
+                <div class="divide-y divide-gray-100 -mx-2 sm:mx-0">
                     {% for level in stock_levels %}
-                        <div class="flex items-center justify-between py-3">
-                            <div>
-                                <p class="text-sm font-semibold text-ink-900">{{ level.drug.generic_name }}</p>
-                                <p class="text-xs text-ink-500">{{ level.drug.formulation }}</p>
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 py-3 px-2 sm:px-0">
+                            <div class="min-w-0 flex-1">
+                                <p class="text-sm font-semibold text-ink-900 truncate">{{ level.drug.generic_name }}</p>
+                                <p class="text-xs text-ink-500 truncate">{{ level.drug.formulation }}</p>
                             </div>
-                            <div class="flex items-center gap-3">
+                            <div class="flex items-center justify-between sm:justify-end gap-3 flex-shrink-0">
                                 <span class="text-sm font-bold {% if level.is_low %}text-red-600{% else %}text-green-600{% endif %}">
                                     {{ level.quantity }}
                                 </span>
                                 {% if level.is_low %}
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 whitespace-nowrap">
                                         Low
                                     </span>
                                 {% endif %}
@@ -51,7 +66,9 @@
                     {% endfor %}
                 </div>
             {% else %}
-                <p class="text-sm text-ink-500">No stock records yet. Add stock above.</p>
+                <div class="text-center py-8">
+                    <p class="text-sm text-ink-500">No stock records yet. Add stock above.</p>
+                </div>
             {% endif %}
         </div>
     </div>

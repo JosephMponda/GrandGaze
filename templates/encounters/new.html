@@ -2,19 +2,29 @@
 {% block title %}New Encounter - {{ patient.full_name }} - MUST EMR{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto py-6">
-    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
-        <div>
-            <h1 class="text-3xl font-bold tracking-tight text-ink-900">New Encounter</h1>
-            <p class="text-sm text-ink-500 mt-2">{{ patient.full_name }} &middot; {{ patient.patient_number }}</p>
+<div class="max-w-4xl mx-auto py-4 sm:py-6 px-4" 
+     x-data="{}" 
+     x-init="$el.querySelectorAll('textarea').forEach(el => el.setAttribute('rows', '3'))">
+
+    <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center mb-6 sm:mb-8 border-b border-gray-200 pb-5 w-full">
+        <div class="sm:col-span-8 min-w-0">
+            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink-900">New Encounter</h1>
+            <p class="text-sm text-ink-500 mt-1 sm:mt-2">
+                {{ patient.full_name }} &middot; <span class="text-ink-400 font-mono text-xs">{{ patient.patient_number }}</span>
+            </p>
         </div>
-        <a href="{% url 'patients:profile' patient.pk %}" class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-            Back to Patient
-        </a>
+        <div class="sm:col-span-4 justify-self-stretch sm:justify-self-end w-full sm:w-auto">
+            <a href="{% url 'patients:profile' patient.pk %}" 
+               class="btn-secondary text-sm font-semibold inline-flex items-center justify-center gap-2 w-full sm:w-max px-4 py-2 hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap">
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to Patient
+            </a>
+        </div>
     </div>
 
-    <form method="post" class="space-y-8">
+    <form method="post" class="space-y-6 sm:space-y-8">
         {% csrf_token %}
 
         {% if form.non_field_errors %}
@@ -25,36 +35,33 @@
         </div>
         {% endif %}
 
-        <!-- Step 1: Basic Encounter Settings -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-8 space-y-6">
             <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
                 <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold">1</span>
                 <h3 class="text-base font-semibold text-ink-900">Encounter Details</h3>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 {% include "components/_field.html" with field=form.encounter_type %}
             </div>
         </div>
 
-        <!-- Step 2: Presenting Complaint -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-8 space-y-6">
             <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
                 <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold">2</span>
                 <h3 class="text-base font-semibold text-ink-900">Chief Complaint & History</h3>
             </div>
-            <div class="space-y-6">
+            <div class="space-y-4 sm:space-y-6">
                 {% include "components/_field.html" with field=form.presenting_complaint %}
                 {% include "components/_field.html" with field=form.history_of_presenting_complaint %}
             </div>
         </div>
 
-        <!-- Step 3: Medical Background -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-8 space-y-6">
             <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
                 <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold">3</span>
                 <h3 class="text-base font-semibold text-ink-900">Patient History Background</h3>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 {% include "components/_field.html" with field=form.past_medical_history %}
                 {% include "components/_field.html" with field=form.past_surgical_history %}
                 {% include "components/_field.html" with field=form.medication_history %}
@@ -64,23 +71,21 @@
             </div>
         </div>
 
-        <!-- Step 4: Clinical Exam & Diagnosis -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-8 space-y-6">
             <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
                 <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold">4</span>
                 <h3 class="text-base font-semibold text-ink-900">Clinical Evaluation</h3>
             </div>
-            <div class="space-y-6">
+            <div class="space-y-4 sm:space-y-6">
                 {% include "components/_field.html" with field=form.examination_findings %}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     {% include "components/_field.html" with field=form.diagnosis %}
                     {% include "components/_field.html" with field=form.differential_diagnosis %}
                 </div>
             </div>
         </div>
 
-        <!-- Step 5: Clinical Plan -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-8 space-y-6">
             <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
                 <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold">5</span>
                 <h3 class="text-base font-semibold text-ink-900">Clinical Management Plan</h3>
@@ -88,11 +93,17 @@
             {% include "components/_field.html" with field=form.clinical_plan %}
         </div>
 
-        <div class="flex items-center justify-end gap-4 pt-6 pb-10">
-            <a href="{% url 'patients:profile' patient.pk %}" class="btn-secondary text-sm font-semibold py-3 px-6 hover:-translate-y-0.5 transition-all duration-200">Cancel</a>
-            <button type="submit" class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:shadow-brand/30 hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2">
-                Open Encounter
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        <div class="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 pt-2 pb-10 w-full">
+            <a href="{% url 'patients:profile' patient.pk %}" 
+               class="w-full sm:w-auto text-center btn-secondary text-sm font-semibold py-2.5 px-6 hover:-translate-y-0.5 transition-all duration-200">
+                Cancel
+            </a>
+            <button type="submit" 
+                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 btn-primary text-sm font-semibold py-2.5 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:shadow-brand/30 hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap">
+                <span>Open Encounter</span>
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                </svg>
             </button>
         </div>
     </form>

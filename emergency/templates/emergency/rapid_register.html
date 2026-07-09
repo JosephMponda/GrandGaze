@@ -1,16 +1,27 @@
 {% extends "base.html" %}
 {% block title %}Rapid Registration - MUST EMR{% endblock %}
 {% block content %}
-<div class="max-w-4xl mx-auto py-6">
-    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
-        <div>
-            <h1 class="text-3xl font-bold tracking-tight text-ink-900">Rapid Registration</h1>
-            <p class="text-sm text-ink-500 mt-2">Minimal registration for unstable patients</p>
+<div class="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <!-- Responsive Header -->
+    <div class="border-b border-gray-200 pb-5 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <!-- Left: Title -->
+            <div class="min-w-0 flex-1">
+                <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink-900 truncate">Rapid Registration</h1>
+                <p class="text-sm text-ink-500 mt-2">Minimal registration for unstable patients</p>
+            </div>
+            
+            <!-- Right: Back button -->
+            <div class="flex-shrink-0">
+                <a href="{% url 'emergency:queue' %}" 
+                   class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200 w-full sm:w-auto justify-center">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Back to Queue
+                </a>
+            </div>
         </div>
-        <a href="{% url 'emergency:queue' %}" class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-            Back to Queue
-        </a>
     </div>
 
     <form method="post" class="space-y-8">
@@ -23,9 +34,10 @@
             </div>
         {% endif %}
 
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 space-y-6">
+        <!-- Patient Identity Section -->
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
             <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
-                <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/10">1</span>
+                <span class="w-6 h-6 flex-shrink-0 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/10">1</span>
                 <h3 class="text-base font-semibold text-ink-900">Patient Identity</h3>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -36,9 +48,10 @@
             </div>
         </div>
 
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 space-y-6">
+        <!-- Triage Section -->
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
             <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
-                <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/10">2</span>
+                <span class="w-6 h-6 flex-shrink-0 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/10">2</span>
                 <h3 class="text-base font-semibold text-ink-900">Triage</h3>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -48,11 +61,18 @@
             </div>
         </div>
 
-        <div class="flex items-center justify-end gap-4 pt-6 pb-10">
-            <a href="{% url 'emergency:queue' %}" class="btn-secondary text-sm font-semibold py-3 px-6 hover:-translate-y-0.5 transition-all duration-200">Cancel</a>
-            <button type="submit" class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:shadow-brand/30 hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2">
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 pt-6 pb-10">
+            <a href="{% url 'emergency:queue' %}" 
+               class="btn-secondary text-sm font-semibold py-3 px-6 hover:-translate-y-0.5 transition-all duration-200 text-center order-2 sm:order-1">
+                Cancel
+            </a>
+            <button type="submit" 
+                    class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:shadow-brand/30 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 order-1 sm:order-2">
                 Register & Triage
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                </svg>
             </button>
         </div>
     </form>

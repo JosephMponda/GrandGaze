@@ -1,55 +1,92 @@
 {% extends "base.html" %}
 {% block title %}Resolve Triage - MUST EMR{% endblock %}
 {% block content %}
-<div class="max-w-4xl mx-auto py-6">
-    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
-        <div>
-            <h1 class="text-3xl font-bold tracking-tight text-ink-900">Resolve Triage</h1>
-            <p class="text-sm text-ink-500 mt-2">{{ triage.patient.first_name }} {{ triage.patient.last_name }} &middot; {{ triage.patient.patient_number }}</p>
+<div class="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <!-- Responsive Header -->
+    <div class="border-b border-gray-200 pb-5 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <!-- Left: Title -->
+            <div class="min-w-0 flex-1">
+                <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink-900 truncate">Resolve Triage</h1>
+                <p class="text-sm text-ink-500 mt-2 truncate">{{ triage.patient.first_name }} {{ triage.patient.last_name }} &middot; {{ triage.patient.patient_number }}</p>
+            </div>
+            
+            <!-- Right: Back button -->
+            <div class="flex-shrink-0">
+                <a href="{% url 'emergency:queue' %}" 
+                   class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200 w-full sm:w-auto justify-center">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Back to Queue
+                </a>
+            </div>
         </div>
-        <a href="{% url 'emergency:queue' %}" class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-            Back to Queue
-        </a>
     </div>
 
-    <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 mb-6">
-        <dl class="grid grid-cols-2 gap-4 text-sm">
-            <div><dt class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Category</dt>
-                <dd class="mt-0.5 font-semibold">{{ triage.get_triage_category_display }}</dd></div>
-            <div><dt class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Triaged By</dt>
-                <dd class="mt-0.5 font-semibold">{{ triage.triaged_by.get_full_name|default:triage.triaged_by.username }}</dd></div>
-            <div class="col-span-2"><dt class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Presenting Condition</dt>
-                <dd class="mt-0.5">{{ triage.presenting_condition }}</dd></div>
+    <!-- Triage Summary Card -->
+    <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 mb-6">
+        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+            <div>
+                <dt class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Category</dt>
+                <dd class="mt-0.5 font-semibold">{{ triage.get_triage_category_display }}</dd>
+            </div>
+            <div>
+                <dt class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Triaged By</dt>
+                <dd class="mt-0.5 font-semibold">{{ triage.triaged_by.get_full_name|default:triage.triaged_by.username }}</dd>
+            </div>
+            <div class="sm:col-span-2">
+                <dt class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Presenting Condition</dt>
+                <dd class="mt-0.5">{{ triage.presenting_condition }}</dd>
+            </div>
         </dl>
     </div>
 
     <form method="post" class="space-y-8">
         {% csrf_token %}
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 space-y-6">
+        
+        <!-- Outcome Section -->
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
             <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
-                <span class="w-6 h-6 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/10">1</span>
+                <span class="w-6 h-6 flex-shrink-0 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/10">1</span>
                 <h3 class="text-base font-semibold text-ink-900">Outcome</h3>
             </div>
+            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <label class="block text-sm font-semibold text-ink-700">Outcome *</label>
-                <select name="outcome" required class="block w-full rounded-xl border-gray-200/80 shadow-sm focus:border-brand focus:ring-brand/20 text-sm py-2.5 px-3.5 transition-colors">
-                    <option value="">Select outcome...</option>
-                    <option value="discharged">Discharged</option>
-                    <option value="admitted">Admitted</option>
-                    <option value="referred">Referred</option>
-                    <option value="dead">Dead</option>
-                </select>
+                <div>
+                    <label class="block text-sm font-semibold text-ink-700 mb-1.5">Outcome *</label>
+                    <select name="outcome" required 
+                            class="block w-full rounded-xl border-gray-200/80 shadow-sm focus:border-brand focus:ring-brand/20 text-sm py-2.5 px-3.5 transition-colors">
+                        <option value="">Select outcome...</option>
+                        <option value="discharged">Discharged</option>
+                        <option value="admitted">Admitted</option>
+                        <option value="referred">Referred</option>
+                        <option value="dead">Dead</option>
+                    </select>
+                </div>
+                <div></div>
             </div>
+            
             <div class="grid grid-cols-1 gap-6">
-                <label class="block text-sm font-semibold text-ink-700">Disposition Note</label>
-                <textarea name="disposition_note" rows="3" class="block w-full rounded-xl border-gray-200/80 shadow-sm focus:border-brand focus:ring-brand/20 text-sm py-2.5 px-3.5 transition-colors" placeholder="e.g. transferred to medical ward"></textarea>
+                <div>
+                    <label class="block text-sm font-semibold text-ink-700 mb-1.5">Disposition Note</label>
+                    <textarea name="disposition_note" rows="3" 
+                              class="block w-full rounded-xl border-gray-200/80 shadow-sm focus:border-brand focus:ring-brand/20 text-sm py-2.5 px-3.5 transition-colors" 
+                              placeholder="e.g. transferred to medical ward"></textarea>
+                </div>
             </div>
         </div>
 
-        <div class="flex items-center justify-end gap-4 pt-6 pb-10">
-            <a href="{% url 'emergency:queue' %}" class="btn-secondary text-sm font-semibold py-3 px-6">Cancel</a>
-            <button type="submit" class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">Resolve Triage</button>
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 pt-6 pb-10">
+            <a href="{% url 'emergency:queue' %}" 
+               class="btn-secondary text-sm font-semibold py-3 px-6 text-center order-2 sm:order-1">
+                Cancel
+            </a>
+            <button type="submit" 
+                    class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 order-1 sm:order-2">
+                Resolve Triage
+            </button>
         </div>
     </form>
 </div>
