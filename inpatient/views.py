@@ -8,6 +8,7 @@ from django.utils.html import format_html
 from accounts.permissions import role_required
 from patients.models import ReferralRecord
 from patients.services import get_patient_or_404
+from pharmacy.models import Prescription
 
 from . import services
 from .models import Admission, AdmissionStatus, Bed, NursingCarePlan, Ward
