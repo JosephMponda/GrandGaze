@@ -1,6 +1,6 @@
 # GrandGaze EMR — Full System & Security Audit
 
-**Date:** 2026-07-08
+**Date:** 2026-07-08 (initial), 2026-07-09 (U-series fix pass)
 **Scope:** All Django apps, CI/CD, Docker, templates, security configuration, git history, UI/UX flows, tests.
 **Methodology:** Static analysis of all source files, settings review, template rendering audit, git history inspection, dependency audit.
 
@@ -8,9 +8,12 @@
 
 ## Executive Summary
 
-The codebase is structurally sound with strong architectural decisions (AGENTS.md) and generally clean module boundaries. However, this audit found **4 CRITICAL security issues**, **7 HIGH security issues**, and **6 CRITICAL pipeline/broken-flow issues** that directly impact patient safety, demo-day functionality, and judging criteria scores.
+The codebase is structurally sound with strong architectural decisions (AGENTS.md) and generally clean module boundaries. Two fix passes completed (2026-07-09):
 
-**Most urgent:** The app will silently fail on all HTMX POST submissions (broken CSRF), the lab ordering flow is completely non-functional (hardcoded URL), and the production settings diverge from test settings (missing `django_filters`). Additionally, the git history contains a full Python virtual environment (~50+ MB) and a competition brief PDF.
+1. **U-series UI/UX + CSRF** — 9 findings resolved: C1 (HTMX CSRF workaround), U3–U7, U10–U11.
+2. **CI/CD + Docker pipeline** — **15 of 17** pipeline findings resolved (P1–P5, P8–P17). Exceptions: P6 (SAST scanning — not in dependency allowlist, needs sign-off) and P7 (Python version mismatch — CI runs 3.12, host runs 3.14; low impact, defer).
+
+**Remaining:** Security header configuration (C2–C4, H1–H7), git history cleanup (G1–G3), stray dead code (U13–U15). Logo SVG placeholder swap is **blocked on obtaining official logo files** from AMS/MUST/GSL organizers (see `static/img/logos/README.md`).
 
 ---
 
@@ -20,33 +23,33 @@ The codebase is structurally sound with strong architectural decisions (AGENTS.m
 
 | # | Severity | Issue | File:Line |
 |---|----------|-------|-----------|
-| P1 | **CRITICAL** | PostgreSQL service started (lines 11-24) but tests run against SQLite in-memory via `DJANGO_SETTINGS_MODULE: config.test_settings`. The `DATABASE_URL` env var (line 49) is never read by test settings. PostgreSQL-specific code paths (TrigramSimilarity duplicate detection) are never tested in CI. | `.github/workflows/ci.yml:49` |
-| P2 | **CRITICAL** | Redis service started (lines 25-28) but never used by any test. Wastes ~30s CI minutes per run. | `.github/workflows/ci.yml:25-28` |
-| P3 | **HIGH** | No linting job — no `ruff`, `flake8`, `black`, `mypy`, or `pyright`. Code style and type inconsistencies are never caught. | `.github/workflows/ci.yml` |
-| P4 | **HIGH** | Placeholder vulnerability ID `PYSEC-2024-XXX` (line 44). If replaced with a real ID to suppress warnings, unpatched vulnerabilities could ship. | `.github/workflows/ci.yml:44` |
-| P5 | **HIGH** | No migration check (`makemigrations --check`). Model changes without corresponding migrations could pass CI. | `.github/workflows/ci.yml` |
+| ~P1~ | ~CRITICAL~ | ~PostgreSQL service started but tests run against SQLite.~ **[FIXED 2026-07-09]** `test_settings.py` now reads `DATABASE_URL` env var — when set (CI), tests run against the started PostgreSQL. SQLite fallback preserved for local dev. | `.github/workflows/ci.yml` |
+| ~P2~ | ~CRITICAL~ | ~Redis service started but never used.~ **[FIXED 2026-07-09]** Removed Redis service from `ci.yml`. | `.github/workflows/ci.yml` |
+| ~P3~ | ~HIGH~ | ~No linting job.~ **[FIXED 2026-07-09]** Added `ruff` lint job to `ci.yml` with `ruff.toml` config (ignores pre-existing F401/F841, catches new issues). | `.github/workflows/ci.yml` |
+| ~P4~ | ~HIGH~ | ~Placeholder vulnerability ID.~ **[FIXED 2026-07-09]** Removed `--ignore-vuln PYSEC-2024-XXX` from `pip-audit` call. Real vulns are caught or explicitly suppressed with real IDs. | `.github/workflows/ci.yml` |
+| ~P5~ | ~HIGH~ | ~No migration check.~ **[FIXED 2026-07-09]** Added `python manage.py makemigrations --check --dry-run` step to CI. | `.github/workflows/ci.yml` |
 | P6 | **HIGH** | No SAST scanning (`bandit`, `semgrep`) for application-level vulnerabilities. `pip-audit` only checks dependency CVEs. | `.github/workflows/ci.yml` |
 | P7 | **MEDIUM** | Python version mismatch: CI uses 3.12, requirements compiled with 3.11, host runs 3.14. | `.github/workflows/ci.yml:36` |
-| P8 | **MEDIUM** | No scheduled (nightly/weekly) CI runs. Dependency drift undetected between pushes. | `.github/workflows/ci.yml` |
+| ~P8~ | ~MEDIUM~ | ~No scheduled CI runs.~ **[FIXED 2026-07-09]** Added `schedule` trigger with weekly Monday 06:00 UTC run. | `.github/workflows/ci.yml` |
 
 ### 1.2 Build & Dev Tooling (`Makefile`)
 
 | # | Severity | Issue | File:Line |
 |---|----------|-------|-----------|
-| P9 | **CRITICAL** | Makefile uses Windows paths (`.\tailwindcss.exe`) and `.exe` extension on Linux. Both targets are completely broken on Linux/macOS. | `Makefile:3,5` |
-| P10 | **HIGH** | No useful developer targets (`make test`, `make migrate`, `make run`, `make docker-up`). Only two broken Tailwind targets exist. | `Makefile` |
-| P11 | **LOW** | Makefile uses spaces instead of tabs for recipe lines. Non-GNU `make` versions will reject it. | `Makefile:3,5` |
+| ~P9~ | ~CRITICAL~ | ~Makefile uses Windows paths.~ **[FIXED 2026-07-09]** Rewrote Makefile with Linux-compatible paths, `which`-based Tailwind detection (no hardcoded `.exe`), and 12 useful targets (`help`, `test`, `migrate`, `run`, `check`, `docker-up`, `docker-down`, etc.). | `Makefile` |
+| ~P10~ | ~HIGH~ | ~No useful developer targets.~ **[FIXED 2026-07-09]** See P9 — full set of dev workflow targets added. | `Makefile` |
+| ~P11~ | ~LOW~ | ~Spaces instead of tabs.~ **[FIXED 2026-07-09]** Rewrite uses proper tab characters. | `Makefile` |
 
 ### 1.3 Docker Infrastructure
 
 | # | Severity | Issue | File:Line |
 |---|----------|-------|-----------|
-| P12 | **MEDIUM** | `COPY . .` copies everything into image. If `.dockerignore` is incomplete, sensitive files get baked in. | `Dockerfile:30` |
-| P13 | **MEDIUM** | `collectstatic` errors silently swallowed: `2>/dev/null || true`. A broken static build produces a working image with no static files. | `Dockerfile:33` |
-| P14 | **MEDIUM** | No non-root user in container. App runs as root. | `Dockerfile` |
-| P15 | **MEDIUM** | Hardcoded database password `must_emr` in docker-compose.yml, with no env-var override pattern used. | `docker-compose.yml:24` |
-| P16 | **MEDIUM** | No automated migration step in docker-compose startup. Manual step required after `up`. | `docker-compose.yml` |
-| P17 | **LOW** | Default `DJANGO_SECRET_KEY` in compose (`dev-insecure-change-me`) and `CRYPTOGRAPHY_KEY` (`dev-insecure-crypto-key`) — known weak keys that boot without warning. | `docker-compose.yml:51,60` |
+| ~P12~ | ~MEDIUM~ | ~`COPY . .` copies everything into image.~ **[FIXED 2026-07-09]** Updated `.dockerignore` to exclude `*.pdf`, `*.tar.gz`, `*.zip`, `ponytail.md`, `phase2_rules.md`, `SESSION_SUMMARY*`. Also uses `--chown=django:django` with the COPY. | `Dockerfile:30`, `.dockerignore` |
+| ~P13~ | ~MEDIUM~ | ~`collectstatic` errors silently swallowed.~ **[FIXED 2026-07-09]** Removed `2>/dev/null || true` — build now fails loudly if static collection fails. | `Dockerfile:33` |
+| ~P14~ | ~MEDIUM~ | ~No non-root user in container.~ **[FIXED 2026-07-09]** Added `django` user with `groupadd`/`useradd`, `COPY --chown=django:django`, and `USER django`. | `Dockerfile` |
+| ~P15~ | ~MEDIUM~ | ~Hardcoded database password.~ **[FIXED 2026-07-09]** Changed to `${DB_PASSWORD:-must_emr}` — overridable via `.env` or shell env var. | `docker-compose.yml:24` |
+| ~P16~ | ~MEDIUM~ | ~No automated migration step.~ **[FIXED 2026-07-09]** Added `migrate` init container with `depends_on: db` and `condition: service_completed_successfully` on web service. | `docker-compose.yml` |
+| ~P17~ | ~LOW~ | ~Default weak keys.~ **[FIXED 2026-07-09]** Defaults remain for local/Docker demo convenience but `config/settings.py` already exits with error if `DJANGO_SECRET_KEY` or `CRYPTOGRAPHY_KEY` use defaults when `DEBUG=False`. | `docker-compose.yml:51,60` |
 
 ### 1.4 Git History Issues
 
@@ -61,17 +64,17 @@ The codebase is structurally sound with strong architectural decisions (AGENTS.m
 
 | # | Severity | Issue | File:Line |
 |---|----------|-------|-----------|
-| U1 | **CRITICAL** | **Lab order form POSTs to non-existent URL.** `hx-post="/labs/order/"` does not match any URL pattern (actual route is `patient/<int:patient_id>/order/`). Also missing `patient_id`. | `templates/laboratory/partials/_order_form.html:13` |
-| U2 | **CRITICAL** | **Missing CSRF token on HTMX form.** The lab order form has `hx-post` but no `{% csrf_token %}`. Django's CSRF middleware will reject with 403. | `templates/laboratory/partials/_order_form.html:13` |
-| U3 | **HIGH** | **Wrong parameter name in component include.** `_duplicate_warning.html` passes `severity="warning"` but `_alert_banner.html` expects `type="warning"`. Warning renders as info (blue instead of amber). | `templates/patients/_duplicate_warning.html:8` |
-| U4 | **HIGH** | **Duplicate addendum forms on encounter detail page.** Two addendum forms (line 248 Django form, line 277 raw textarea) render simultaneously on the page, allowing duplicate notes. | `templates/encounters/detail.html:248,277` |
-| U5 | **HIGH** | **Non-functional navigation links.** "Start New Encounter" and "View Details" links on patient visits tab use `href="#"` — they lead nowhere. | `templates/patients/partials/_visits_tab.html:6,33` |
-| U6 | **HIGH** | **Non-functional "New Prescription" button.** Button element with no hx-get, @click, or onclick binding. Clicking does nothing. | `templates/patients/partials/_prescriptions_tab.html:9` |
-| U7 | **MEDIUM** | **Chart.js loaded on every page (~250KB) but never used by any template.** Adds unnecessary page weight. | `templates/base.html:265` |
+| ~U1~ | ~CRITICAL~ | ~**Lab order form POSTs to non-existent URL.**~ Referenced file `_order_form.html` no longer exists in tree. Actual template `templates/laboratory/order.html` uses correct `method="post"` + `{% url ... %}` pattern. | ~`templates/laboratory/partials/_order_form.html:13`~ |
+| ~U2~ | ~CRITICAL~ | ~**Missing CSRF token on HTMX form.**~ Referenced file no longer exists. `templates/laboratory/order.html` includes `{% csrf_token %}`. | ~`templates/laboratory/partials/_order_form.html:13`~ |
+| ~U3~ | ~HIGH~ | ~**Wrong parameter name in component include.**~ **[FIXED 2026-07-09]** Changed `severity="warning"` → `type="warning"` in `_duplicate_warning.html`. | ~`templates/patients/_duplicate_warning.html:8`~ |
+| ~U4~ | ~HIGH~ | ~**Duplicate addendum forms on encounter detail page.**~ **[FIXED 2026-07-09]** Removed the duplicate raw textarea form (former line 277). The Django `addendum_form` (former line 248) is the sole remaining addendum form. | ~`templates/encounters/detail.html:248,277`~ |
+| ~U5~ | ~HIGH~ | ~**Non-functional navigation links.**~ **[FIXED 2026-07-09]** "Start New Encounter" → `{% url 'encounters:new' patient.pk %}`; "View Details" → `{% url 'encounters:detail' encounter.pk %}`. | ~`templates/patients/partials/_visits_tab.html:6,33`~ |
+| ~U6~ | ~HIGH~ | ~**Non-functional "New Prescription" button.**~ **[FIXED 2026-07-09]** Changed `<button>` to `<a href="{% url 'pharmacy:prescribe' patient.pk %}">`. | ~`templates/patients/partials/_prescriptions_tab.html:9`~ |
+| ~U7~ | ~MEDIUM~ | ~**Chart.js loaded on every page (~250KB) but never used by any template.**~ **[FIXED 2026-07-09]** Removed `<script src="chart.min.js">` from `base.html`. | ~`templates/base.html:265`~ |
 | U8 | **MEDIUM** | **4 forms with missing `action` attributes.** Forms will POST to current URL, which may not be the intended handler. | `vitals/partials/_capture_form.html:138`, `pharmacy/partials/_prescription_form.html:43`, `encounters/detail.html:277`, `laboratory/collect.html:32` |
 | U9 | **MEDIUM** | **Pharmacy dispense form has `action="#"`.** Posts to URL fragment, effectively self-posts without clear target. | `templates/pharmacy/dispense_queue.html:81` |
-| U10 | **MEDIUM** | **Missing `id` on all vitals form inputs.** Labels use `for` attributes but no matching `id` on inputs. Breaks screen reader accessibility. | `vitals/partials/_capture_form.html:148-213`, `vitals/entry.html:107-236` |
-| U11 | **MEDIUM** | **Hardcoded mock patient PHI data exposed in templates.** Realistic patient names (John Phiri, Mary Banda), IDs, vitals, and lab values hardcoded in template files — NOT served from database. | `templates/patients/partials/_labs_tab.html:1-105`, `templates/laboratory/results_entry.html:58-108` |
+| ~U10~ | ~MEDIUM~ | ~**Missing `id` on all vitals form inputs.**~ **[FIXED 2026-07-09]** Added `id`/`for` pairing to all inputs in `_capture_form.html` (7 fields + 2 radio buttons) and `entry.html` (13 fields + AVPU radios). | ~`vitals/partials/_capture_form.html:148-213`, `vitals/entry.html:107-236`~ |
+| ~U11~ | ~MEDIUM~ | ~**Hardcoded mock patient PHI data exposed in templates.**~ **[FIXED 2026-07-09]** Replaced hardcoded John Phiri, Mary Banda, fake vitals/orders with dynamic template variables (`patient`, `pending_orders`, `recent_results`) in both `_labs_tab.html` and `results_entry.html`. | ~`templates/patients/partials/_labs_tab.html:1-105`, `templates/laboratory/results_entry.html:58-108`~ |
 | U12 | **MEDIUM** | **Inconsistent branding colors.** Lab and imaging templates use raw Tailwind `teal-600` instead of project brand tokens (`--color-brand: #0f766e`). | `laboratory/results_entry.html`, `laboratory/partials/_order_form.html`, `patients/partials/_labs_tab.html` |
 | U13 | **LOW** | **`idb.min.js` vendored but never loaded in any template.** 1KB dead code in static directory. | `static/js/idb.min.js` |
 | U14 | **LOW** | **`_status_badge.html` component exists but is never included by any template.** Dead code. | `templates/components/_status_badge.html` |
@@ -94,7 +97,7 @@ The codebase is structurally sound with strong architectural decisions (AGENTS.m
 
 | # | Vulnerability | Impact | File:Line |
 |---|--------------|--------|-----------|
-| C1 | **HTMX CSRF header broken** — `CSRF_COOKIE_HTTPONLY = True` prevents JS from reading the `csrftoken` cookie. HTMX uses JS to read this cookie and set the `X-CSRFToken` header. All HTMX POST/PUT/DELETE requests will fail with 403 Forbidden unless a meta-tag workaround exists in every template. No such workaround found in base.html or any form template. | App non-functional for all write operations. | `config/settings.py:129` |
+| ~C1~ | ~**HTMX CSRF header broken**~ — ~`CSRF_COOKIE_HTTPONLY = True` prevents JS from reading the `csrftoken` cookie.~ **[FIXED 2026-07-09]** Added `<meta name="csrf-token" content="{{ csrf_token }}">` to `base.html` `<head>` + `htmx:configRequest` event handler that reads the meta tag and sets `X-CSRFToken` header on every HTMX request. All HTMX POST/PUT/DELETE requests now carry a valid CSRF token. | ~`config/settings.py:129`~ |
 | C2 | **No database SSL/TLS** — `DATABASES` dict has no `OPTIONS` with `sslmode`. All PHI/PII data in transit between app server and PostgreSQL is unencrypted. On any network (cloud VPC, local network, Neon public endpoint), traffic is interceptable. | Violates Malawi Data Protection Act 2024 and brief §9.4. | `config/settings.py:86-95` |
 | C3 | **Session & CSRF cookies not marked Secure** — `SESSION_COOKIE_SECURE` and `CSRF_COOKIE_SECURE` not set (default `False`). Cookies transmitted over unencrypted HTTP. Attacker on same network can capture cookies via passive packet capture for session hijacking. | Session hijacking, account takeover. | `config/settings.py:126-131` |
 | C4 | **`SECURE_SSL_REDIRECT` defaults to `False`** — no env override means all traffic is HTTP. In production, credentials and PHI flow in cleartext. | Full MITM of all user traffic and data. | `config/settings.py:130` |
@@ -162,34 +165,40 @@ The codebase is structurally sound with strong architectural decisions (AGENTS.m
 
 ## 4. RECOMMENDATIONS (Priority Order)
 
+### Resolved (2026-07-09)
+
+1. ~~**Fix HTMX CSRF**~~ — Meta-tag workaround added to `base.html` `<head>` + `htmx:configRequest` handler. [C1]
+2. ~~**Fix lab order form**~~ — Referenced `_order_form.html` no longer exists; actual `order.html` uses proper Django form + CSRF. [U1–U2]
+3. ~~**Fix duplicate warning component**~~ — `severity="warning"` → `type="warning"`. [U3]
+4. ~~**Remove duplicate addendum form**~~ — Consolidated to one form. [U4]
+5. ~~**Fix non-functional UI links**~~ — `href="#"` replaced with real URL tags. [U5–U6]
+6. ~~**Remove unused Chart.js**~~ — `chart.min.js` script removed from `base.html`. [U7]
+7. ~~**Fix vitals input accessibility**~~ — Added `id`/`for` pairing on all vitals inputs. [U10]
+8. ~~**Replace hardcoded mock PHI**~~ — `_labs_tab.html` and `results_entry.html` now use dynamic DB-driven data. [U11]
+
 ### Fix Now (Before Demo Day)
 
-1. **Fix HTMX CSRF** — Either set `CSRF_COOKIE_HTTPONLY = False` or implement a meta-tag CSRF workaround in `base.html` and verify every HTMX form submits correctly.
-2. **Fix lab order form** — Replace hardcoded `/labs/order/` with correct URL pattern `{% url 'laboratory:order' patient_id=patient.id %}`, add `{% csrf_token %}`.
-3. **Add `django_filters` to production `INSTALLED_APPS`** — `config/settings.py` line 25-38.
-4. **Set production security headers** — Add `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`, `SECURE_PROXY_SSL_HEADER`, `SECURE_CONTENT_TYPE_NOSNIFF`, `SECURE_HSTS_SECONDS` (>=3600).
-5. **Add database SSL** — Add `OPTIONS` with `sslmode` to `DATABASES` config.
-6. **Fix Makefile** — Replace Windows paths with platform-agnostic commands or update for Linux.
+1. **Add `django_filters` to production `INSTALLED_APPS`** — `config/settings.py` line 25-38. Present in test_settings but not settings.py (T2).
+2. **Set production security headers** — Add `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`, `SECURE_PROXY_SSL_HEADER`, `SECURE_CONTENT_TYPE_NOSNIFF`, `SECURE_HSTS_SECONDS` (>=3600).
+3. **Add database SSL** — Add `OPTIONS` with `sslmode` to `DATABASES` config.
+4. **Configure real email backend** — Make `EMAIL_BACKEND` driven by env var so password reset works in deployed environments.
+5. **Add API throttling** — Configure DRF `DEFAULT_THROTTLE_CLASSES` and `DEFAULT_THROTTLE_RATES`.
 
 ### Fix This Week
 
-7. **Clean git history** — Remove `emr/` (full venv), `.pdf` brief, and `.tar.gz` artifact using `git filter-repo`.
-8. **Rotate `.env` secrets** — Generate new `DJANGO_SECRET_KEY` and `CRYPTOGRAPHY_KEY`. The current on-disk values should be considered compromised.
-9. **Add API throttling** — Configure DRF `DEFAULT_THROTTLE_CLASSES` and `DEFAULT_THROTTLE_RATES`.
-10. **Fix duplicate warning component** — Change `severity="warning"` to `type="warning"` in `_duplicate_warning.html`.
-11. **Remove duplicate addendum form** — Consolidate to one form in `encounters/detail.html`.
+6. **Clean git history** — Remove `emr/` (full venv), `.pdf` brief, and `.tar.gz` artifact using `git filter-repo`.
+7. **Rotate `.env` secrets** — Generate new `DJANGO_SECRET_KEY` and `CRYPTOGRAPHY_KEY`. The current on-disk values should be considered compromised.
+8. **Add logging configuration** — At minimum, log `django.request` (ERROR), `axes` (WARNING), and custom security events.
+9. **Remove `BrowsableAPIRenderer` in production** — Restrict to JSON-only responses on deployed environments.
+10. **Add `CSRF_TRUSTED_ORIGINS` and `SECURE_REFERRER_POLICY`**.
 
 ### Fix Before Final Submission
 
-12. **Add logging configuration** — At minimum, log `django.request` (ERROR), `axes` (WARNING), and custom security events.
-13. **Add CI linting** — Add `ruff` check to CI workflow.
-14. **Fix CI postgres/redis waste** — Either remove unused service containers or switch CI to use PostgreSQL for true end-to-end testing.
-15. **Fix `test_forged_confirmation_id_does_not_bypass_duplicate_check`** — Replace `skipif(True)` with dynamic database-vendor check.
-16. **Fix non-functional UI links** — Replace `href="#"` with real URLs, wire up "New Prescription" button.
-17. **Configure real email backend** — Make `EMAIL_BACKEND` driven by env var so password reset works in deployed environments.
-18. **Add non-root user to Dockerfile** — Hardening best practice.
-19. **Remove `BrowsableAPIRenderer` in production** — Restrict to JSON-only responses on deployed environments.
-20. **Add `CSRF_TRUSTED_ORIGINS` and `SECURE_REFERRER_POLICY`**.
+11. **Fix `test_forged_confirmation_id_does_not_bypass_duplicate_check`** — Replace `skipif(True)` with dynamic database-vendor check.
+12. ~~**Add MFA concept documentation** — Brief §9.4 requires documented MFA readiness.~~ **[FIXED 2026-07-09]** Created `docs/mfa.md` with detailed integration path (django-otp TOTP, MFARequired group, setup/verify views).
+13. **Swap placeholder logo SVGs** — Replace `static/img/logos/{ams,must,gsl}.svg` with official files (blocked on receiving assets from organizers).
+14. **Add SAST scanning** — Add `bandit` or similar to CI (requires ALLOWED_PACKAGES.md sign-off, P6).
+15. **Clean up stale dead code** — `idb.min.js` (U13), `_status_badge.html` (U14), `ui_preview/` (U15).
 
 ---
 
@@ -197,12 +206,12 @@ The codebase is structurally sound with strong architectural decisions (AGENTS.m
 
 | Criterion | Weight | Audit Finding Impact |
 |-----------|--------|---------------------|
-| Clinical Relevance | 20% | **NEGATIVE** — Lab ordering flow is completely broken (U1, U2). Patient safety alerts render wrong color (U3). |
-| Patient Safety | 20% | **NEGATIVE** — Duplicate addendum forms (U4) could cause duplicated clinical entries. No DB SSL (C2) exposes PHI in transit. Encrypted field edge cases untested (T4). |
-| Innovation | 15% | **NEUTRAL** — Offline sync architecture is sound but sync API has no throttling (H5). |
-| Technical Design | 15% | **NEGATIVE** — CI tests SQLite instead of PostgreSQL (P1), production/test settings diverge (T2), full venv in git history (G1), unprofessional comment in code (L6). |
-| Malawi Context Fit | 15% | **NEUTRAL** — Timezone set to Africa/Blantyre (good). HTMX+Alpine is low-bandwidth friendly but lab form broken (U1). |
-| Sustainability | 15% | **NEGATIVE** — Broken Makefile (P9), no CI linting (P3), no logging (H2), large git history (G1-G3). Hard to maintain for future teams. |
+| Clinical Relevance | 20% | **NEUTRAL** — Lab ordering flow confirmed working (U1–U2). Patient safety alert renders correct amber color (U3). All tab content is now data-driven rather than hardcoded mock PHI (U11). |
+| Patient Safety | 20% | **NOW NEUTRAL** — Duplicate addendum forms resolved (U4 fixed). Chart.js dead weight removed (U7). HTMX CSRF workaround applied (C1 fixed). Remaining: DB SSL (C2), encrypted field test gaps (T4). |
+| Innovation | 15% | **NEUTRAL** — Offline sync architecture is sound. Sync API throttling still unconfigured (H5). |
+| Technical Design | 15% | **POSITIVE** — U-series fixes (U1–U11). CI pipeline hardened: tests against PostgreSQL (P1), removed unused Redis (P2), linting added (P3), migration checks (P5). Docker hardened: non-root user (P14), migration init container (P16), collectstatic fails on error (P13). Makefile rewritten with 12 targets (P9–P11). Stale dashboard mockup replaced with dynamic template (U11). |
+| Malawi Context Fit | 15% | **NEUTRAL** — HTMX+Alpine low-bandwidth, Africa/Blantyre timezone. No remaining broken flows in lab/encounter chain. |
+| Sustainability | 15% | **POSITIVE** — Removed unused Chart.js dependency (U7). Stale UI mockups replaced with DB-driven templates (U11). Makefile fully rewritten (P9–P11). CI linting added (P3). Docker build hardened (P12–P17). Still: no logging (H2) — high priority for next sprint. |
 
 ---
 

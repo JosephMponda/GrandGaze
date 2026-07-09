@@ -1,0 +1,7 @@
+# Minimal ruff config - catches real issues without blocking on pre-existing noise.
+# F401/F841 excluded because ~30 pre-existing instances would mask regressions.
+target-version = "py312"
+line-length = 120
+
+[lint]
+ignore = ["F401", "F841"]

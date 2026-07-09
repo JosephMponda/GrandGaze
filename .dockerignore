@@ -41,3 +41,15 @@ AGENTS.md
 ALLOWED_PACKAGES.md
 CHANGES_SUMMARY.md
 docs/
+
+# Large artifacts
+*.pdf
+*.tar.gz
+*.tar.bz2
+*.zip
+
+# AI agent instructions (not needed at runtime)
+AGENTS.md
+ponytail.md
+phase2_rules.md
+SESSION_SUMMARY_AND_PHASE2_PLAN.md

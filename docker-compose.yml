@@ -4,11 +4,10 @@
 #
 # Usage:
 #   docker compose up -d
-#   docker compose exec web python manage.py migrate
-#   docker compose exec web python manage.py loaddata fixtures/*.json
 #   open http://localhost
-
-version: "3.9"
+#
+# Migrations run automatically via the init container.
+# Override secrets via .env or shell env vars.
 
 services:
 
@@ -21,7 +20,7 @@ services:
     environment:
       POSTGRES_DB: must_emr
       POSTGRES_USER: must_emr
-      POSTGRES_PASSWORD: must_emr
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-must_emr}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U must_emr"]
       interval: 10s
@@ -47,13 +46,15 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     environment:
       DJANGO_SECRET_KEY: "${DJANGO_SECRET_KEY:-dev-insecure-change-me}"
       DEBUG: "${DEBUG:-False}"
       ALLOWED_HOSTS: "${ALLOWED_HOSTS:-localhost,127.0.0.1}"
       DB_NAME: must_emr
       DB_USER: must_emr
-      DB_PASSWORD: must_emr
+      DB_PASSWORD: "${DB_PASSWORD:-must_emr}"
       DB_HOST: db
       DB_PORT: "5432"
       REDIS_URL: "redis://redis:6379/0"
@@ -68,6 +69,29 @@ services:
       timeout: 5s
       start_period: 30s
       retries: 3
+
+  migrate:
+    build: .
+    container_name: must_emr_migrate
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DJANGO_SECRET_KEY: "${DJANGO_SECRET_KEY:-dev-insecure-change-me}"
+      DEBUG: "False"
+      ALLOWED_HOSTS: "localhost"
+      DB_NAME: must_emr
+      DB_USER: must_emr
+      DB_PASSWORD: "${DB_PASSWORD:-must_emr}"
+      DB_HOST: db
+      DB_PORT: "5432"
+      CRYPTOGRAPHY_KEY: "${CRYPTOGRAPHY_KEY:-dev-insecure-crypto-key}"
+    command: >
+      sh -c "
+        python manage.py migrate --noinput &&
+        echo 'Migrations complete.'
+      "
 
   nginx:
     image: nginx:1.27-alpine

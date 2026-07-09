@@ -4,8 +4,23 @@ on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    - cron: "0 6 * * 1"  # 06:00 UTC every Monday
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install ruff
+        run: pip install --quiet ruff
+      - name: Run ruff check
+        run: ruff check --output-format=github .
+
   test:
     runs-on: ubuntu-latest
     services:
@@ -22,10 +37,6 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-      redis:
-        image: redis:7
-        ports:
-          - 6379:6379
 
     steps:
       - uses: actions/checkout@v4
@@ -41,12 +52,25 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run pip-audit
-        run: pip-audit --strict --ignore-vuln PYSEC-2024-XXX
+        run: pip-audit --strict
+
+      - name: Check migrations
+        env:
+          DATABASE_URL: postgres://test:test@localhost:5432/test_grandgaze
+          DJANGO_SETTINGS_MODULE: config.test_settings
+          SECRET_KEY: ci-test-key-not-for-production
+        run: python manage.py makemigrations --check --dry-run --verbosity=0
 
       - name: Run tests
         env:
-          DJANGO_SETTINGS_MODULE: config.test_settings
           DATABASE_URL: postgres://test:test@localhost:5432/test_grandgaze
-          REDIS_URL: redis://localhost:6379/0
+          DJANGO_SETTINGS_MODULE: config.test_settings
           SECRET_KEY: ci-test-key-not-for-production
         run: python -m pytest -q --tb=short
+
+      - name: Run PostgreSQL-specific tests
+        env:
+          DATABASE_URL: postgres://test:test@localhost:5432/test_grandgaze
+          DJANGO_SETTINGS_MODULE: config.test_settings
+          SECRET_KEY: ci-test-key-not-for-production
+        run: python -m pytest -q --tb=short -m "requires_postgres"
