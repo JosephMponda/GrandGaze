@@ -9,7 +9,7 @@
     <div class="mb-8 md:flex md:items-center md:justify-between">
         <div class="flex-1 min-w-0">
             <h2 class="text-2xl font-bold leading-7 text-slate-900 sm:text-3xl sm:truncate flex items-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                 </svg>
                 Laboratory Dashboard
@@ -18,21 +18,16 @@
                 Manage pending test requests and enter results
             </p>
         </div>
-        <div class="mt-4 flex md:mt-0 md:ml-4">
-            <button type="button" class="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-colors">
-                Scan Barcode
-            </button>
-        </div>
     </div>
 
     <!-- Tabs -->
     <div class="border-b border-slate-200 mb-6">
         <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-            <button @click="activeTab = 'pending'" :class="{ 'border-teal-500 text-teal-600': activeTab === 'pending', 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300': activeTab !== 'pending' }" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center">
+            <button @click="activeTab = 'pending'" :class="{ 'border-brand text-brand': activeTab === 'pending', 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300': activeTab !== 'pending' }" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center">
                 Pending Orders
-                <span :class="{ 'bg-teal-100 text-teal-600': activeTab === 'pending', 'bg-slate-100 text-slate-900': activeTab !== 'pending' }" class="hidden ml-2 py-0.5 px-2.5 rounded-full text-xs font-medium md:inline-block">3</span>
+                <span :class="{ 'bg-brand/10 text-brand': activeTab === 'pending', 'bg-slate-100 text-slate-900': activeTab !== 'pending' }" class="hidden ml-2 py-0.5 px-2.5 rounded-full text-xs font-medium md:inline-block">{{ summary.pending|default:"0" }}</span>
             </button>
-            <button @click="activeTab = 'completed'" :class="{ 'border-teal-500 text-teal-600': activeTab === 'completed', 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300': activeTab !== 'completed' }" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+            <button @click="activeTab = 'completed'" :class="{ 'border-brand text-brand': activeTab === 'completed', 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300': activeTab !== 'completed' }" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                 Recently Completed
             </button>
         </nav>
@@ -50,139 +45,64 @@
                             <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
                         </svg>
                     </div>
-                    <input type="text" name="search" id="search" class="focus:ring-teal-500 focus:border-teal-500 block w-full pl-10 sm:text-sm border-slate-300 rounded-md" placeholder="Search Patient ID or Name">
+                    <input type="text" name="search" id="id_search" class="focus:ring-brand focus:border-brand block w-full pl-10 sm:text-sm border-slate-300 rounded-md" placeholder="Search Patient ID or Name">
                 </div>
             </div>
 
-            <!-- Queue Items -->
             <ul role="list" class="divide-y divide-slate-200 border-t border-slate-200">
-                <!-- Selected Item -->
-                <li class="py-4 cursor-pointer bg-slate-50 px-3 -mx-3 rounded-md border-l-4 border-l-teal-500">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-sm font-medium text-slate-900">John Phiri</p>
-                            <p class="text-xs text-slate-500">MUST-202607-00123</p>
+                {% if pending_orders %}
+                    {% for order in pending_orders %}
+                    <li class="py-4 cursor-pointer hover:bg-slate-50 px-3 -mx-3 rounded-md transition-colors border-l-4 border-l-transparent">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm font-medium text-slate-900">{{ order.patient.full_name }}</p>
+                                <p class="text-xs text-slate-500">{{ order.patient.patient_number }}</p>
+                            </div>
                         </div>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
-                            STAT
-                        </span>
-                    </div>
-                    <div class="mt-2">
-                        <p class="text-sm tracking-wide font-medium text-slate-700">Full Blood Count (FBC)</p>
-                        <p class="text-xs text-slate-500 mt-1">Ordered: 10 mins ago</p>
-                    </div>
-                </li>
-
-                <!-- Unselected Item -->
-                <li class="py-4 cursor-pointer hover:bg-slate-50 px-3 -mx-3 rounded-md transition-colors border-l-4 border-l-transparent">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-sm font-medium text-slate-900">Mary Banda</p>
-                            <p class="text-xs text-slate-500">MUST-202607-00142</p>
+                        <div class="mt-2">
+                            <p class="text-sm tracking-wide font-medium text-slate-700">{{ order.test }}</p>
+                            <p class="text-xs text-slate-500 mt-1">Ordered: {{ order.created_at|timesince }} ago</p>
                         </div>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-800">
-                            Routine
-                        </span>
-                    </div>
-                    <div class="mt-2">
-                        <p class="text-sm tracking-wide font-medium text-slate-700">Malaria RDT</p>
-                        <p class="text-xs text-slate-500 mt-1">Ordered: 45 mins ago</p>
-                    </div>
-                </li>
+                    </li>
+                    {% endfor %}
+                {% else %}
+                    <li class="py-8 text-center text-sm text-slate-500">No pending orders.</li>
+                {% endif %}
             </ul>
         </div>
 
         <!-- Results Entry Workspace -->
         <div class="lg:col-span-2" x-show="activeTab === 'pending'">
+            {% if selected_order %}
             <div class="bg-white shadow rounded-lg border border-slate-200 overflow-hidden">
-                <!-- Patient Context Banner -->
                 <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
                     <div>
-                        <h3 class="text-lg font-bold text-slate-900">John Phiri</h3>
-                        <p class="text-sm text-slate-500 font-mono">MUST-202607-00123 • 34 yrs • Male</p>
+                        <h3 class="text-lg font-bold text-slate-900">{{ selected_order.patient.full_name }}</h3>
+                        <p class="text-sm text-slate-500 font-mono">{{ selected_order.patient.patient_number }}</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-sm font-medium text-red-600">STAT Priority</p>
-                        <p class="text-xs text-slate-500">Dr. Sarah K.</p>
+                        <p class="text-sm font-medium text-brand">{{ selected_order.test.name }}</p>
+                        <p class="text-xs text-slate-500">{{ selected_order.ordered_by.get_full_name }}</p>
                     </div>
                 </div>
 
                 <div class="p-6">
-                    <h4 class="text-md font-semibold text-slate-800 mb-4 pb-2 border-b border-slate-100">Full Blood Count (FBC) Results</h4>
-                    
-                    <form>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-                            <!-- Field -->
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Hemoglobin (Hb)</label>
-                                <div class="mt-1 flex rounded-md shadow-sm">
-                                    <input type="number" step="0.1" name="hb" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-l-md focus:ring-teal-500 focus:border-teal-500 sm:text-sm border-slate-300">
-                                    <span class="inline-flex items-center px-3 rounded-r-md border border-l-0 border-slate-300 bg-slate-50 text-slate-500 sm:text-sm">
-                                        g/dL
-                                    </span>
-                                </div>
-                                <p class="mt-1 text-xs text-slate-500">Ref: 13.0 - 17.0</p>
-                            </div>
-
-                            <!-- Field -->
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">White Blood Cells (WBC)</label>
-                                <div class="mt-1 flex rounded-md shadow-sm">
-                                    <input type="number" step="0.1" name="wbc" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-l-md focus:ring-teal-500 focus:border-teal-500 sm:text-sm border-slate-300">
-                                    <span class="inline-flex items-center px-3 rounded-r-md border border-l-0 border-slate-300 bg-slate-50 text-slate-500 sm:text-sm">
-                                        x10^9/L
-                                    </span>
-                                </div>
-                                <p class="mt-1 text-xs text-slate-500">Ref: 4.0 - 10.0</p>
-                            </div>
-
-                            <!-- Field -->
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Platelets (Plt)</label>
-                                <div class="mt-1 flex rounded-md shadow-sm">
-                                    <input type="number" name="plt" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-l-md focus:ring-teal-500 focus:border-teal-500 sm:text-sm border-slate-300">
-                                    <span class="inline-flex items-center px-3 rounded-r-md border border-l-0 border-slate-300 bg-slate-50 text-slate-500 sm:text-sm">
-                                        x10^9/L
-                                    </span>
-                                </div>
-                                <p class="mt-1 text-xs text-slate-500">Ref: 150 - 400</p>
-                            </div>
-                        </div>
-
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Technician Notes (Optional)</label>
-                            <textarea name="notes" rows="2" class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-slate-300 rounded-md"></textarea>
-                        </div>
-
-                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 hidden" id="critical-alert">
-                            <div class="flex">
-                                <div class="flex-shrink-0">
-                                    <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                                <div class="ml-3">
-                                    <p class="text-sm text-yellow-700">
-                                        Value is outside critical range. This will trigger an alert to the ordering physician.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex justify-end pt-5 border-t border-slate-200">
-                            <button type="button" class="bg-white py-2 px-4 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
-                                Save Draft
-                            </button>
-                            <button type="submit" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
-                                Verify & Release Results
-                            </button>
-                        </div>
-                    </form>
+                    <p class="text-sm text-slate-500">Select a pending order from the queue to enter results.</p>
                 </div>
             </div>
+            {% else %}
+            <!-- Empty State -->
+            <div class="bg-white shadow rounded-lg border border-slate-200 p-12 text-center">
+                <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-slate-900">No pending orders</h3>
+                <p class="mt-1 text-sm text-slate-500">Orders will appear here once created by clinicians.</p>
+            </div>
+            {% endif %}
         </div>
         
-        <!-- Completed State (Empty state for mockup) -->
+        <!-- Completed State -->
         <div class="lg:col-span-3 text-center py-12" x-show="activeTab === 'completed'" style="display: none;">
             <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />

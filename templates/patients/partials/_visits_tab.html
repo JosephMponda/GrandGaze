@@ -3,7 +3,7 @@
     
     <div class="flex items-center justify-between">
         <h3 class="text-lg font-bold text-gray-900">Clinical Encounters</h3>
-        <a href="#" class="btn-primary text-sm font-semibold flex items-center gap-2">
+        <a href="{% url 'encounters:new' patient.pk %}" class="btn-primary text-sm font-semibold flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             Start New Encounter
         </a>
@@ -30,7 +30,7 @@
                         <p class="text-sm text-gray-500 font-medium">Seen by: <span class="text-gray-700">{{ encounter.clinician.get_full_name|default:encounter.clinician.username }}</span></p>
                     </div>
                     
-                    <a href="#" class="btn-secondary text-xs font-semibold shrink-0">
+                    <a href="{% url 'encounters:detail' encounter.pk %}" class="btn-secondary text-xs font-semibold shrink-0">
                         View Details
                     </a>
                 </div>

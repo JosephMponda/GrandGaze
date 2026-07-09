@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <title>{% block title %}MUST Teaching Hospital EMR{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
 </head>
@@ -284,7 +285,11 @@
     </script>
     <script src="{% static 'js/alpinejs.min.js' %}" defer></script>
     <script src="{% static 'js/htmx.min.js' %}"></script>
-    <script src="{% static 'js/chart.min.js' %}"></script>
+    <script>
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            event.detail.headers['X-CSRFToken'] = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        });
+    </script>
     <script src="{% static 'js/app.js' %}"></script>
 </body>
 </html>

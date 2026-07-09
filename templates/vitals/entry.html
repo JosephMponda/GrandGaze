@@ -112,9 +112,9 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
                 <!-- Temperature -->
                 <div>
-                    <label class="block text-sm font-medium text-ink-700 mb-1">Temperature</label>
+                    <label for="id_temperature_c" class="block text-sm font-medium text-ink-700 mb-1">Temperature</label>
                     <div class="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:border-brand focus-within:ring-1 focus-within:ring-brand transition-all">
-                        <input type="number" name="temperature_c" step="0.1" min="30" max="43"
+                        <input id="id_temperature_c" type="number" name="temperature_c" step="0.1" min="30" max="43"
                                x-model="temp" @input="calcNEWS2()"
                                class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white"
                                placeholder="36.5">
@@ -124,9 +124,9 @@
 
                 <!-- Pulse -->
                 <div>
-                    <label class="block text-sm font-medium text-ink-700 mb-1">Pulse Rate</label>
+                    <label for="id_pulse_rate" class="block text-sm font-medium text-ink-700 mb-1">Pulse Rate</label>
                     <div class="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:border-brand focus-within:ring-1 focus-within:ring-brand transition-all">
-                        <input type="number" name="pulse_rate" min="20" max="300"
+                        <input id="id_pulse_rate" type="number" name="pulse_rate" min="20" max="300"
                                x-model="pulse" @input="calcNEWS2()"
                                class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white"
                                placeholder="72">
@@ -136,9 +136,9 @@
 
                 <!-- Respiratory Rate -->
                 <div>
-                    <label class="block text-sm font-medium text-ink-700 mb-1">Respiratory Rate</label>
+                    <label for="id_respiratory_rate" class="block text-sm font-medium text-ink-700 mb-1">Respiratory Rate</label>
                     <div class="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:border-brand focus-within:ring-1 focus-within:ring-brand transition-all">
-                        <input type="number" name="respiratory_rate" min="5" max="60"
+                        <input id="id_respiratory_rate" type="number" name="respiratory_rate" min="5" max="60"
                                x-model="rr" @input="calcNEWS2()"
                                class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white"
                                placeholder="16">
@@ -148,9 +148,9 @@
 
                 <!-- Systolic BP -->
                 <div>
-                    <label class="block text-sm font-medium text-ink-700 mb-1">Systolic BP</label>
+                    <label for="id_blood_pressure_systolic" class="block text-sm font-medium text-ink-700 mb-1">Systolic BP</label>
                     <div class="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:border-brand focus-within:ring-1 focus-within:ring-brand transition-all">
-                        <input type="number" name="blood_pressure_systolic" min="50" max="280"
+                        <input id="id_blood_pressure_systolic" type="number" name="blood_pressure_systolic" min="50" max="280"
                                x-model="sbp" @input="calcNEWS2()"
                                class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white"
                                placeholder="120">
@@ -160,9 +160,9 @@
 
                 <!-- Diastolic BP -->
                 <div>
-                    <label class="block text-sm font-medium text-ink-700 mb-1">Diastolic BP</label>
+                    <label for="id_blood_pressure_diastolic" class="block text-sm font-medium text-ink-700 mb-1">Diastolic BP</label>
                     <div class="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:border-brand focus-within:ring-1 focus-within:ring-brand transition-all">
-                        <input type="number" name="blood_pressure_diastolic" min="30" max="180"
+                        <input id="id_blood_pressure_diastolic" type="number" name="blood_pressure_diastolic" min="30" max="180"
                                x-model="dbp"
                                class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white"
                                placeholder="80">
@@ -172,9 +172,9 @@
 
                 <!-- SpO2 -->
                 <div>
-                    <label class="block text-sm font-medium text-ink-700 mb-1">Oxygen Saturation (SpO2)</label>
+                    <label for="id_oxygen_saturation" class="block text-sm font-medium text-ink-700 mb-1">Oxygen Saturation (SpO2)</label>
                     <div class="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:border-brand focus-within:ring-1 focus-within:ring-brand transition-all">
-                        <input type="number" name="oxygen_saturation" min="50" max="100"
+                        <input id="id_oxygen_saturation" type="number" name="oxygen_saturation" min="50" max="100"
                                x-model="spo2" @input="calcNEWS2()"
                                class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white"
                                placeholder="98">
@@ -208,43 +208,43 @@
             
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
                 <div>
-                    <label class="block text-sm font-medium text-ink-700 mb-1">Weight</label>
+                    <label for="id_weight_kg" class="block text-sm font-medium text-ink-700 mb-1">Weight</label>
                     <div class="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:border-brand focus-within:ring-1 focus-within:ring-brand">
-                        <input type="number" name="weight_kg" step="0.1" class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white" placeholder="70.0">
+                        <input id="id_weight_kg" type="number" name="weight_kg" step="0.1" class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white" placeholder="70.0">
                         <span class="inline-flex items-center px-3 bg-gray-50 text-ink-400 text-sm border-l border-gray-200">kg</span>
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-ink-700 mb-1">Height</label>
+                    <label for="id_height_cm" class="block text-sm font-medium text-ink-700 mb-1">Height</label>
                     <div class="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:border-brand focus-within:ring-1 focus-within:ring-brand">
-                        <input type="number" name="height_cm" step="0.1" class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white" placeholder="165">
+                        <input id="id_height_cm" type="number" name="height_cm" step="0.1" class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white" placeholder="165">
                         <span class="inline-flex items-center px-3 bg-gray-50 text-ink-400 text-sm border-l border-gray-200">cm</span>
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-ink-700 mb-1">Blood Glucose</label>
+                    <label for="id_blood_glucose" class="block text-sm font-medium text-ink-700 mb-1">Blood Glucose</label>
                     <div class="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:border-brand focus-within:ring-1 focus-within:ring-brand">
-                        <input type="number" name="blood_glucose" step="0.1" class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white" placeholder="5.4">
+                        <input id="id_blood_glucose" type="number" name="blood_glucose" step="0.1" class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white" placeholder="5.4">
                         <span class="inline-flex items-center px-3 bg-gray-50 text-ink-400 text-sm border-l border-gray-200">mmol/L</span>
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-ink-700 mb-1">Pain Score</label>
+                    <label for="id_pain_score" class="block text-sm font-medium text-ink-700 mb-1">Pain Score</label>
                     <div class="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:border-brand focus-within:ring-1 focus-within:ring-brand">
-                        <input type="number" name="pain_score" min="0" max="10" class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white" placeholder="0">
+                        <input id="id_pain_score" type="number" name="pain_score" min="0" max="10" class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white" placeholder="0">
                         <span class="inline-flex items-center px-3 bg-gray-50 text-ink-400 text-sm border-l border-gray-200">/ 10</span>
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-ink-700 mb-1">Glasgow Coma Scale</label>
+                    <label for="id_glasgow_coma_scale" class="block text-sm font-medium text-ink-700 mb-1">Glasgow Coma Scale</label>
                     <div class="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:border-brand focus-within:ring-1 focus-within:ring-brand">
-                        <input type="number" name="glasgow_coma_scale" min="3" max="15" class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white" placeholder="15">
+                        <input id="id_glasgow_coma_scale" type="number" name="glasgow_coma_scale" min="3" max="15" class="flex-1 min-w-0 block px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-white" placeholder="15">
                         <span class="inline-flex items-center px-3 bg-gray-50 text-ink-400 text-sm border-l border-gray-200">/ 15</span>
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-ink-700 mb-1">Pregnancy Status</label>
-                    <select name="pregnancy_status" class="w-full rounded-xl border-gray-200 shadow-sm focus:border-brand focus:ring-brand px-3 py-2 sm:text-sm bg-white">
+                    <label for="id_pregnancy_status" class="block text-sm font-medium text-ink-700 mb-1">Pregnancy Status</label>
+                    <select id="id_pregnancy_status" name="pregnancy_status" class="w-full rounded-xl border-gray-200 shadow-sm focus:border-brand focus:ring-brand px-3 py-2 sm:text-sm bg-white">
                         <option value="n/a">N/A</option>
                         <option value="pregnant">Pregnant</option>
                         <option value="not_pregnant">Not Pregnant</option>
