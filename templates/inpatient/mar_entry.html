@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}MAR Entry - {{ admission.patient.patient_number }}{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center gap-3 mb-6">
+        <a href="{% url 'inpatient:admission_detail' admission.pk %}" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors" aria-label="Back">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        </a>
+        <div>
+            <h1 class="text-2xl font-bold text-ink-900">Record Medication Administration</h1>
+            <p class="text-sm text-ink-500 mt-1">{{ admission.patient.full_name }} &middot; {{ admission.bed.ward.name|default:"-" }} / {{ admission.bed.label|default:"-" }}</p>
+        </div>
+    </div>
+
+    <form method="post" class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-6 space-y-4">
+        {% csrf_token %}
+        <div>
+            <label for="prescription" class="block text-sm font-semibold text-ink-900 mb-1">Prescription</label>
+            <select name="prescription" id="prescription" required class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
+                <option value="">- Select prescription -</option>
+                {% for rx in prescriptions %}
+                    <option value="{{ rx.pk }}">{{ rx.drug }} {{ rx.dose }} {{ rx.route }} {{ rx.frequency }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label for="dose" class="block text-sm font-semibold text-ink-900 mb-1">Dose Given</label>
+                <input type="text" name="dose" id="dose" required placeholder="e.g. 500mg" class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
+            </div>
+            <div>
+                <label for="route" class="block text-sm font-semibold text-ink-900 mb-1">Route</label>
+                <select name="route" id="route" required class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
+                    <option value="">- Select -</option>
+                    <option value="oral">Oral</option>
+                    <option value="iv">Intravenous</option>
+                    <option value="im">Intramuscular</option>
+                    <option value="sc">Subcutaneous</option>
+                    <option value="topical">Topical</option>
+                    <option value="rectal">Rectal</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+        </div>
+        <div>
+            <label for="site" class="block text-sm font-semibold text-ink-900 mb-1">Injection Site (if applicable)</label>
+            <input type="text" name="site" id="site" placeholder="e.g. Left deltoid" class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
+        </div>
+        <div>
+            <label for="notes" class="block text-sm font-semibold text-ink-900 mb-1">Notes</label>
+            <textarea name="notes" id="notes" rows="2" class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20 resize-y"></textarea>
+        </div>
+        <button type="submit" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold text-sm py-2.5 px-5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200">
+            Record Administration
+        </button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Care Plans - {{ admission.patient.patient_number }}{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+            <a href="{% url 'inpatient:admission_detail' admission.pk %}" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors" aria-label="Back">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            </a>
+            <h1 class="text-2xl font-bold text-ink-900">Nursing Care Plans</h1>
+        </div>
+        {% if admission.status == 'active' %}
+        <a href="{% url 'inpatient:care_plan_create' admission.pk %}" class="bg-green-600 hover:bg-green-700 text-white font-semibold text-sm py-2 px-4 rounded-lg shadow-sm transition-all">+ New Care Plan</a>
+        {% endif %}
+    </div>
+
+    <p class="text-sm text-ink-500 mb-4">{{ admission.patient.full_name }} &middot; {{ admission.get_status_display }}</p>
+
+    {% if plans %}
+        <div class="space-y-4">
+        {% for plan in plans %}
+            <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-6">
+                <div class="flex items-start justify-between mb-3">
+                    <div>
+                        <h3 class="text-sm font-bold text-ink-900">{{ plan.problem }}</h3>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium mt-1
+                            {% if plan.goal_status == 'ongoing' %}bg-blue-50 text-blue-700
+                            {% elif plan.goal_status == 'met' %}bg-green-50 text-green-700
+                            {% elif plan.goal_status == 'partial' %}bg-yellow-50 text-yellow-700
+                            {% else %}bg-red-50 text-red-700{% endif %}">
+                            {{ plan.get_goal_status_display }}
+                        </span>
+                    </div>
+                    <span class="text-xs text-ink-400">{{ plan.created_at|date:"d M Y H:i" }}</span>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <div><span class="font-semibold text-ink-700">Goal:</span> <span class="text-ink-600">{{ plan.goal }}</span></div>
+                    <div><span class="font-semibold text-ink-700">Interventions:</span> <span class="text-ink-600 whitespace-pre-wrap">{{ plan.interventions }}</span></div>
+                    {% if plan.evaluation %}
+                        <div class="pt-2 border-t border-gray-100 mt-2">
+                            <span class="font-semibold text-ink-700">Evaluation:</span> <span class="text-ink-600">{{ plan.evaluation }}</span>
+                            <p class="text-xs text-ink-400 mt-1">By {{ plan.evaluated_by.get_full_name|default:plan.evaluated_by }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+                {% if plan.goal_status == 'ongoing' and admission.status == 'active' %}
+                <div class="mt-4 pt-3 border-t border-gray-100">
+                    <form method="post" action="{% url 'inpatient:care_plan_evaluate' plan.pk %}" class="flex flex-col sm:flex-row gap-2">
+                        {% csrf_token %}
+                        <input type="text" name="evaluation" placeholder="Evaluation notes" required class="flex-1 rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
+                        <select name="goal_status" class="rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand">
+                            <option value="met">Met</option>
+                            <option value="partial">Partially Met</option>
+                            <option value="not_met">Not Met</option>
+                            <option value="ongoing">Still Ongoing</option>
+                        </select>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2 px-4 rounded-lg transition-all">Evaluate</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 text-center">
+            <p class="text-sm text-ink-500">No care plans recorded yet.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

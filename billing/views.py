@@ -76,3 +76,12 @@ def invoice_detail(request, invoice_id):
     else:
         form = PaymentForm()
     return render(request, "billing/invoice_detail.html", {"invoice": invoice, "balance": balance, "total_billed": total_billed, "form": form})
+
+
+@login_required
+def invoice_print(request, invoice_id):
+    """§8.1.14(c): Printable invoice/receipt. Minimal layout for browser print."""
+    invoice = get_object_or_404(Invoice.objects.prefetch_related("line_items__service_item", "payments", "patient"), pk=invoice_id)
+    balance = outstanding_balance(invoice)
+    total_billed = sum(item.amount_mwk for item in invoice.line_items.all())
+    return render(request, "billing/invoice_print.html", {"invoice": invoice, "balance": balance, "total_billed": total_billed})

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}New Care Plan - {{ admission.patient.patient_number }}{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center gap-3 mb-6">
+        <a href="{% url 'inpatient:care_plan_list' admission.pk %}" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors" aria-label="Back">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        </a>
+        <h1 class="text-2xl font-bold text-ink-900">New Nursing Care Plan</h1>
+    </div>
+    <p class="text-sm text-ink-500 mb-4">{{ admission.patient.full_name }}</p>
+
+    <form method="post" class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-6 space-y-4">
+        {% csrf_token %}
+        <div>
+            <label for="problem" class="block text-sm font-semibold text-ink-900 mb-1">Problem</label>
+            <input type="text" name="problem" id="problem" required placeholder="e.g. Risk of falls" class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
+        </div>
+        <div>
+            <label for="goal" class="block text-sm font-semibold text-ink-900 mb-1">Goal</label>
+            <textarea name="goal" id="goal" rows="2" required placeholder="Patient will remain free of falls during hospitalisation" class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20 resize-y"></textarea>
+        </div>
+        <div>
+            <label for="interventions" class="block text-sm font-semibold text-ink-900 mb-1">Interventions</label>
+            <textarea name="interventions" id="interventions" rows="3" required placeholder="1. Apply fall risk bracelet&#10;2. Bed at lowest height&#10;3. Call bell within reach&#10;4. Hourly rounding" class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20 resize-y"></textarea>
+        </div>
+        <button type="submit" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold text-sm py-2.5 px-5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200">
+            Create Care Plan
+        </button>
+    </form>
+</div>
+{% endblock %}

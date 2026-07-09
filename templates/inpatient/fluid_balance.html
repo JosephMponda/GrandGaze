@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Fluid Balance - {{ admission.patient.patient_number }}{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center gap-3 mb-6">
+        <a href="{% url 'inpatient:admission_detail' admission.pk %}" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors" aria-label="Back">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        </a>
+        <h1 class="text-2xl font-bold text-ink-900">Fluid Balance Chart</h1>
+    </div>
+    <p class="text-sm text-ink-500 mb-4">{{ admission.patient.full_name }} &middot; {{ admission.bed.ward.name|default:"-" }} / {{ admission.bed.label|default:"-" }}</p>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-3 gap-4 mb-6">
+        <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 text-center">
+            <p class="text-xs font-bold text-blue-600 uppercase tracking-wider">Intake</p>
+            <p class="text-2xl font-bold text-blue-900 mt-1">{{ summary.intake_ml }}<span class="text-sm font-normal ml-0.5">ml</span></p>
+        </div>
+        <div class="bg-amber-50 border border-amber-100 rounded-2xl p-4 text-center">
+            <p class="text-xs font-bold text-amber-600 uppercase tracking-wider">Output</p>
+            <p class="text-2xl font-bold text-amber-900 mt-1">{{ summary.output_ml }}<span class="text-sm font-normal ml-0.5">ml</span></p>
+        </div>
+        <div class="border border-gray-200 rounded-2xl p-4 text-center {% if summary.net_ml >= 0 %}bg-green-50{% else %}bg-red-50{% endif %}">
+            <p class="text-xs font-bold text-ink-600 uppercase tracking-wider">Net Balance</p>
+            <p class="text-2xl font-bold mt-1 {% if summary.net_ml >= 0 %}text-green-900{% else %}text-red-900{% endif %}">{{ summary.net_ml }}<span class="text-sm font-normal ml-0.5">ml</span></p>
+        </div>
+    </div>
+
+    <!-- Entry Form -->
+    <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-6 mb-6">
+        <h3 class="text-sm font-bold text-ink-900 mb-4">Record Fluid</h3>
+        <form method="post" class="flex flex-col sm:flex-row gap-3">
+            {% csrf_token %}
+            <select name="fluid_type" required class="flex-1 rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
+                <option value="">- Type -</option>
+                <optgroup label="Intake">
+                    <option value="oral">Oral intake</option>
+                    <option value="iv_fluid">IV fluid</option>
+                    <option value="blood">Blood products</option>
+                    <option value="other_input">Other input</option>
+                </optgroup>
+                <optgroup label="Output">
+                    <option value="urine">Urine</option>
+                    <option value="stool">Stool</option>
+                    <option value="vomit">Vomit/NG output</option>
+                    <option value="drain">Drain output</option>
+                    <option value="other_output">Other output</option>
+                </optgroup>
+            </select>
+            <div class="flex items-center gap-2">
+                <input type="number" name="volume_ml" required min="1" placeholder="ml" class="w-24 rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-semibold text-sm py-2 px-4 rounded-lg shadow-sm transition-all whitespace-nowrap">Record</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Entry List -->
+    {% if summary.entries %}
+        <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-2xl overflow-hidden bg-white shadow-sm">
+            <div class="px-4 sm:px-6 py-3 bg-gray-50 border-b border-gray-100">
+                <p class="text-xs font-bold text-ink-700 uppercase tracking-wider">Recent Entries</p>
+            </div>
+            {% for entry in summary.entries|slice:":20" %}
+                <div class="px-4 sm:px-6 py-3 flex items-center justify-between text-sm">
+                    <div class="flex items-center gap-3">
+                        <span class="w-2 h-2 rounded-full {% if entry.is_intake %}bg-blue-500{% else %}bg-amber-500{% endif %}"></span>
+                        <span class="text-ink-900 font-medium">{{ entry.get_fluid_type_display }}</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="font-semibold {% if entry.is_intake %}text-blue-700{% else %}text-amber-700{% endif %}">{% if entry.is_intake %}+{% else %}-{% endif %}{{ entry.volume_ml }}ml</span>
+                        <span class="text-xs text-ink-400 ml-2">{{ entry.recorded_at|date:"d M H:i" }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 text-center">
+            <p class="text-sm text-ink-500">No fluid balance entries recorded yet.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
