@@ -18,16 +18,16 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center gap-8">
-                    <div class="flex items-center gap-3">
-                        <div class="flex items-center gap-1.5">
-                            <span class="w-8 h-8 rounded-lg bg-white border border-gray-200 shadow-sm flex items-center justify-center overflow-hidden">
-                                <img src="{% static 'img/must-logo.png' %}" alt="MUST logo" class="h-7 w-7 object-contain">
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <div class="flex items-center gap-1 sm:gap-1.5">
+                            <span class="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-lg bg-white border border-gray-200 shadow-sm flex items-center justify-center overflow-hidden shrink-0" style="width: clamp(1.5rem, 3vw, 2.25rem); height: clamp(1.5rem, 3vw, 2.25rem);">
+                                <img src="{% static 'img/must-logo.png' %}" alt="MUST logo" class="h-full w-full object-contain p-0.5">
                             </span>
-                            <span class="w-8 h-8 rounded-lg bg-white border border-gray-200 shadow-sm flex items-center justify-center overflow-hidden">
-                                <img src="{% static 'img/gsl-logo.png' %}" alt="GSL logo" class="h-7 w-7 object-contain">
+                            <span class="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-lg bg-white border border-gray-200 shadow-sm flex items-center justify-center overflow-hidden shrink-0" style="width: clamp(1.5rem, 3vw, 2.25rem); height: clamp(1.5rem, 3vw, 2.25rem);">
+                                <img src="{% static 'img/logos/GSL-Official-Logo.png' %}" alt="GSL logo" class="h-full w-full object-contain p-0.5">
                             </span>
                         </div>
-                        <span class="text-md font-bold tracking-tight text-gray-900">MUST EMR</span>
+                        <span class="text-md sm:text-lg font-bold tracking-tight text-gray-900">MUST EMR</span>
                     </div>
                     {% if user.is_authenticated %}
                         <nav aria-label="Main navigation" class="hidden md:flex items-center gap-1">

@@ -8,7 +8,7 @@
  * - Static assets cached aggressively
  */
 
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const CACHE_NAME = `must-emr-${CACHE_VERSION}`;
 
 // Assets to cache on install (app shell + static dependencies)
@@ -21,7 +21,7 @@ const ASSETS_TO_CACHE = [
   '/static/js/idb.min.js',
   '/static/js/app.js',
   '/static/img/must-logo.png',
-  '/static/img/gsl-logo.png',
+  '/static/img/logos/GSL-Official-Logo.png',
 ];
 
 // ===== Install Event =====
