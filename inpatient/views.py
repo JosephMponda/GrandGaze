@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -70,9 +71,36 @@ def ward_dashboard(request, ward_id):
 @login_required
 def dashboard(request):
     wards = Ward.objects.all()
-    ward_data = [(w, services.ward_occupancy(w)) for w in wards]
+    ward_data = []
+    for ward in wards:
+        occupancy = services.ward_occupancy(ward)
+        total = occupancy["total_beds"] or 1
+        occupancy["occupancy_pct"] = round((occupancy["occupied_beds"] / total) * 100, 1)
+        ward_data.append((ward, occupancy))
     admissions = services.active_admissions()
-    return render(request, "inpatient/dashboard.html", {"ward_data": ward_data, "admissions": admissions})
+    total_beds = sum(ward.bed_count for ward in wards)
+    occupied_beds = sum(item[1]["occupied_beds"] for item in ward_data)
+    available_beds = max(total_beds - occupied_beds, 0)
+    ward_chart = {
+        "labels": [ward.name for ward, _ in ward_data],
+        "occupied": [data["occupied_beds"] for _, data in ward_data],
+        "capacity": [data["total_beds"] for _, data in ward_data],
+    }
+    return render(
+        request,
+        "inpatient/dashboard.html",
+        {
+            "ward_data": ward_data,
+            "admissions": admissions,
+            "ward_total": wards.count(),
+            "bed_total": total_beds,
+            "occupied_beds": occupied_beds,
+            "available_beds": available_beds,
+            "occupancy_rate": round((occupied_beds / total_beds) * 100, 1) if total_beds else 0,
+            "ward_chart": ward_chart,
+            "recent_admissions": admissions[:8],
+        },
+    )
 
 
 @login_required

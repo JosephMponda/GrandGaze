@@ -1,12 +1,14 @@
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Sum
+from django.db.models.functions import TruncDate
 from django.shortcuts import get_object_or_404, redirect, render
+from collections import OrderedDict
 
 from accounts.permissions import role_required
 from patients.models import Patient
 
 from .forms import InvoiceForm, LineItemFormSet, PaymentForm
-from .models import Invoice, ServiceCatalogItem
+from .models import Invoice, Payment, ServiceCatalogItem
 from .services import add_line_item, create_invoice, outstanding_balance, record_payment, unpaid_invoices_for
 
 
@@ -18,7 +20,44 @@ def dashboard(request):
         unpaid=Count("pk", filter=Q(status__in=["draft", "issued", "partially_paid"])),
         paid=Count("pk", filter=Q(status="paid")),
     )
-    return render(request, "billing/dashboard.html", {"recent": recent, "counts": counts})
+    invoice_daily = list(
+        Invoice.objects.annotate(day=TruncDate("created_at"))
+        .values("day")
+        .annotate(total=Count("pk"))
+        .order_by("-day")[:7]
+    )
+    payment_daily = list(
+        Payment.objects.annotate(day=TruncDate("received_at"))
+        .values("day")
+        .annotate(total=Sum("amount_mwk"))
+        .order_by("-day")[:7]
+    )
+    day_map = OrderedDict()
+    for row in reversed(invoice_daily):
+        if row["day"]:
+            day_map[row["day"]] = {"invoice_count": row["total"], "payment_total": 0}
+    for row in reversed(payment_daily):
+        if row["day"]:
+            day_map.setdefault(row["day"], {"invoice_count": 0, "payment_total": 0})
+            day_map[row["day"]]["payment_total"] = float(row["total"] or 0)
+    labels = [day.strftime("%d %b") for day in day_map.keys()]
+    outstanding = 0
+    for invoice in Invoice.objects.prefetch_related("line_items", "payments").filter(status__in=["draft", "issued", "partially_paid"]):
+        outstanding += outstanding_balance(invoice)
+    return render(
+        request,
+        "billing/dashboard.html",
+        {
+            "recent": recent,
+            "counts": counts,
+            "outstanding": outstanding,
+            "trend": {
+                "labels": labels,
+                "invoice_counts": [series["invoice_count"] for series in day_map.values()],
+                "payment_totals": [series["payment_total"] for series in day_map.values()],
+            },
+        },
+    )
 
 
 @login_required

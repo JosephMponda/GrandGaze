@@ -22,8 +22,14 @@ def recent_alerts(request):
     once Engineer E builds out the rest of `reporting`.
     """
     since = timezone.now() - timedelta(hours=4)
-    alerts = AlertEvent.objects.filter(raised_at__gte=since).select_related("patient")
-    return render(request, "reporting/recent_alerts.html", {"alerts": alerts})
+    alerts = AlertEvent.objects.filter(raised_at__gte=since).select_related("patient", "acknowledged_by")
+    context = {
+        "alerts": alerts,
+        "critical_count": alerts.filter(severity="critical").count(),
+        "warning_count": alerts.filter(severity="warning").count(),
+        "info_count": alerts.filter(severity="info").count(),
+    }
+    return render(request, "reporting/recent_alerts.html", context)
 
 
 @login_required
@@ -35,9 +41,28 @@ def acknowledge_alert(request, alert_id):
 
 @login_required
 def analytics_dashboard(request):
-    today = timezone.now().date()
+    now = timezone.now()
+    today = now.date()
 
     from patients.models import Patient
+
+    alert_window = AlertEvent.objects.filter(raised_at__gte=now - timedelta(hours=4))
+    severity_breakdown = alert_window.aggregate(
+        critical=Count("pk", filter=Q(severity="critical")),
+        warning=Count("pk", filter=Q(severity="warning")),
+        info=Count("pk", filter=Q(severity="info")),
+    )
+    module_breakdown = {
+        "labels": ["Patients", "Encounters", "Labs", "Imaging", "Prescriptions", "Alerts"],
+        "values": [
+            Patient.objects.filter(created_at__date=today).count(),
+            Encounter.objects.filter(signed_at__isnull=True).count(),
+            LabOrder.objects.filter(status__in=["ordered", "specimen_collected", "in_progress"]).count(),
+            ImagingRequest.objects.filter(status__in=["requested", "scheduled"]).count(),
+            Prescription.objects.filter(status="prescribed").count(),
+            AlertEvent.objects.filter(acknowledged_by__isnull=True).count(),
+        ],
+    }
 
     context = {
         "patients_today": Patient.objects.filter(created_at__date=today).count(),
@@ -48,7 +73,19 @@ def analytics_dashboard(request):
         "unacknowledged_alerts": AlertEvent.objects.filter(acknowledged_by__isnull=True).count(),
         "critical_alerts_4h": AlertEvent.objects.filter(
             severity="critical",
-            raised_at__gte=timezone.now() - timedelta(hours=4),
+            raised_at__gte=now - timedelta(hours=4),
         ).count(),
+        "warning_count": severity_breakdown["warning"] or 0,
+        "info_count": severity_breakdown["info"] or 0,
+        "severity_chart": {
+            "labels": ["Critical", "Warning", "Info"],
+            "values": [
+                severity_breakdown["critical"] or 0,
+                severity_breakdown["warning"] or 0,
+                severity_breakdown["info"] or 0,
+            ],
+        },
+        "module_chart": module_breakdown,
+        "recent_alerts": alert_window.select_related("patient").order_by("-raised_at")[:6],
     }
     return render(request, "reporting/analytics_dashboard.html", context)

@@ -1,81 +1,186 @@
 {% extends "base.html" %}
 {% block title %}Billing Dashboard - MUST EMR{% endblock %}
 {% block content %}
-<div class="max-w-5xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-    <!-- Responsive Header -->
-    <div class="border-b border-gray-200 pb-5 mb-8">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <!-- Left: Title -->
-            <div class="min-w-0 flex-1">
-                <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink truncate">Billing Dashboard</h1>
-                <p class="text-sm text-ink-500 mt-1">Recent invoices and payment activity</p>
+<div class="mx-auto max-w-7xl space-y-6">
+    <section class="rounded-[2rem] border border-slate-200/80 bg-white/90 p-6 shadow-sm backdrop-blur sm:p-8">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+                <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Revenue workspace</p>
+                <h1 class="mt-1 text-3xl font-black tracking-tight text-gray-900">Billing dashboard</h1>
+                <p class="mt-2 max-w-2xl text-sm leading-6 text-gray-600">Monitor invoice volume, payment flow, and outstanding balance from one screen.</p>
             </div>
-            
-            <!-- Right: Back button -->
-            <div class="flex-shrink-0">
-                <a href="{% url 'accounts:dashboard' %}" 
-                   class="btn-secondary text-sm font-semibold inline-flex items-center justify-center gap-1.5 py-2 px-4 w-full sm:w-auto">
-                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
-                    Back to Dashboard
-                </a>
+            <a href="{% url 'accounts:dashboard' %}" class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                Back to dashboard
+            </a>
+        </div>
+    </section>
+
+    <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <article class="rounded-3xl border border-gray-200/80 bg-white p-5 shadow-sm">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Total invoices</p>
+            <p class="mt-3 text-3xl font-black text-gray-900">{{ counts.total }}</p>
+        </article>
+        <article class="rounded-3xl border border-gray-200/80 bg-white p-5 shadow-sm">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Outstanding</p>
+            <p class="mt-3 text-3xl font-black text-amber-600">MWK {{ outstanding|floatformat:0 }}</p>
+        </article>
+        <article class="rounded-3xl border border-gray-200/80 bg-white p-5 shadow-sm">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Unpaid</p>
+            <p class="mt-3 text-3xl font-black text-gray-900">{{ counts.unpaid }}</p>
+        </article>
+        <article class="rounded-3xl border border-gray-200/80 bg-white p-5 shadow-sm">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Paid</p>
+            <p class="mt-3 text-3xl font-black text-green-600">{{ counts.paid }}</p>
+        </article>
+    </section>
+
+    <section class="grid gap-6 xl:grid-cols-[1.2fr,0.8fr]">
+        <div class="rounded-[2rem] border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Billing trend</p>
+                    <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900">Invoice and payment movement</h2>
+                </div>
+                <span class="rounded-full bg-brand-light px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-brand">Last 7 active days</span>
+            </div>
+            <div class="mt-6 h-[20rem]">
+                <canvas id="billingTrendChart"></canvas>
             </div>
         </div>
-    </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-        <!-- Total Invoices -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-6 text-center">
-            <p class="text-2xl sm:text-3xl font-bold text-ink">{{ counts.total }}</p>
-            <p class="text-xs sm:text-sm text-ink-500 mt-1">Total Invoices</p>
+        <div class="rounded-[2rem] border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Status mix</p>
+                    <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900">Payment state</h2>
+                </div>
+            </div>
+            <div class="mt-6 space-y-3">
+                <div class="rounded-2xl border border-green-100 bg-green-50 px-4 py-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-green-700">Paid</p>
+                    <p class="mt-1 text-2xl font-black text-green-700">{{ counts.paid }}</p>
+                </div>
+                <div class="rounded-2xl border border-amber-100 bg-amber-50 px-4 py-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-amber-700">Unpaid</p>
+                    <p class="mt-1 text-2xl font-black text-amber-700">{{ counts.unpaid }}</p>
+                </div>
+                <div class="rounded-2xl border border-gray-200 bg-slate-50 px-4 py-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-gray-600">Invoices</p>
+                    <p class="mt-1 text-2xl font-black text-gray-900">{{ counts.total }}</p>
+                </div>
+            </div>
         </div>
-        
-        <!-- Unpaid -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-6 text-center">
-            <p class="text-2xl sm:text-3xl font-bold text-amber-600">{{ counts.unpaid }}</p>
-            <p class="text-xs sm:text-sm text-ink-500 mt-1">Unpaid</p>
-        </div>
-        
-        <!-- Paid -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-6 text-center">
-            <p class="text-2xl sm:text-3xl font-bold text-green-600">{{ counts.paid }}</p>
-            <p class="text-xs sm:text-sm text-ink-500 mt-1">Paid</p>
-        </div>
-    </div>
+    </section>
 
-    <!-- Recent Invoices -->
-    {% if recent %}
-        <div class="mt-6 sm:mt-8 bg-white border border-gray-200/60 rounded-2xl shadow-sm overflow-hidden">
-            <div class="divide-y divide-gray-100">
-                {% for inv in recent %}
-                    <a href="{% url 'billing:invoice_detail' inv.pk %}" 
-                       class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 hover:bg-paper transition-colors">
-                        <!-- Patient Info -->
-                        <div class="min-w-0 flex-1">
-                            <p class="text-sm font-semibold text-ink truncate">{{ inv.patient.full_name }}</p>
-                            <p class="text-xs text-ink-400 truncate">Invoice #{{ inv.pk }} · {{ inv.created_at|date:"M j, Y" }}</p>
-                        </div>
-                        
-                        <!-- Status Badge -->
-                        <div class="flex-shrink-0 self-start sm:self-center">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap
-                                {% if inv.status == 'paid' %}bg-green-100 text-green-800
-                                {% elif inv.status == 'partially_paid' %}bg-amber-100 text-amber-800
-                                {% elif inv.status == 'waived' %}bg-gray-100 text-gray-800
-                                {% else %}bg-blue-100 text-blue-800{% endif %}">
+    <section class="rounded-[2rem] border border-gray-200/80 bg-white shadow-sm">
+        <div class="flex items-center justify-between gap-3 px-6 pt-6 sm:px-8">
+            <div>
+                <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Recent invoices</p>
+                <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900">Latest activity</h2>
+            </div>
+            <a href="{% url 'patients:register' %}" class="text-sm font-semibold text-brand hover:text-brand-hover">Register patient</a>
+        </div>
+        {% if recent %}
+        <div class="mt-5 overflow-hidden rounded-b-[2rem] border-t border-gray-100">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Invoice</th>
+                        <th>Patient</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inv in recent %}
+                    <tr>
+                        <td><a class="font-semibold text-brand hover:text-brand-hover" href="{% url 'billing:invoice_detail' inv.pk %}">#{{ inv.pk }}</a></td>
+                        <td>{{ inv.patient.full_name }}</td>
+                        <td>
+                            <span class="badge
+                                {% if inv.status == 'paid' %}badge-success
+                                {% elif inv.status == 'partially_paid' %}badge-warning
+                                {% elif inv.status == 'waived' %}badge-info
+                                {% else %}badge-info{% endif %}">
                                 {{ inv.get_status_display }}
                             </span>
-                        </div>
-                    </a>
-                {% endfor %}
-            </div>
+                        </td>
+                        <td>{{ inv.created_at|date:"d M Y, H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-    {% else %}
-        <div class="mt-6 sm:mt-8 bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 text-center">
-            <p class="text-sm text-ink-500">No invoices yet.</p>
+        {% else %}
+        <div class="p-8">
+            {% include "components/_empty_state.html" with icon="document" title="No invoices yet" message="Invoice activity will appear here once the billing workflow starts issuing bills." %}
         </div>
-    {% endif %}
+        {% endif %}
+    </section>
 </div>
+
+{{ trend|json_script:"billing-trend-data" }}
+<script>
+    (function () {
+        function initBillingTrend() {
+            if (!window.Chart) return;
+            const node = document.getElementById('billing-trend-data');
+            const canvas = document.getElementById('billingTrendChart');
+            if (!node || !canvas || canvas.dataset.chartReady === 'true') return;
+            const trend = JSON.parse(node.textContent);
+            canvas.dataset.chartReady = 'true';
+            new Chart(canvas, {
+                data: {
+                    labels: trend.labels,
+                    datasets: [
+                        {
+                            type: 'bar',
+                            label: 'Invoices',
+                            data: trend.invoice_counts,
+                            backgroundColor: '#009fe3',
+                            borderRadius: 14,
+                            maxBarThickness: 36,
+                        },
+                        {
+                            type: 'line',
+                            label: 'Payments',
+                            data: trend.payment_totals,
+                            borderColor: '#16a34a',
+                            backgroundColor: 'rgba(22, 163, 74, 0.12)',
+                            tension: 0.35,
+                            fill: true,
+                            pointRadius: 3,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#475569' } },
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#64748b' },
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(148, 163, 184, 0.18)' },
+                            ticks: { color: '#64748b' },
+                        },
+                    },
+                },
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initBillingTrend, { once: true });
+        } else {
+            initBillingTrend();
+        }
+        document.body.addEventListener('htmx:load', initBillingTrend);
+    })();
+</script>
 {% endblock %}

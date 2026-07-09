@@ -1,8 +1,8 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect, render
 from django.urls import reverse
-
 from . import services
 from .forms import PatientRegistrationForm
 
@@ -63,6 +63,41 @@ def edit_patient(request, pk):
 @login_required
 def patient_profile(request, pk):
     patient = services.get_patient_or_404(pk)
+    vitals = list(patient.vital_sign_sets.select_related("ews").order_by("-recorded_at")[:6])
+    vitals.reverse()
+    vitals_chart = {
+        "labels": [v.recorded_at.strftime("%d %b %H:%M") for v in vitals],
+        "temperature": [float(v.temperature_c) if v.temperature_c is not None else None for v in vitals],
+        "pulse": [v.pulse_rate for v in vitals],
+        "systolic": [v.blood_pressure_systolic for v in vitals],
+        "diastolic": [v.blood_pressure_diastolic for v in vitals],
+    }
+    recent_labs = []
+    for lab in patient.lab_orders.select_related("test").order_by("-created_at")[:5]:
+        try:
+            result = lab.result
+        except ObjectDoesNotExist:
+            result = None
+        recent_labs.append(
+            {
+                "name": lab.test.name,
+                "status": lab.get_status_display(),
+                "value": result.display_value if result else "Awaiting result",
+                "is_abnormal": getattr(result, "is_abnormal", False),
+                "is_critical": getattr(result, "is_critical", False),
+            }
+        )
+    recent_imaging = patient.imaging_requests.select_related("modality").order_by("-created_at")[:5]
+    recent_alerts = patient.alerts.select_related("acknowledged_by").order_by("-raised_at")[:5]
+    latest_vitals = patient.vital_sign_sets.select_related("ews").first()
+    latest_vitals_summary = None
+    if latest_vitals:
+        latest_vitals_summary = {
+            "temperature_c": latest_vitals.temperature_c,
+            "bp": f"{latest_vitals.blood_pressure_systolic or '-'} / {latest_vitals.blood_pressure_diastolic or '-'}",
+            "pulse": latest_vitals.pulse_rate,
+            "ews_score": getattr(getattr(latest_vitals, "ews", None), "score", None),
+        }
     tabs = [
         {"id": "encounters", "label": "Visits & Encounters", "badge": patient.encounters.count()},
         {"id": "vitals", "label": "Vitals", "badge": patient.vital_sign_sets.count()},
@@ -75,4 +110,18 @@ def patient_profile(request, pk):
         {"id": "inpatient", "label": "Admissions", "badge": patient.admissions.count()},
         {"id": "referrals", "label": "Referrals", "badge": patient.referrals.count()},
     ]
-    return render(request, "patients/profile.html", {"patient": patient, "tabs": tabs})
+    return render(
+        request,
+        "patients/profile.html",
+        {
+            "patient": patient,
+            "tabs": tabs,
+            "vitals_chart": vitals_chart,
+            "recent_labs": recent_labs,
+            "recent_imaging": recent_imaging,
+            "recent_alerts": recent_alerts,
+            "latest_vitals": latest_vitals_summary,
+            "open_alerts": patient.alerts.filter(acknowledged_by__isnull=True).count(),
+            "critical_alerts": patient.alerts.filter(severity="critical").count(),
+        },
+    )

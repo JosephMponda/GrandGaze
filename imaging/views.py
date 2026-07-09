@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
@@ -66,4 +67,27 @@ def report_detail(request, pk):
 @role_required("Radiographer", "Clinician", "Admin")
 def worklist(request):
     requests = ImagingRequest.objects.exclude(status="reported").select_related("patient", "modality")[:50]
-    return render(request, "imaging/worklist.html", {"requests": requests})
+    status_counts = {}
+    modality_counts = {}
+    for req in requests:
+        status_counts[req.status] = status_counts.get(req.status, 0) + 1
+        modality_counts[req.modality.name] = modality_counts.get(req.modality.name, 0) + 1
+    status_labels = dict(ImagingRequest._meta.get_field("status").choices)
+    worklist_chart = {
+        "labels": [status_labels.get(status, status) for status in status_counts.keys()],
+        "values": list(status_counts.values()),
+    }
+    modality_chart = {
+        "labels": list(modality_counts.keys()),
+        "values": list(modality_counts.values()),
+    }
+    return render(
+        request,
+        "imaging/worklist.html",
+        {
+            "requests": requests,
+            "request_count": len(requests),
+            "worklist_chart": worklist_chart,
+            "modality_chart": modality_chart,
+        },
+    )

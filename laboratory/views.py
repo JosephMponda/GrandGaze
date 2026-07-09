@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
@@ -87,4 +88,23 @@ def patient_tab(request, patient_id):
 
 @role_required("LabTech", "Clinician", "Admin")
 def workload(request):
-    return render(request, "laboratory/workload.html", {"summary": services.workload_summary()})
+    summary = services.workload_summary()
+    status_counts = {
+        row["status"]: row["total"]
+        for row in LabOrder.objects.exclude(status__in=["cancelled"]).values("status").annotate(total=Count("id"))
+    }
+    status_labels = dict(LabOrder._meta.get_field("status").choices)
+    workload_chart = {
+        "labels": [status_labels.get(status, status) for status in status_counts.keys()],
+        "values": list(status_counts.values()),
+    }
+    critical_pending = LabOrder.objects.filter(test__is_critical_if_outside_range=True).exclude(status__in=["verified", "cancelled"]).count()
+    return render(
+        request,
+        "laboratory/workload.html",
+        {
+            "summary": summary,
+            "workload_chart": workload_chart,
+            "critical_pending": critical_pending,
+        },
+    )

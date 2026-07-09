@@ -58,9 +58,29 @@ def queue(request):
     prescriptions = Prescription.objects.exclude(status__in=[PrescriptionStatus.DISPENSED, PrescriptionStatus.CANCELLED]).select_related("patient", "drug")[:50]
     drug_ids = [p.drug_id for p in prescriptions]
     stock_map = {s.drug_id: s for s in StockLevel.objects.filter(drug_id__in=drug_ids)}
+    status_counts = {}
+    low_stock = 0
     for p in prescriptions:
         p.stock = stock_map.get(p.drug_id)
-    return render(request, "pharmacy/queue.html", {"prescriptions": prescriptions})
+        status_counts[p.status] = status_counts.get(p.status, 0) + 1
+        if p.stock and p.stock.is_low:
+            low_stock += 1
+    status_labels = dict(PrescriptionStatus.choices)
+    queue_chart = {
+        "labels": [status_labels.get(status, status) for status in status_counts.keys()],
+        "values": list(status_counts.values()),
+    }
+    return render(
+        request,
+        "pharmacy/queue.html",
+        {
+            "prescriptions": prescriptions,
+            "prescription_count": len(prescriptions),
+            "low_stock": low_stock,
+            "status_counts": status_counts,
+            "queue_chart": queue_chart,
+        },
+    )
 
 
 @login_required

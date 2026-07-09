@@ -40,7 +40,24 @@ def rapid_register(request):
 @login_required
 def queue(request):
     triages = services.triage_queue()
-    return render(request, "emergency/queue.html", {"triages": triages})
+    category_counts = {}
+    for triage in triages:
+        category_counts[triage.triage_category] = category_counts.get(triage.triage_category, 0) + 1
+    category_labels = dict(TriageEncounter._meta.get_field("triage_category").choices)
+    triage_chart = {
+        "labels": [category_labels.get(category, category) for category in category_counts.keys()],
+        "values": list(category_counts.values()),
+    }
+    return render(
+        request,
+        "emergency/queue.html",
+        {
+            "triages": triages,
+            "waiting_count": len(triages),
+            "urgent_count": category_counts.get("immediate", 0) + category_counts.get("emergency", 0),
+            "triage_chart": triage_chart,
+        },
+    )
 
 
 @login_required

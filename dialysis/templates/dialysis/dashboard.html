@@ -1,43 +1,96 @@
 {% extends "base.html" %}
 {% block title %}Dialysis Dashboard{% endblock %}
 {% block content %}
-<div class="max-w-4xl mx-auto py-6">
-    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
-        <div>
-            <h1 class="text-3xl font-bold tracking-tight text-ink-900">Dialysis</h1>
-            <p class="text-sm text-ink-500 mt-2">Today's sessions</p>
-        </div>
-        <a href="{% url 'accounts:dashboard' %}" class="btn-secondary text-sm font-semibold inline-flex items-center gap-1.5">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-            Back to Dashboard
-        </a>
-    </div>
-
-    {% if counts %}
-        <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-2xl overflow-hidden bg-white shadow-sm">
-            {% for item in counts %}
-                <div class="px-6 py-4 flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-semibold">{{ item.prescription.patient.full_name }}</p>
-                        <p class="text-xs text-ink-500">{{ item.prescription.frequency_per_week }}x/week &middot; {{ item.prescription.get_vascular_access_display }}</p>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        {% if item.sessions_today > 0 %}
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                Done ({{ item.sessions_today }})
-                            </span>
-                        {% else %}
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>
-                            <a href="{% url 'dialysis:record_session' item.prescription.pk %}" class="btn-primary text-xs font-semibold py-1.5 px-3">Record</a>
-                        {% endif %}
-                    </div>
+<div class="space-y-6">
+    <section class="overflow-hidden rounded-[2rem] bg-gradient-to-br from-slate-950 via-slate-900 to-sky-800 text-white shadow-2xl shadow-slate-950/20">
+        <div class="grid gap-6 px-6 py-8 lg:grid-cols-[1.5fr_1fr] lg:px-8 lg:py-10">
+            <div class="space-y-4">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.28em] text-sky-200/80">Dialysis command center</p>
+                <h1 class="text-3xl font-black tracking-tight sm:text-4xl">Session readiness and access mix</h1>
+                <p class="max-w-2xl text-sm leading-6 text-slate-300">Track active prescriptions, completed sessions for today, and vascular access distribution.</p>
+                <a href="{% url 'accounts:dashboard' %}" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10">Back to dashboard</a>
+            </div>
+            <div class="grid gap-3 sm:grid-cols-2">
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Active prescriptions</p>
+                    <p class="mt-3 text-3xl font-black">{{ active_count }}</p>
                 </div>
-            {% endfor %}
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Completed today</p>
+                    <p class="mt-3 text-3xl font-black">{{ completed_today }}</p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Pending today</p>
+                    <p class="mt-3 text-3xl font-black">{{ pending_today }}</p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Completion rate</p>
+                    <p class="mt-3 text-3xl font-black">{{ completion_rate }}%</p>
+                </div>
+            </div>
         </div>
-    {% else %}
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 text-center">
-            <p class="text-sm text-ink-500">No active dialysis prescriptions.</p>
+    </section>
+
+    <section class="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+        <div class="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center justify-between gap-4">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Access mix</p>
+                    <h2 class="mt-1 text-xl font-black text-slate-900">Vascular access distribution</h2>
+                </div>
+            </div>
+            <div class="mt-5 h-80">
+                <canvas id="accessChart"></canvas>
+            </div>
         </div>
-    {% endif %}
+        <div class="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Today&apos;s queue</p>
+            <div class="mt-4 space-y-3">
+                {% for item in counts %}
+                    <div class="rounded-2xl border border-slate-200 px-4 py-3">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <p class="text-sm font-semibold text-slate-900">{{ item.patient.full_name }}</p>
+                                <p class="text-xs text-slate-500">{{ item.frequency_per_week }}x/week · {{ item.get_vascular_access_display }}</p>
+                            </div>
+                            {% if item.sessions_today %}
+                                <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">Done ({{ item.sessions_today }})</span>
+                            {% else %}
+                                <a href="{% url 'dialysis:record_session' item.pk %}" class="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">Record session</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="rounded-2xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">No active dialysis prescriptions.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
 </div>
+
+{{ access_chart|json_script:"access-chart-data" }}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const dataEl = document.getElementById("access-chart-data");
+    const canvas = document.getElementById("accessChart");
+    if (!dataEl || !canvas || typeof Chart === "undefined") return;
+    const accessChartData = JSON.parse(dataEl.textContent);
+    new Chart(canvas, {
+        type: "doughnut",
+        data: {
+            labels: accessChartData.labels,
+            datasets: [{
+                data: accessChartData.values,
+                backgroundColor: ["#0f766e", "#0284c7", "#7c3aed", "#f59e0b", "#ef4444"],
+                borderWidth: 0,
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: "bottom" } },
+        },
+    });
+});
+</script>
 {% endblock %}
