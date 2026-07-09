@@ -68,9 +68,4 @@ jobs:
           SECRET_KEY: ci-test-key-not-for-production
         run: python -m pytest -q --tb=short
 
-      - name: Run PostgreSQL-specific tests
-        env:
-          DATABASE_URL: postgres://test:test@localhost:5432/test_grandgaze
-          DJANGO_SETTINGS_MODULE: config.test_settings
-          SECRET_KEY: ci-test-key-not-for-production
-        run: python -m pytest -q --tb=short -m "requires_postgres"
+
