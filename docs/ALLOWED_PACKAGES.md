@@ -17,6 +17,9 @@ Per AGENTS.md §5: no new dependency without an entry here first, with a one-lin
 | python-decouple | Env-based settings, no secrets in code. |
 | pip-audit | CI dependency vulnerability scan. |
 | pytest, pytest-django, factory-boy | Test suite. |
+| django-otp (>=1.7) | TOTP-based multi-factor authentication for admin/ICT roles (§9.4). |
+| qrcode (>=8.0) | Generate TOTP provisioning QR codes for authenticator app setup. |
+| Pillow | Image library required by qrcode for PNG output. |
 
 ## Removed from the original AGENTS.md allowlist
 

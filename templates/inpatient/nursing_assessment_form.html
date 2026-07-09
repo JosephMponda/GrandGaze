@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}New Nursing Assessment - {{ admission.patient.patient_number }}{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center gap-3 mb-6">
+        <a href="{% url 'inpatient:nursing_assessment_list' admission.pk %}" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors" aria-label="Back">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        </a>
+        <h1 class="text-2xl font-bold text-ink-900">New Nursing Assessment</h1>
+    </div>
+    <p class="text-sm text-ink-500 mb-4">{{ admission.patient.full_name }}</p>
+
+    <form method="post" class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-6 space-y-4" x-data="assessmentForm()">
+        {% csrf_token %}
+        <div>
+            <label for="assessment_note" class="block text-sm font-semibold text-ink-900 mb-1">Assessment Note</label>
+            <textarea name="assessment_note" id="assessment_note" rows="4" required placeholder="General condition, skin integrity, mobility, pain, nutritional status, psychosocial..." class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20 resize-y"></textarea>
+        </div>
+
+        <div>
+            <div class="flex items-center justify-between mb-2">
+                <label class="text-sm font-semibold text-ink-900">Problems Identified</label>
+                <button type="button" @click="addProblem()" class="text-xs text-green-600 hover:text-green-700 font-semibold">+ Add Problem</button>
+            </div>
+            <template x-for="(p, i) in problems" :key="i">
+                <div class="flex gap-2 mb-2">
+                    <input type="text" :name="'problem_name[]'" x-model="p.name" placeholder="Problem description" class="flex-1 rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
+                    <select :name="'problem_status[]'" x-model="p.status" class="w-32 rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand">
+                        <option value="active">Active</option>
+                        <option value="improving">Improving</option>
+                        <option value="resolved">Resolved</option>
+                    </select>
+                    <button type="button" @click="problems.splice(i, 1)" class="text-red-500 hover:text-red-700 text-sm px-2">&times;</button>
+                </div>
+            </template>
+        </div>
+
+        <button type="submit" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold text-sm py-2.5 px-5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200">
+            Save Assessment
+        </button>
+    </form>
+</div>
+<script>
+function assessmentForm() {
+    return {
+        problems: [{ name: '', status: 'active' }],
+        addProblem() { this.problems.push({ name: '', status: 'active' }); }
+    };
+}
+</script>
+{% endblock %}

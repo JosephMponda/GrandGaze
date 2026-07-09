@@ -20,6 +20,7 @@
             {% else %}bg-blue-100 text-blue-800{% endif %}">
             {{ invoice.get_status_display }}
         </span>
+        <a href="{% url 'billing:invoice_print' invoice.pk %}" target="_blank" class="text-sm text-brand hover:text-brand-dark font-semibold underline ml-4">Print Invoice</a>
     </div>
 
     <div class="mt-6 bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">

@@ -1,118 +1,261 @@
 {% extends "base.html" %}
 {% block title %}Analytics Dashboard - MUST EMR{% endblock %}
 {% block content %}
-<div class="max-w-5xl mx-auto py-6">
-    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-5">
-        <div>
-            <h1 class="text-3xl font-bold tracking-tight text-ink">Analytics Dashboard</h1>
-            <p class="text-sm text-ink-500 mt-1">Real-time counts across all modules</p>
-        </div>
-        <a href="{% url 'accounts:dashboard' %}" class="btn-secondary text-sm font-semibold inline-flex items-center gap-1.5">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-            Back to Dashboard
-        </a>
-    </div>
-
-    <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Patients registered today -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
-                </div>
-                <div>
-                    <p class="text-sm text-ink-500 font-medium">Patients Today</p>
-                    <p class="text-2xl font-bold text-ink">{{ patients_today }}</p>
-                </div>
+<div class="mx-auto max-w-7xl space-y-6">
+    <section class="rounded-[2rem] border border-slate-200/80 bg-white/90 p-6 shadow-sm backdrop-blur sm:p-8">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+                <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">System analytics</p>
+                <h1 class="mt-1 text-3xl font-black tracking-tight text-gray-900">Operations overview</h1>
+                <p class="mt-2 max-w-2xl text-sm leading-6 text-gray-600">
+                    Cross-module visibility for patient flow, backlog, and safety alerts in one screen.
+                </p>
             </div>
+            <a href="{% url 'accounts:dashboard' %}" class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                Back to dashboard
+            </a>
         </div>
+    </section>
 
-        <!-- Open encounters -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-green-50 text-green-600 flex items-center justify-center">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                </div>
-                <div>
-                    <p class="text-sm text-ink-500 font-medium">Open Encounters</p>
-                    <p class="text-2xl font-bold text-ink">{{ open_encounters }}</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pending lab orders -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                </div>
-                <div>
-                    <p class="text-sm text-ink-500 font-medium">Pending Lab Orders</p>
-                    <p class="text-2xl font-bold text-ink">{{ pending_labs }}</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pending imaging requests -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                </div>
-                <div>
-                    <p class="text-sm text-ink-500 font-medium">Pending Imaging</p>
-                    <p class="text-2xl font-bold text-ink">{{ pending_imaging }}</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pending prescriptions -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                </div>
-                <div>
-                    <p class="text-sm text-ink-500 font-medium">Pending Prescriptions</p>
-                    <p class="text-2xl font-bold text-ink">{{ pending_prescriptions }}</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Unacknowledged alerts -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg {% if unacknowledged_alerts > 0 %}bg-red-50 text-red-600{% else %}bg-gray-50 text-gray-400{% endif %}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                </div>
-                <div>
-                    <p class="text-sm text-ink-500 font-medium">Unacknowledged Alerts</p>
-                    <p class="text-2xl font-bold {% if unacknowledged_alerts > 0 %}text-red-600{% else %}text-ink{% endif %}">{{ unacknowledged_alerts }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+        <article class="rounded-3xl border border-gray-200/80 bg-white p-5 shadow-sm xl:col-span-1">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Patients today</p>
+            <p class="mt-3 text-3xl font-black text-gray-900">{{ patients_today }}</p>
+            <p class="mt-1 text-xs text-gray-500">Master Patient Index activity</p>
+        </article>
+        <article class="rounded-3xl border border-gray-200/80 bg-white p-5 shadow-sm xl:col-span-1">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Open encounters</p>
+            <p class="mt-3 text-3xl font-black text-gray-900">{{ open_encounters }}</p>
+            <p class="mt-1 text-xs text-gray-500">Unsigned or active notes</p>
+        </article>
+        <article class="rounded-3xl border border-gray-200/80 bg-white p-5 shadow-sm xl:col-span-1">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Pending labs</p>
+            <p class="mt-3 text-3xl font-black text-gray-900">{{ pending_labs }}</p>
+            <p class="mt-1 text-xs text-gray-500">Ordered and in progress</p>
+        </article>
+        <article class="rounded-3xl border border-gray-200/80 bg-white p-5 shadow-sm xl:col-span-1">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Pending imaging</p>
+            <p class="mt-3 text-3xl font-black text-gray-900">{{ pending_imaging }}</p>
+            <p class="mt-1 text-xs text-gray-500">Requested and scheduled</p>
+        </article>
+        <article class="rounded-3xl border border-gray-200/80 bg-white p-5 shadow-sm xl:col-span-1">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Pending prescriptions</p>
+            <p class="mt-3 text-3xl font-black text-gray-900">{{ pending_prescriptions }}</p>
+            <p class="mt-1 text-xs text-gray-500">Awaiting dispensing</p>
+        </article>
+        <article class="rounded-3xl border border-gray-200/80 bg-white p-5 shadow-sm xl:col-span-1">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Unacknowledged alerts</p>
+            <p class="mt-3 text-3xl font-black {% if unacknowledged_alerts > 0 %}text-red-600{% else %}text-gray-900{% endif %}">{{ unacknowledged_alerts }}</p>
+            <p class="mt-1 text-xs text-gray-500">Requires clinical review</p>
+        </article>
+    </section>
 
     {% if critical_alerts_4h > 0 %}
-    <div class="mt-6 bg-red-50 border border-red-200 rounded-2xl p-6">
-        <div class="flex items-center gap-3">
-            <svg class="w-6 h-6 text-red-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <section class="rounded-[2rem] border border-red-200 bg-red-50 px-5 py-4 shadow-sm">
+        <div class="flex items-start gap-3">
+            <svg class="mt-0.5 h-6 w-6 shrink-0 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
             <div>
-                <p class="font-bold text-red-800">{{ critical_alerts_4h }} critical alert{{ critical_alerts_4h|pluralize }} in the last 4 hours</p>
-                <p class="text-sm text-red-600"><a href="{% url 'reporting:recent_alerts' %}" class="underline">View all recent alerts</a></p>
+                <p class="font-semibold text-red-800">{{ critical_alerts_4h }} critical alert{{ critical_alerts_4h|pluralize }} in the last 4 hours</p>
+                <p class="mt-1 text-sm text-red-700">These events need immediate clinical attention.</p>
             </div>
         </div>
-    </div>
+    </section>
     {% endif %}
 
-    {% if not patients_today and not open_encounters and not pending_labs and not pending_imaging and not pending_prescriptions and not unacknowledged_alerts %}
-    <div class="mt-12 bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 text-center">
-        <svg class="mx-auto h-12 w-12 text-ink-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-        </svg>
-        <h3 class="mt-3 text-sm font-semibold text-ink-900">No data yet</h3>
-        <p class="mt-1 text-sm text-ink-500">Register a patient and start using the system to see analytics here.</p>
-    </div>
-    {% endif %}
+    <section class="grid gap-6 xl:grid-cols-[1.25fr,0.75fr]">
+        <div class="rounded-[2rem] border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Module backlog</p>
+                    <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900">Live workload mix</h2>
+                </div>
+                <span class="rounded-full bg-brand-light px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-brand">Current state</span>
+            </div>
+            <div class="mt-6 h-[20rem]">
+                <canvas id="moduleChart"></canvas>
+            </div>
+        </div>
+
+        <div class="rounded-[2rem] border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Safety signal</p>
+                    <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900">Alert severity</h2>
+                </div>
+                <a href="{% url 'reporting:recent_alerts' %}" class="text-sm font-semibold text-brand hover:text-brand-hover">Recent feed</a>
+            </div>
+            <div class="mt-6 grid gap-5 sm:grid-cols-[1fr,0.95fr] sm:items-center">
+                <div class="mx-auto max-w-[16rem]">
+                    <canvas id="severityChart" height="240"></canvas>
+                </div>
+                <div class="space-y-3">
+                    <div class="rounded-2xl border border-red-100 bg-red-50 px-4 py-3">
+                        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-red-700">Critical</p>
+                        <p class="mt-1 text-2xl font-black text-red-700">{{ critical_alerts_4h }}</p>
+                    </div>
+                    <div class="rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3">
+                        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-amber-700">Warning</p>
+                        <p class="mt-1 text-2xl font-black text-amber-700">{{ warning_count|default:0 }}</p>
+                    </div>
+                    <div class="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3">
+                        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-blue-700">Info</p>
+                        <p class="mt-1 text-2xl font-black text-blue-700">{{ info_count|default:0 }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid gap-6 lg:grid-cols-[1fr,0.85fr]">
+        <div class="rounded-[2rem] border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+            <div class="flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Recent alerts</p>
+                    <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900">Latest safety events</h2>
+                </div>
+                <a href="{% url 'reporting:recent_alerts' %}" class="text-sm font-semibold text-brand hover:text-brand-hover">View full feed</a>
+            </div>
+            <div class="mt-5 divide-y divide-gray-100 overflow-hidden rounded-2xl border border-gray-200/80">
+                {% for alert in recent_alerts %}
+                <article class="flex gap-4 px-4 py-4 hover:bg-slate-50/70">
+                    <div class="mt-1 flex-shrink-0">
+                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl
+                            {% if alert.severity == 'critical' %}bg-red-100 text-red-700
+                            {% elif alert.severity == 'warning' %}bg-amber-100 text-amber-700
+                            {% else %}bg-blue-100 text-blue-700{% endif %}">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <a href="{% url 'patients:profile' alert.patient.pk %}" class="text-sm font-semibold text-gray-900 hover:text-brand">{{ alert.patient.full_name }}</a>
+                            <span class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.22em]
+                                {% if alert.severity == 'critical' %}bg-red-50 text-red-700
+                                {% elif alert.severity == 'warning' %}bg-amber-50 text-amber-700
+                                {% else %}bg-blue-50 text-blue-700{% endif %}">
+                                {{ alert.get_severity_display }}
+                            </span>
+                        </div>
+                        <p class="mt-1 text-sm leading-6 text-gray-600">{{ alert.message }}</p>
+                        <p class="mt-2 text-xs font-medium uppercase tracking-[0.18em] text-gray-400">{{ alert.source }} &middot; {{ alert.raised_at|date:"M j, Y g:i a" }}</p>
+                    </div>
+                </article>
+                {% empty %}
+                <div class="px-4 py-10">
+                    {% include "components/_empty_state.html" with icon="document" title="No recent alerts" message="There are no alert events in the last four hours." %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="rounded-[2rem] border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+            <div class="flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Recent activity</p>
+                    <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900">What to watch next</h2>
+                </div>
+            </div>
+
+            <div class="mt-5 space-y-4">
+                <div class="rounded-2xl border border-gray-200 bg-slate-50/70 px-4 py-4">
+                    <p class="text-sm font-semibold text-gray-900">Patients registered today</p>
+                    <p class="mt-1 text-2xl font-black text-gray-900">{{ patients_today }}</p>
+                </div>
+                <div class="rounded-2xl border border-gray-200 bg-slate-50/70 px-4 py-4">
+                    <p class="text-sm font-semibold text-gray-900">Pending diagnostics</p>
+                    <p class="mt-1 text-2xl font-black text-gray-900">{{ pending_labs|add:pending_imaging }}</p>
+                </div>
+                <div class="rounded-2xl border border-gray-200 bg-slate-50/70 px-4 py-4">
+                    <p class="text-sm font-semibold text-gray-900">Pending prescriptions</p>
+                    <p class="mt-1 text-2xl font-black text-gray-900">{{ pending_prescriptions }}</p>
+                </div>
+                <div class="rounded-2xl border border-gray-200 bg-slate-50/70 px-4 py-4">
+                    <p class="text-sm font-semibold text-gray-900">Unacknowledged alerts</p>
+                    <p class="mt-1 text-2xl font-black {% if unacknowledged_alerts > 0 %}text-red-600{% else %}text-gray-900{% endif %}">{{ unacknowledged_alerts }}</p>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
+
+{{ module_chart|json_script:"module-chart-data" }}
+{{ severity_chart|json_script:"severity-chart-data" }}
+<script>
+    (function () {
+        function initAnalyticsCharts() {
+            if (!window.Chart) return;
+
+            const moduleNode = document.getElementById('module-chart-data');
+            const severityNode = document.getElementById('severity-chart-data');
+            const moduleCanvas = document.getElementById('moduleChart');
+            const severityCanvas = document.getElementById('severityChart');
+
+            if (!moduleNode || !severityNode || !moduleCanvas || !severityCanvas) return;
+            if (moduleCanvas.dataset.chartReady === 'true') return;
+
+            const moduleData = JSON.parse(moduleNode.textContent);
+            const severityData = JSON.parse(severityNode.textContent);
+
+            moduleCanvas.dataset.chartReady = 'true';
+            severityCanvas.dataset.chartReady = 'true';
+
+            new Chart(moduleCanvas, {
+                type: 'bar',
+                data: {
+                    labels: moduleData.labels,
+                    datasets: [{
+                        label: 'Open items',
+                        data: moduleData.values,
+                        borderRadius: 16,
+                        backgroundColor: ['#009fe3', '#162b4a', '#0ea5e9', '#94a3b8', '#8b5cf6', '#ef4444'],
+                        maxBarThickness: 42,
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#475569', font: { weight: '600' } },
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(148, 163, 184, 0.18)' },
+                            ticks: { color: '#64748b' },
+                        },
+                    },
+                },
+            });
+
+            new Chart(severityCanvas, {
+                type: 'doughnut',
+                data: {
+                    labels: severityData.labels,
+                    datasets: [{
+                        data: severityData.values,
+                        backgroundColor: ['#dc2626', '#f59e0b', '#0ea5e9'],
+                        borderWidth: 0,
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    cutout: '70%',
+                    plugins: { legend: { display: false } },
+                },
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initAnalyticsCharts, { once: true });
+        } else {
+            initAnalyticsCharts();
+        }
+        document.body.addEventListener('htmx:load', initAnalyticsCharts);
+    })();
+</script>
 {% endblock %}

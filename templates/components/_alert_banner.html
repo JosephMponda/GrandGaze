@@ -1,4 +1,4 @@
-<div class="alert alert-{{ type|default:'info' }} mb-4 flex items-start gap-3">
+<div role="alert" class="alert alert-{{ type|default:'info' }} mb-4 flex items-start gap-3">
     {% if type == 'success' %}
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
     {% elif type == 'warning' %}

@@ -28,6 +28,8 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "simple_history",
     "axes",
+    "django_otp",
+    "django_otp.plugins.otp_totp",
     # local apps
     "core",
     "accounts",
@@ -53,6 +55,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django_otp.middleware.OTPMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
@@ -127,6 +130,10 @@ SESSION_COOKIE_AGE = config("SESSION_COOKIE_AGE", default=15 * 60, cast=int)  # 
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 CSRF_COOKIE_HTTPONLY = True
+# Secure flags default True (browsers only enforce "Secure" over HTTPS, so this
+# is a no-op for local HTTP dev and only matters if a real deployment forgets TLS).
+SESSION_COOKIE_SECURE = config("SESSION_COOKIE_SECURE", default=True, cast=bool)
+CSRF_COOKIE_SECURE = config("CSRF_COOKIE_SECURE", default=True, cast=bool)
 SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", default=False, cast=bool)  # False for local Docker fallback only
 SECURE_HSTS_SECONDS = config("SECURE_HSTS_SECONDS", default=0, cast=int)
 

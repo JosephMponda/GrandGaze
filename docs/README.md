@@ -1,29 +1,65 @@
-# Documentation Index
+# MUST–GSL EMR — Documentation
 
-## Active / Current Sprint
+**Root-level trackers:**
+| File | Purpose |
+|------|---------|
+| `Requirements-Tracker.md` | Every brief spec → implementation status (✅/⚡/❌) |
+| `Untouched-Parts.md` | Specifications with zero implementation, prioritized |
+| `UI-UX-concerns.md` | Accessibility and usability issues by severity |
 
-| Path | Content |
-|---|---|
-| `AGENTS.md` | Global stack decisions, module boundaries, security baseline (root of repo) |
-| `ALLOWED_PACKAGES.md` | Allowlisted dependencies (root of repo) |
-| `docs/REFERENCE_ALIGNMENT.md` | Comparison to OpenMRS, FHIR, LOINC, DICOM, ICD-11 references |
-| `docs/reference-systems-review.md` | Review of GrandGaze vs. reference platforms (OpenMRS, FHIR, DICOM, LOINC, ICD-11, DHIS2, MaHIS) |
-| `docs/sprint-summary-phase-3.md` | Current sprint: specs review, safety gaps closed, UX polish, audit fix (THIS SPRINT) |
-| `docs/phase-2/` | Feature specs (inpatient, emergency, appointments) |
+---
 
-## Completed (archived in `docs/completed/`)
-
-| Path | Content |
-|---|---|
-| `docs/completed/specs_review.md` | Full system-vs-brief audit (571 lines), all action items now addressed |
-| `docs/completed/sprint-summary-phase-2.md` | Phase 2 sprint: emergency, inpatient, dialysis, stock built |
-| `docs/completed/COMPLETED_FEATURES.md` | Traceability matrix: every feature mapped to brief §8.1.x |
-| `docs/completed/backend/engineer-*-*/` | Phase 1 module specs, build plans, agent instructions |
-| `docs/completed/frontend/` | Phase 1 design system, architecture, build plan |
-| `docs/completed/README.md` | (superseded by this file) |
-
-## Cross-cutting
+## Architecture & Standards
 
 | File | Content |
-|---|---|
-| `README.md` | Running locally, migration, test instructions (repo root) |
+|------|---------|
+| `AGENTS.md` | Global stack decisions, module boundaries, security baseline |
+| `ALLOWED_PACKAGES.md` | Allowlisted dependencies with justifications |
+| `REFERENCE_ALIGNMENT.md` | Comparison to OpenMRS, FHIR, LOINC, DICOM, ICD-11 |
+
+## Security & Compliance
+
+| File | Content |
+|------|---------|
+| `mfa.md` | MFA integration path (brief §9.4 readiness doc) |
+| `Audit.md` | Full security audit with findings, fixes, and judging impact |
+
+## Sprint & Development History
+
+| File | Content |
+|------|---------|
+| `README.md` (this file) | Documentation index |
+| original `README.md` | Historical build log (moved from root) |
+| `CHANGES_SUMMARY.md` | Summary of all changes made |
+| `FRONTEND_DEBUGGING_GUIDE.md` | Frontend debugging reference |
+| `FRONTEND_INTEGRATION.md` | Frontend integration patterns |
+| `SESSION_SUMMARY_AND_PHASE2_PLAN.md` | Session summary and phase 2 planning |
+| `phase2_rules.md` | Phase 2 engineering rules |
+| `ponytail.md` | Known issues and limitations |
+| `pipeline-review.md` | CI/CD pipeline review |
+| `reference-systems-review.md` | Reference platforms review |
+| `sprint-summary-phase-3.md` | Phase 3 sprint summary |
+
+## Phase Specifications
+
+| Path | Content |
+|------|---------|
+| `phase-2/` | Feature specs for inpatient, emergency, appointments |
+| `completed/` | Archived specs, build plans, agent instructions |
+
+## Setup
+
+```bash
+cp .env.example .env   # edit DB_* and CRYPTOGRAPHY_KEY
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py loaddata accounts/fixtures/groups_permissions.json
+python manage.py runserver
+```
+
+Tests: `make test` (requires PostgreSQL, or SQLite via `config.test_settings`).
+
+Docker: `make docker-up` (full stack: Django + Postgres + Nginx).
+
+Tailwind: `make tailwind-watch` (compile CSS on changes).

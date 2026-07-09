@@ -1,8 +1,7 @@
-"""Test-only settings - SQLite in-memory, no PostgreSQL dependency."""
+"""Test-only settings: SQLite in-memory by default, PostgreSQL via DATABASE_URL."""
 import os
 import sys
 
-# Paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, BASE_DIR)
 
@@ -19,9 +18,11 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_spectacular",
     "axes",
+    "core",
     "simple_history",
     "django_filters",
-    # Project apps
+    "django_otp",
+    "django_otp.plugins.otp_totp",
     "accounts",
     "patients",
     "encounters",
@@ -66,12 +67,31 @@ TEMPLATES = [
     },
 ]
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": ":memory:",
+# Use PostgreSQL if DATABASE_URL is set (CI), otherwise SQLite in-memory (local)
+_database_url = os.environ.get("DATABASE_URL")
+if _database_url:
+    import re
+    _m = re.match(r"postgres://(\w+):(\w+)@([\w.]+):(\d+)/(\w+)", _database_url)
+    if _m:
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.postgresql",
+                "NAME": _m.group(5),
+                "USER": _m.group(1),
+                "PASSWORD": _m.group(2),
+                "HOST": _m.group(3),
+                "PORT": _m.group(4),
+            }
+        }
+    else:
+        raise ValueError(f"Unsupported DATABASE_URL format: {_database_url}")
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": ":memory:",
+        }
     }
-}
 
 AUTH_PASSWORD_VALIDATORS = []
 LANGUAGE_CODE = "en-us"

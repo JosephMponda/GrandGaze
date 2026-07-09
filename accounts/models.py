@@ -16,6 +16,30 @@ class Role(models.TextChoices):
     ICT = "ICT", "ICT"
 
 
+ROLE_GROUP_NAMES = {
+    Role.NURSE: "Nurse",
+    Role.CLINICIAN: "Clinician",
+    Role.PHARMACIST: "Pharmacist",
+    Role.LAB_TECH: "LabTech",
+    Role.RADIOGRAPHER: "Radiographer",
+    Role.BILLING_OFFICER: "BillingOfficer",
+    Role.ADMIN: "Admin",
+    Role.ICT: "ICT",
+}
+
+
+def group_name_for_role(role: str) -> str:
+    return ROLE_GROUP_NAMES[role]
+
+
+def assign_user_role_group(user, role: str) -> None:
+    """Keep Profile.role and Django Group membership in sync for RBAC."""
+    from django.contrib.auth.models import Group
+
+    group, _ = Group.objects.get_or_create(name=group_name_for_role(role))
+    user.groups.add(group)
+
+
 class Profile(models.Model):
     """One-to-one extension of Django's built-in User. Do not replace User."""
 

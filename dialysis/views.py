@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -49,9 +50,32 @@ def record_session(request, prescription_id):
 @login_required
 def dashboard(request):
     today = timezone.now().date()
-    sessions = DialysisPrescription.objects.filter(is_active=True).select_related("patient")
-    counts = []
-    for rx in sessions:
-        done = rx.sessions.filter(session_date=today).count()
-        counts.append({"prescription": rx, "sessions_today": done})
-    return render(request, "dialysis/dashboard.html", {"counts": counts})
+    sessions = (
+        DialysisPrescription.objects.filter(is_active=True)
+        .select_related("patient")
+        .annotate(sessions_today=Count("sessions", filter=Q(sessions__session_date=today)))
+    )
+    counts = list(sessions)
+    completed_today = sum(1 for rx in counts if rx.sessions_today)
+    pending_today = max(len(counts) - completed_today, 0)
+    completion_rate = round((completed_today / len(counts)) * 100, 1) if counts else 0
+    access_labels = dict(DialysisPrescription.VascularAccess.choices)
+    access_counts = {}
+    for rx in counts:
+        access_counts[rx.vascular_access] = access_counts.get(rx.vascular_access, 0) + 1
+    access_chart = {
+        "labels": [access_labels.get(label, label) for label in access_counts.keys()],
+        "values": [value for value in access_counts.values()],
+    }
+    return render(
+        request,
+        "dialysis/dashboard.html",
+        {
+            "counts": counts,
+            "active_count": len(counts),
+            "completed_today": completed_today,
+            "pending_today": pending_today,
+            "completion_rate": completion_rate,
+            "access_chart": access_chart,
+        },
+    )

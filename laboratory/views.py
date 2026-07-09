@@ -1,10 +1,11 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from accounts.permissions import role_required
+from accounts.permissions import has_role, role_required
 from patients.services import get_patient_or_404
 
 from . import services
@@ -21,7 +22,7 @@ def order_test(request, patient_id):
         if form.is_valid():
             order = services.create_order(patient, form.cleaned_data["test"], request.user, form.cleaned_data.get("encounter"))
             messages.success(request, "Lab order created.")
-            if request.user.groups.filter(name__in=["LabTech", "Admin"]).exists():
+            if has_role(request.user, "LabTech", "Admin"):
                 return redirect(reverse("laboratory:collect", args=[order.pk]))
             return redirect(reverse("patients:profile", args=[patient.pk]))
     else:
@@ -87,4 +88,23 @@ def patient_tab(request, patient_id):
 
 @role_required("LabTech", "Clinician", "Admin")
 def workload(request):
-    return render(request, "laboratory/workload.html", {"summary": services.workload_summary()})
+    summary = services.workload_summary()
+    status_counts = {
+        row["status"]: row["total"]
+        for row in LabOrder.objects.exclude(status__in=["cancelled"]).values("status").annotate(total=Count("id"))
+    }
+    status_labels = dict(LabOrder._meta.get_field("status").choices)
+    workload_chart = {
+        "labels": [status_labels.get(status, status) for status in status_counts.keys()],
+        "values": list(status_counts.values()),
+    }
+    critical_pending = LabOrder.objects.filter(test__is_critical_if_outside_range=True).exclude(status__in=["verified", "cancelled"]).count()
+    return render(
+        request,
+        "laboratory/workload.html",
+        {
+            "summary": summary,
+            "workload_chart": workload_chart,
+            "critical_pending": critical_pending,
+        },
+    )
