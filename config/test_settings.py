@@ -18,6 +18,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_spectacular",
     "axes",
+    "core",
     "simple_history",
     "django_filters",
     "django_otp",
