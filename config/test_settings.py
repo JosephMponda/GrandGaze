@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     "axes",
     "simple_history",
     "django_filters",
+    "core",
     "accounts",
     "patients",
     "encounters",

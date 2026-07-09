@@ -15,7 +15,7 @@
 
     <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Patients registered today -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
+        <article class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
@@ -25,10 +25,10 @@
                     <p class="text-2xl font-bold text-ink">{{ patients_today }}</p>
                 </div>
             </div>
-        </div>
+        </article>
 
         <!-- Open encounters -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
+        <article class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-lg bg-green-50 text-green-600 flex items-center justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -38,10 +38,10 @@
                     <p class="text-2xl font-bold text-ink">{{ open_encounters }}</p>
                 </div>
             </div>
-        </div>
+        </article>
 
         <!-- Pending lab orders -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
+        <article class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
@@ -51,10 +51,10 @@
                     <p class="text-2xl font-bold text-ink">{{ pending_labs }}</p>
                 </div>
             </div>
-        </div>
+        </article>
 
         <!-- Pending imaging requests -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
+        <article class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -64,10 +64,10 @@
                     <p class="text-2xl font-bold text-ink">{{ pending_imaging }}</p>
                 </div>
             </div>
-        </div>
+        </article>
 
         <!-- Pending prescriptions -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
+        <article class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -77,10 +77,10 @@
                     <p class="text-2xl font-bold text-ink">{{ pending_prescriptions }}</p>
                 </div>
             </div>
-        </div>
+        </article>
 
         <!-- Unacknowledged alerts -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
+        <article class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-lg {% if unacknowledged_alerts > 0 %}bg-red-50 text-red-600{% else %}bg-gray-50 text-gray-400{% endif %}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
@@ -88,9 +88,9 @@
                 <div>
                     <p class="text-sm text-ink-500 font-medium">Unacknowledged Alerts</p>
                     <p class="text-2xl font-bold {% if unacknowledged_alerts > 0 %}text-red-600{% else %}text-ink{% endif %}">{{ unacknowledged_alerts }}</p>
-                </div>
             </div>
-        </div>
+        </article>
+    </div>
     </div>
 
     {% if critical_alerts_4h > 0 %}

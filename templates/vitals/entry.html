@@ -184,8 +184,8 @@
             </div>
 
             <!-- AVPU Layout Adjustment -->
-            <div>
-                <label class="block text-sm font-medium text-ink-700 mb-2">Consciousness (AVPU)</label>
+            <fieldset>
+                <legend class="block text-sm font-medium text-ink-700 mb-2">Consciousness (AVPU)</legend>
                 <div class="flex flex-wrap gap-2" x-model="avpu" @change="calcNEWS2()">
                     <template x-for="opt in [['A','Alert'],['V','Voice'],['P','Pain'],['U','Unresponsive']]" :key="opt[0]">
                         <label class="relative cursor-pointer grow sm:grow-0">
@@ -195,7 +195,7 @@
                         </label>
                     </template>
                 </div>
-            </div>
+            </fieldset>
         </div>
 
         <!-- Secondary Measurements Card -->
@@ -255,8 +255,8 @@
 
             <!-- Clinical Notes 3-Row Textarea -->
             <div class="pt-2">
-                <label class="block text-sm font-medium text-ink-700 mb-1">Clinical Notes / Comments</label>
-                <textarea name="vitals_notes" rows="3" 
+                <label for="id_vitals_notes" class="block text-sm font-medium text-ink-700 mb-1">Clinical Notes / Comments</label>
+                <textarea id="id_vitals_notes" name="vitals_notes" rows="3" 
                           class="w-full block px-3 py-2 rounded-xl border border-gray-200 shadow-sm focus:border-brand focus:ring-brand sm:text-sm bg-white placeholder-gray-400" 
                           placeholder="Describe any observable custom conditions, anomalies, or situational details here..."></textarea>
             </div>

@@ -177,22 +177,18 @@
                             {% include "components/_field.html" with field=edit_form.clinical_plan %}
                         </div>
 
-                        {# Assessment & Plan #}
+                        {% if encounter.icd_code %}
                         <div class="space-y-3">
                             <label class="flex items-center gap-2 text-base font-bold text-gray-900">
                                 <div class="w-6 h-6 rounded bg-brand/10 text-brand flex items-center justify-center text-xs">4</div>
                                 Assessment &amp; Plan
                             </label>
-                            {% if encounter.icd_code %}
                             <div class="flex items-center gap-2 text-sm">
                                 <span class="px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-100 font-mono text-xs font-bold">{{ encounter.icd_code }}</span>
                                 <span class="text-gray-600">{{ encounter.icd_display }}</span>
                             </div>
-                            {% endif %}
-                            <div>
-                                <textarea name="plan" rows="4" class="form-textarea w-full rounded-xl border-gray-200 focus:border-brand focus:ring-brand shadow-sm resize-y p-3 text-sm placeholder-gray-400" placeholder="1. Presumptive diagnosis...&#10;2. Orders...&#10;3. Follow up...">{{ encounter.clinical_plan|default:"" }}</textarea>
-                            </div>
                         </div>
+                        {% endif %}
                     </form>
                 {% else %}
                     {# Signed/Read-Only Mode #}

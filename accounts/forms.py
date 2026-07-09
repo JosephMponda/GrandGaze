@@ -1,7 +1,15 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import AuthenticationForm
 from django.db import transaction
 from .models import Profile, Role
+
+
+class LoginForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["username"].widget.attrs.update({"autocomplete": "username"})
+        self.fields["password"].widget.attrs.update({"autocomplete": "current-password"})
 
 User = get_user_model()
 

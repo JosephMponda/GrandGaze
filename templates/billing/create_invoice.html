@@ -52,10 +52,11 @@
                 
                 <div class="space-y-4" id="line-items">
                     {% for line_form in formset %}
-                        <div class="line-item grid grid-cols-1 md:grid-cols-2 gap-6 p-5 bg-gray-50 border border-gray-200/50 rounded-xl">
+                        <fieldset class="line-item grid grid-cols-1 md:grid-cols-2 gap-6 p-5 bg-gray-50 border border-gray-200/50 rounded-xl">
+                            <legend class="sr-only">Item #{{ forloop.counter }}</legend>
                             {% include "components/_field.html" with field=line_form.service_item %}
                             {% include "components/_field.html" with field=line_form.quantity %}
-                        </div>
+                        </fieldset>
                     {% endfor %}
                 </div>
             </div>
