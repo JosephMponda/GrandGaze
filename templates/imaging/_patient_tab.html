@@ -1,7 +1,7 @@
 <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 class="text-xl font-bold text-ink-900">Imaging</h2>
-        <a href="{% url 'imaging:request' patient.pk %}" class="btn-primary text-sm font-semibold py-2 px-4 shadow-sm hover:-translate-y-0.5 transition-all duration-200">Request Imaging</a>
+        <a href="{% url 'imaging:request' patient.pk %}" class="btn-primary text-sm font-semibold py-2 px-4 shadow-sm hover:-translate-y-0.5 transition-all duration-200 sm:w-auto">Request Imaging</a>
     </div>
 
     <div>
@@ -9,7 +9,7 @@
         {% if pending_requests %}
             <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-xl overflow-hidden">
                 {% for request in pending_requests %}
-                    <div class="flex items-center justify-between px-4 py-3 bg-white hover:bg-paper transition-colors duration-150">
+                    <div class="flex flex-col gap-2 px-4 py-3 bg-white hover:bg-paper transition-colors duration-150 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <p class="text-sm font-semibold text-ink-900">{{ request.modality }}</p>
                             <p class="text-xs text-ink-500">{{ request.get_status_display }}</p>
@@ -28,7 +28,7 @@
         {% if recent_reports %}
             <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-xl overflow-hidden">
                 {% for report in recent_reports %}
-                    <div class="flex items-center justify-between px-4 py-3 bg-white hover:bg-paper transition-colors duration-150">
+                    <div class="flex flex-col gap-2 px-4 py-3 bg-white hover:bg-paper transition-colors duration-150 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <p class="text-sm font-semibold text-ink-900">{{ report.request.modality }}</p>
                             <p class="text-xs text-ink-500">{{ report.impression|truncatechars:60 }}</p>

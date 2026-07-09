@@ -121,8 +121,8 @@
     }">
 
     {# Header #}
-    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
-        <div class="flex items-center gap-3">
+    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
             </div>
@@ -133,10 +133,10 @@
         </div>
 
         {# Live Score Badge #}
-        <div x-show="isReady" style="display: none;" 
+        <div x-show="isReady" style="display: none;"
              x-transition
              :class="riskLevel.color" 
-             class="px-4 py-2 rounded-lg font-bold text-sm shadow-inner flex items-center gap-2 transition-colors duration-300">
+             class="w-full sm:w-auto px-4 py-2 rounded-lg font-bold text-sm shadow-inner flex items-center gap-2 transition-colors duration-300">
             <span :class="riskLevel.dot" class="w-2 h-2 rounded-full animate-pulse"></span>
             <span x-text="'NEWS2 Score: ' + score"></span>
             <span class="opacity-70 mx-1">|</span>
@@ -165,7 +165,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Supplemental Oxygen?</label>
-                    <div class="flex gap-4">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:gap-4">
                         <label for="oxygen_no" class="flex items-center gap-2 cursor-pointer">
                             <input id="oxygen_no" type="radio" x-model="oxygen" value="no" name="oxygen_radio" class="text-brand focus:ring-brand">
                             <span class="text-sm text-gray-700 font-medium">Room Air</span>
@@ -187,7 +187,7 @@
                     <input id="id_hr" type="number" x-model="hr" step="1" class="w-full form-input rounded-lg border-gray-300 focus:ring-brand focus:border-brand sm:text-sm">
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div>
                         <label for="id_sbp" class="block text-sm font-medium text-gray-700 mb-1">Systolic BP</label>
                         <input id="id_sbp" type="number" x-model="sbp" step="1" class="w-full form-input rounded-lg border-gray-300 focus:ring-brand focus:border-brand sm:text-sm" placeholder="120">
@@ -219,9 +219,9 @@
 
         </div>
 
-        <div class="mt-8 flex justify-end gap-3 pt-5 border-t border-gray-100">
-            <button type="button" @click="clear()" class="btn-secondary">Clear</button>
-            <button type="submit" class="btn-primary" :disabled="!isReady" :class="{ 'opacity-50 cursor-not-allowed': !isReady }">
+        <div class="mt-8 flex flex-col gap-3 pt-5 border-t border-gray-100 sm:flex-row sm:justify-end">
+            <button type="button" @click="clear()" class="btn-secondary sm:w-auto">Clear</button>
+            <button type="submit" class="btn-primary sm:w-auto" :disabled="!isReady" :class="{ 'opacity-50 cursor-not-allowed': !isReady }">
                 <span class="htmx-indicator inline-flex items-center">
                     <svg class="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                 </span>

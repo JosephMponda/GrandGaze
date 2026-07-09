@@ -6,7 +6,7 @@
     <div class="border-b border-gray-200 pb-5">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <!-- Left: Back button + Title -->
-            <div class="flex items-center gap-3 min-w-0">
+            <div class="flex flex-col gap-3 min-w-0 sm:flex-row sm:items-center">
                 <a href="{% url 'patients:profile' patient.pk %}#billing" 
                    class="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
                    aria-label="Back to patient profile">
@@ -40,7 +40,7 @@
                             <p class="text-sm font-semibold text-ink">Invoice #{{ inv.pk }}</p>
                             <p class="text-xs text-ink-400 mt-0.5">{{ inv.created_at|date:"M j, Y, g:i a" }}</p>
                         </div>
-                        <div class="flex flex-row items-center justify-between sm:flex-col sm:items-end sm:text-right gap-2">
+                        <div class="flex flex-col items-start gap-2 sm:items-end sm:text-right">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap
                                 {% if inv.status == 'paid' %}bg-green-100 text-green-800
                                 {% elif inv.status == 'partially_paid' %}bg-amber-100 text-amber-800
@@ -67,7 +67,7 @@
             <h3 class="mt-3 text-sm font-semibold text-ink-900">No invoices yet</h3>
             <p class="mt-1 text-sm text-ink-500">Create an invoice for this patient to get started.</p>
             <a href="{% url 'billing:create_invoice' patient.pk %}" 
-               class="mt-4 inline-flex items-center text-sm font-semibold text-brand hover:text-brand-dark">
+               class="mt-4 inline-flex items-center justify-center text-sm font-semibold text-brand hover:text-brand-dark">
                 Create Invoice
             </a>
         </div>

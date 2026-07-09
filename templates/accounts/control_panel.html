@@ -24,7 +24,7 @@
         </div>
     </section>
 
-    <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <article class="rounded-3xl border border-gray-200/80 bg-white p-5 shadow-sm">
             <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Users</p>
             <p class="mt-3 text-3xl font-black text-gray-900">{{ user_total }}</p>
@@ -45,7 +45,7 @@
 
     <section class="grid gap-6 xl:grid-cols-[0.95fr,1.05fr]">
         <div class="rounded-[2rem] border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
-            <div class="flex items-start justify-between gap-3">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                     <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Roles</p>
                     <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900">Staff mix</h2>
@@ -57,7 +57,7 @@
         </div>
 
         <div class="rounded-[2rem] border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
-            <div class="flex items-start justify-between gap-3">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                     <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Ward capacity</p>
                     <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900">Bed allocations</h2>
@@ -66,7 +66,7 @@
             <div class="mt-5 space-y-4">
                 {% for ward in ward_rows %}
                 <div>
-                    <div class="mb-1 flex items-center justify-between gap-3 text-sm">
+                    <div class="mb-1 flex flex-col gap-1 text-sm sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <p class="font-semibold text-gray-900">{{ ward.name }}</p>
                             <p class="text-xs uppercase tracking-[0.18em] text-gray-400">{{ ward.department }}</p>
@@ -86,41 +86,43 @@
 
     <section class="grid gap-6 xl:grid-cols-[1fr,1fr]">
         <div class="rounded-[2rem] border border-gray-200/80 bg-white shadow-sm">
-            <div class="flex items-center justify-between gap-3 px-6 pt-6 sm:px-8">
+            <div class="flex flex-col gap-3 px-6 pt-6 sm:flex-row sm:items-center sm:justify-between sm:px-8">
                 <div>
                     <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Staff directory</p>
                     <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900">Active users</h2>
                 </div>
             </div>
             <div class="mt-5 overflow-hidden rounded-b-[2rem] border-t border-gray-100">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>User</th>
-                            <th>Role</th>
-                            <th>Department</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for u in users %}
-                        <tr>
-                            <td>
-                                <div class="min-w-0">
-                                    <p class="font-semibold text-gray-900">{{ u.get_full_name|default:u.username }}</p>
-                                    <p class="text-xs text-gray-400">{{ u.username }}</p>
-                                </div>
-                            </td>
-                            <td>{{ u.profile.get_role_display|default:"Superuser" }}</td>
-                            <td>{{ u.profile.department|default:"-" }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="overflow-x-auto">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Role</th>
+                                <th>Department</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in users %}
+                            <tr>
+                                <td>
+                                    <div class="min-w-0">
+                                        <p class="font-semibold text-gray-900">{{ u.get_full_name|default:u.username }}</p>
+                                        <p class="text-xs text-gray-400">{{ u.username }}</p>
+                                    </div>
+                                </td>
+                                <td>{{ u.profile.get_role_display|default:"Superuser" }}</td>
+                                <td>{{ u.profile.department|default:"-" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
         <div class="rounded-[2rem] border border-gray-200/80 bg-white shadow-sm">
-            <div class="flex items-center justify-between gap-3 px-6 pt-6 sm:px-8">
+            <div class="flex flex-col gap-3 px-6 pt-6 sm:flex-row sm:items-center sm:justify-between sm:px-8">
                 <div>
                     <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Control shortcuts</p>
                     <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900">Quick actions</h2>

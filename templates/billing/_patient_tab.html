@@ -1,5 +1,5 @@
 <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 class="text-xl font-bold text-ink-900">Billing</h2>
         <a href="{% url 'billing:create_invoice' patient.pk %}" class="btn-primary text-sm font-semibold py-2 px-4 shadow-sm hover:-translate-y-0.5 transition-all duration-200">New Invoice</a>
     </div>
@@ -7,12 +7,12 @@
     {% if invoices %}
         <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-xl overflow-hidden">
             {% for inv in invoices %}
-                <a href="{% url 'billing:invoice_detail' inv.pk %}" class="flex items-center justify-between px-4 py-3 bg-white hover:bg-paper transition-colors duration-150">
+                <a href="{% url 'billing:invoice_detail' inv.pk %}" class="flex flex-col gap-2 px-4 py-3 bg-white hover:bg-paper transition-colors duration-150 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <p class="text-sm font-semibold text-ink-900">Invoice #{{ inv.pk }}</p>
                         <p class="text-xs text-ink-500">{{ inv.created_at|date:"M j, Y, g:i a" }}</p>
                     </div>
-                    <div class="text-right flex items-center gap-3">
+                    <div class="text-left flex items-start gap-3 sm:text-right sm:items-center sm:justify-end">
                         <span class="text-xs text-ink-500">MWK {{ inv.balance|floatformat:2 }}</span>
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                             {% if inv.status == 'paid' %}bg-green-100 text-green-800
