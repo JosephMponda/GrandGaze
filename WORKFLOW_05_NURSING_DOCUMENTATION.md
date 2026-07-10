@@ -1,5 +1,10 @@
 # Nursing Documentation Flow
 
+<p align="left">
+  <img src="static/img/must-logo.png" alt="MUST logo" width="72">
+  <img src="static/img/logos/GSL-Official-Logo.png" alt="GSL logo" width="72">
+</p>
+
 ```mermaid
 flowchart TD
     A[Open nursing form] --> B[Record assessment]
@@ -13,4 +18,3 @@ flowchart TD
 Implemented in:
 - `inpatient`
 - `templates/inpatient/nursing_assessment_*`
-

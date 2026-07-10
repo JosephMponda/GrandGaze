@@ -1,5 +1,10 @@
 # System Design Document
 
+<p align="left">
+  <img src="static/img/must-logo.png" alt="MUST logo" width="72">
+  <img src="static/img/logos/GSL-Official-Logo.png" alt="GSL logo" width="72">
+</p>
+
 ## Overview
 
 This prototype is a modular EMR for a low-resource teaching hospital environment.

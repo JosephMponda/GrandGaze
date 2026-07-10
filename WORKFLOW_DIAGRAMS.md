@@ -1,5 +1,10 @@
 # Workflow Diagrams Index
 
+<p align="left">
+  <img src="static/img/must-logo.png" alt="MUST logo" width="72">
+  <img src="static/img/logos/GSL-Official-Logo.png" alt="GSL logo" width="72">
+</p>
+
 Separate workflow diagram files:
 - [`WORKFLOW_01_PATIENT_REGISTRATION.md`](/data/data/com.termux/files/home/MUST_EMR/WORKFLOW_01_PATIENT_REGISTRATION.md)
 - [`WORKFLOW_02_OUTPATIENT_ENCOUNTER.md`](/data/data/com.termux/files/home/MUST_EMR/WORKFLOW_02_OUTPATIENT_ENCOUNTER.md)

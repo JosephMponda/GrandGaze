@@ -1,5 +1,10 @@
 # Cybersecurity and Compliance Plan
 
+<p align="left">
+  <img src="static/img/must-logo.png" alt="MUST logo" width="72">
+  <img src="static/img/logos/GSL-Official-Logo.png" alt="GSL logo" width="72">
+</p>
+
 ## Authentication
 
 - All authenticated clinical views are protected by Django login and role checks.
@@ -40,4 +45,3 @@
 - Use only synthetic or fictional patient data in the challenge submission.
 - Respect the joint IP and branding requirements in the brief.
 - Ensure access, retention, and disclosure policies align with institutional and national governance.
-
