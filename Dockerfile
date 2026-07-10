@@ -29,7 +29,8 @@ ENV PYTHONUSERBASE=/home/django/.local
 
 COPY --chown=django:django . .
 
-RUN python manage.py collectstatic --noinput --clear
+RUN DEBUG=True DJANGO_SECRET_KEY=build-time-only-not-used-at-runtime \
+    python manage.py collectstatic --noinput --clear
 
 HEALTHCHECK --interval=15s --timeout=5s --start-period=30s --retries=3 \
     CMD curl -sf http://localhost:8000/health/ || exit 1
