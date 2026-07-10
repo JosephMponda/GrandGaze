@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", function () {
             labels: modalityChartData.labels,
             datasets: [{ data: modalityChartData.values, backgroundColor: ["#0284c7", "#0f766e", "#7c3aed", "#f59e0b", "#ef4444"], borderWidth: 0 }],
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom" } } },
+        options: { responsive: true, maintainAspectRatio: false, animation: { duration: 250 }, plugins: { legend: { position: "bottom" } } },
     });
 });
 </script>
