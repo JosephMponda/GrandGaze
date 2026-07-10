@@ -1,9 +1,8 @@
 # Governance and Safety Framework
 
-<p align="left">
-  <img src="static/img/must-logo.png" alt="MUST logo" width="72">
-  <img src="static/img/logos/GSL-Official-Logo.png" alt="GSL logo" width="72">
-</p>
+![MUST logo](static/img/must-logo.png) ![GSL logo](static/img/logos/GSL-Official-Logo.png)
+
+Grand Gaze
 
 ## Safety Controls
 
