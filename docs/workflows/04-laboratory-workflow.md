@@ -2,30 +2,18 @@
 
 ```mermaid
 flowchart TD
-    A([Clinician Orders Lab]) --> B[Order Received in Lab]
-    B --> C[Print Labels & Requisition]
-    C --> D[Sample Collection]
-    D --> E{Sample Adequate?}
-    E -->|No| F[Request New Sample]
-    F --> D
-    E -->|Yes| G[Sample Registered & Tracked]
-    G --> H[Assigned to Lab Section]
-    H --> I[Hematology]
-    H --> J[Biochemistry]
-    H --> K[Microbiology]
-    H --> L[Other]
-    I --> M[Result Entry]
-    J --> M
-    K --> M
-    L --> M
-    M --> N[Technician Verification]
-    N --> O{Critical Value?}
-    O -->|Yes| P[Critical Alert to Clinician]
-    O -->|No| Q[Pathologist Review]
-    P --> Q
-    Q --> R[Result Authorized]
-    R --> S[Result Available in EMR]
-    S --> T{Result Requested?}
-    T -->|Yes| U[Push Notification]
-    T -->|No| V[Available on Dashboard]
+    A([Lab order created]) --> B[Order linked to patient and encounter]
+    B --> C[Collect specimen]
+    C --> D[Barcode generated on collection]
+    D --> E[Result entry]
+    E --> F{Numeric result outside range and critical flag on test?}
+    F -->|Yes| G[Critical alert raised]
+    F -->|No| H[Save result]
+    G --> H
+    H --> I{Second user verification done?}
+    I -->|Yes| J[Order status: verified]
+    I -->|No| K[Order status: resulted]
+    J --> L[Result visible in EMR and patient tab]
+    K --> L
+    L --> M[Worklist and workload views]
 ```

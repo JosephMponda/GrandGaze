@@ -2,25 +2,24 @@
 
 ```mermaid
 flowchart TD
-    A([Patient Arrives at Ward/Clinic]) --> B[Triage Assessment]
-    B --> C[Vital Signs Recording]
-    C --> D{NEWS2 Score}
-    D -->|0-4 Low Risk| E[Routine Monitoring]
-    D -->|5-6 Medium Risk| F[Increased Frequency]
-    D -->|7+ High Risk| G[Immediate Clinician Review]
-    F --> H[Nursing Care Plan]
+    A([Patient in ward/clinic]) --> B[Vital signs recording]
+    B --> C[EWS computed from vitals]
+    C --> D{Risk level}
+    D -->|Low| E[Routine monitoring]
+    D -->|Medium| F[Increased observation frequency]
+    D -->|High/Critical| G[Escalate to clinician]
+    E --> H[Nursing assessment]
+    F --> H
     G --> H
-    E --> H
-    H --> I[Nursing Notes & Observations]
-    I --> J[MAR - Medication Administration]
-    J --> K{Patient Condition Changed?}
-    K -->|Yes| L[Escalation to Clinician]
-    K -->|No| M[Continue Monitoring]
-    L --> N[Updated Orders]
-    N --> O[Nursing Handover]
-    M --> O
-    O --> P{Shift Change?}
-    P -->|Yes| Q[Structured Handover Report]
-    P -->|No| B
+    H --> I[Structured care plan]
+    I --> J[Care plan evaluation]
+    J --> K[Nursing notes & observations]
+    K --> L[Medication administration record]
+    L --> M[Fluid balance recording]
+    M --> N[Procedure notes if performed]
+    N --> O[Shift handover]
+    O --> P{Condition changes?}
+    P -->|Yes| G
+    P -->|No| Q[Continue monitoring]
     Q --> B
 ```
