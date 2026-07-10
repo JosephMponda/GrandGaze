@@ -28,6 +28,7 @@ Grand Gaze
 - Patient safety
 - Maintainability
 - Expansion path from prototype to teaching hospital deployment
+- Render-hosted central app with browser-side offline caching and queued sync for intermittent connectivity
 
 ## Presentation Assets
 
