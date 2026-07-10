@@ -25,6 +25,7 @@ RUN groupadd -r django && useradd -r -g django django
 
 COPY --from=builder /root/.local /home/django/.local
 ENV PATH=/home/django/.local/bin:$PATH
+ENV PYTHONUSERBASE=/home/django/.local
 
 COPY --chown=django:django . .
 
