@@ -16,6 +16,13 @@ SECRET_KEY = config("DJANGO_SECRET_KEY", default=_INSECURE_DEFAULT_KEY)
 DEBUG = config("DEBUG", default=False, cast=bool)  # secure-by-default; local dev sets DEBUG=True via .env
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1", cast=Csv())
 
+# --- Reverse proxy (Render, or any platform that terminates TLS at an edge
+# and forwards plain HTTP to the container). Without this, Django can't tell
+# a request arrived over HTTPS, which breaks secure cookies and CSRF checks
+# even though the browser-to-edge connection is HTTPS. ---
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="", cast=Csv())
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
