@@ -11,7 +11,7 @@
 
 ## Suggested Walkthrough
 
-- Start on the role-aware dashboard.
+- Start on the role-aware dashboard (`accounts:dashboard`).
 - Show patient registration and profile access.
 - Demonstrate one clinical path, such as outpatient or emergency.
 - Show supporting module flows: lab, imaging, pharmacy, billing, and dialysis.
@@ -32,4 +32,3 @@
 - System design summary
 - Governance and safety framework
 - Sustainability and implementation plan
-

@@ -14,6 +14,6 @@ Separate workflow diagram files:
 - [`WORKFLOW_11_DIALYSIS.md`](/data/data/com.termux/files/home/MUST_EMR/WORKFLOW_11_DIALYSIS.md)
 
 Cross-cutting views:
-- `templates/accounts/dashboard.html`
-- `templates/reporting/analytics_dashboard.html`
-- `templates/accounts/control_panel.html`
+- `accounts:dashboard` via `templates/accounts/dashboard.html`
+- `reporting:analytics_dashboard` via `templates/reporting/analytics_dashboard.html`
+- `accounts:control_panel` via `templates/accounts/control_panel.html`
