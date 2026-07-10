@@ -50,7 +50,7 @@
      }">
 
     <!-- Header Block -->
-<div class="flex items-center justify-between gap-6 mb-6 sm:mb-8 border-b border-gray-200 pb-5 w-full">
+<div class="flex flex-col gap-4 mb-6 sm:mb-8 border-b border-gray-200 pb-5 w-full sm:flex-row sm:items-center sm:justify-between sm:gap-6">
     
     <div class="min-w-0 flex-1">
         <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink-900">Record Vitals</h1>
@@ -61,7 +61,7 @@
     
     <div class="flex-shrink-0">
         <a href="{% url 'patients:profile' patient.pk %}" 
-           class="btn-secondary text-sm font-semibold inline-flex items-center justify-center gap-2 px-4 py-2 hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap">
+           class="btn-secondary text-sm font-semibold inline-flex items-center justify-center gap-2 px-4 py-2 hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap sm:w-auto">
             <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
             </svg>
@@ -72,12 +72,12 @@
 </div>
     <!-- NEWS2 Live Score Badge layout adjustments -->
     <div class="mb-6 sm:mb-8 bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
                 <h3 class="text-xs font-bold uppercase tracking-wider text-ink-500 mb-1">NEWS2 Score (Live)</h3>
                 <p class="text-xs text-ink-400">Fills in as you enter values below</p>
             </div>
-            <div x-show="news2Score !== null" class="flex sm:block items-center justify-between sm:text-right border-t sm:border-t-0 pt-3 sm:pt-0 border-gray-100">
+            <div x-show="news2Score !== null" class="flex items-center justify-between border-t border-gray-100 pt-3 sm:block sm:border-t-0 sm:pt-0 sm:text-right">
                 <div class="text-3xl sm:text-4xl font-black"
                      :class="{
                         'text-green-600': news2Risk === 'low',
@@ -93,7 +93,7 @@
                     <span x-text="news2Risk === 'low' ? 'Low Risk' : news2Risk === 'medium' ? 'Medium Risk' : 'High Risk - Escalate'"></span>
                 </div>
             </div>
-            <div x-show="news2Score === null" class="sm:text-right text-ink-400 text-sm italic border-t sm:border-t-0 pt-3 sm:pt-0 border-gray-100">
+            <div x-show="news2Score === null" class="border-t border-gray-100 pt-3 text-ink-400 text-sm italic sm:border-t-0 sm:pt-0 sm:text-right">
                 Awaiting input...
             </div>
         </div>

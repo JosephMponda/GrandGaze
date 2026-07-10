@@ -2,26 +2,26 @@
 
 ```mermaid
 flowchart TD
-    A([Patient Assigned]) --> B[Review Triage & Vitals]
-    B --> C[H&P - History & Physical Exam]
-    C --> D[Differential Diagnosis]
-    D --> E{Investigations Needed?}
-    E -->|Lab Orders| F[Order Lab Tests]
-    E -->|Imaging| G[Order Imaging]
-    E -->|Both| H[Order All]
-    E -->|None| I[Clinical Diagnosis]
-    F --> J[Review Results]
+    A([Patient context]) --> B[Review triage, vitals, labs, imaging, alerts]
+    B --> C[History and physical exam]
+    C --> D[Assessment and differential]
+    D --> E{Investigations needed?}
+    E -->|Lab| F[Create lab order]
+    E -->|Imaging| G[Create imaging request]
+    E -->|Both| H[Create lab and imaging orders]
+    E -->|None| I[Proceed to diagnosis]
+    F --> J[Review results]
     G --> J
     H --> J
     J --> I
-    I --> K[Treatment Plan]
-    K --> L[Prescribe Medications]
-    L --> M[Document Clinical Notes]
-    M --> N{Disposition}
-    N -->|Discharge| O[Discharge Summary]
-    N -->|Admit| P[Admission Orders]
-    N -->|Refer| Q[Referral Note]
-    O --> R[Follow-up Schedule]
-    P --> S[Ward Team Handover]
-    Q --> T[Receiving Department]
+    I --> K[Treatment plan]
+    K --> L{Medication required?}
+    L -->|Yes| M[Prescribe with pharmacy safety checks]
+    L -->|No| N[Document plan only]
+    M --> N
+    N --> O{Disposition}
+    O -->|Discharge| P[Discharge summary + follow-up]
+    O -->|Admit| Q[Admission order + ward handover]
+    O -->|Refer| R[Referral record]
+    O -->|Death| S[Death documentation]
 ```

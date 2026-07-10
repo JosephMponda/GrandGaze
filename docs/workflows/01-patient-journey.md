@@ -2,33 +2,39 @@
 
 ```mermaid
 flowchart TD
-    A([Patient Arrives]) --> B{Registered?}
+    A([Patient Arrives]) --> B{Existing patient?}
     B -->|No| C[Registration & Demographics]
-    B -->|Yes| D[Triage & Vital Signs]
-    C --> D
-    D --> E{Needs Emergency Care?}
-    E -->|Yes| F[Emergency Fast-Track]
-    E -->|No| G[Consultation / Clinical Review]
+    C --> D{Possible duplicate?}
+    D -->|Yes| E[Show duplicate warning + require explicit confirmation]
+    D -->|No| F[Profile Created]
+    E --> F
+    B -->|Yes| G[Open Patient Profile]
     F --> G
-    G --> H[Diagnosis & Investigations]
-    H --> I{Requires Lab?}
-    I -->|Yes| J[Lab Orders → Sample → Results]
-    I -->|No| K{Requires Imaging?}
-    J --> K
-    K -->|Yes| L[Imaging Request → Report]
-    K -->|No| M[Treatment Plan]
-    L --> M
-    M --> N{Medication Needed?}
-    N -->|Yes| O[Prescribe → Pharmacy Dispense]
-    N -->|No| P[Billing]
-    O --> P
-    P --> Q{Disposition}
-    Q -->|Discharge| R[Discharge Summary & Follow-up]
-    Q -->|Admit| S[Admission to Ward]
-    Q -->|Refer| T[Referral to Department]
-    Q -->|Death| U[Death Documentation]
-    R --> V([Exit])
-    S --> V
-    T --> V
-    U --> V
+    G --> H[Search / Visit / Encounter Context]
+    H --> I{Urgent or emergency presentation?}
+    I -->|Yes| J[Triage or rapid register + triage]
+    I -->|No| K[Routine review]
+    J --> L[Review Vitals / EWS / History]
+    K --> L
+    L --> M{Needs investigations?}
+    M -->|Lab| N[Lab order -> collection -> result -> verify]
+    M -->|Imaging| O[Imaging request -> report]
+    M -->|Both| P[Lab and imaging orders]
+    M -->|None| Q[Treatment plan]
+    N --> Q
+    O --> Q
+    P --> Q
+    Q --> R{Medication needed?}
+    R -->|Yes| S[Prescribe -> safety checks -> pharmacy queue]
+    R -->|No| T[Proceed]
+    S --> T
+    T --> U{Disposition}
+    U -->|Discharge| V[Discharge summary]
+    U -->|Admit| W[Admission to ward/bed]
+    U -->|Refer| X[Referral record]
+    U -->|Death| Y[Death documentation]
+    V --> Z([Exit / follow-up])
+    W --> Z
+    X --> Z
+    Y --> Z
 ```

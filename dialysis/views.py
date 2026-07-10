@@ -9,7 +9,7 @@ from accounts.permissions import role_required
 from patients.services import get_patient_or_404
 
 from . import services
-from .models import DialysisPrescription
+from .models import DialysisPrescription, VascularAccess
 
 
 @login_required
@@ -59,7 +59,7 @@ def dashboard(request):
     completed_today = sum(1 for rx in counts if rx.sessions_today)
     pending_today = max(len(counts) - completed_today, 0)
     completion_rate = round((completed_today / len(counts)) * 100, 1) if counts else 0
-    access_labels = dict(DialysisPrescription.VascularAccess.choices)
+    access_labels = dict(VascularAccess.choices)
     access_counts = {}
     for rx in counts:
         access_counts[rx.vascular_access] = access_counts.get(rx.vascular_access, 0) + 1

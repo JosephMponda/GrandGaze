@@ -110,6 +110,21 @@ def test_recent_alerts_view_shows_alerts(client, patient, nurse_user):
     assert "Critical alert visible" in response.content.decode()
 
 
+def test_recent_alerts_view_counts_each_severity(client, patient, nurse_user):
+    client.force_login(nurse_user)
+    services.raise_alert(patient=patient, source="lab", severity="critical", message="Critical alert")
+    services.raise_alert(patient=patient, source="lab", severity="warning", message="Warning alert")
+    services.raise_alert(patient=patient, source="lab", severity="info", message="Info alert")
+
+    url = reverse("reporting:recent_alerts")
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert response.context["critical_count"] == 1
+    assert response.context["warning_count"] == 1
+    assert response.context["info_count"] == 1
+
+
 def test_acknowledge_alert_view_updates_alert(client, patient, nurse_user):
     client.force_login(nurse_user)
     alert = services.raise_alert(patient=patient, source="lab", severity="info", message="To acknowledge")

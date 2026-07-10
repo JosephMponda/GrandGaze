@@ -105,3 +105,10 @@ class TestViews:
         })
         assert resp.status_code == 200  # re-renders with error
         assert DialysisSession.objects.count() == 0
+
+    def test_dashboard_renders_without_crash(self, clinician, rx):
+        c = Client()
+        c.force_login(clinician)
+        resp = c.get(reverse("dialysis:dashboard"))
+        assert resp.status_code == 200
+        assert "Dialysis Dashboard" in resp.content.decode()

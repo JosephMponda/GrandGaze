@@ -6,6 +6,7 @@ from django.urls import reverse
 from accounts.forms import StaffUserForm
 from accounts.models import Profile, Role
 from patients import services as patient_services
+from reporting import services as reporting_services
 
 pytestmark = pytest.mark.django_db
 
@@ -143,6 +144,33 @@ def test_form_created_clinician_can_open_new_encounter(client, nurse_user):
     response = client.get(reverse("encounters:new", args=[patient.pk]))
 
     assert response.status_code == 200
+
+
+def test_dashboard_uses_alert_severity_counts(client, nurse_user):
+    from patients.models import Patient
+
+    client.force_login(nurse_user)
+    patient = Patient.objects.create(
+        first_name="Grace",
+        last_name="Banda",
+        sex="female",
+        registered_by=nurse_user,
+    )
+
+    reporting_services.raise_alert(patient=patient, source="lab", severity="critical", message="Critical")
+    reporting_services.raise_alert(patient=patient, source="lab", severity="warning", message="Warning")
+    reporting_services.raise_alert(patient=patient, source="lab", severity="info", message="Info")
+
+    response = client.get(reverse("accounts:dashboard"))
+
+    assert response.status_code == 200
+    assert response.context["critical_alerts_4h"] == 1
+    assert response.context["warning_count"] == 1
+    assert response.context["info_count"] == 1
+    assert response.context["patients_today"] == 1
+    body = response.content.decode()
+    assert "Warning" in body
+    assert "Info" in body
 
 
 # --- validation-failure path ---

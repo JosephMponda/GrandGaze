@@ -10,7 +10,7 @@
                 <p class="max-w-2xl text-sm leading-6 text-slate-300">Track workload by modality and status without leaving the worklist.</p>
                 <a href="{% url 'accounts:dashboard' %}" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10">Back to dashboard</a>
             </div>
-            <div class="grid gap-3 sm:grid-cols-2">
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
                     <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Requests</p>
                     <p class="mt-3 text-3xl font-black">{{ request_count }}</p>
@@ -36,7 +36,7 @@
             <div class="mt-4 space-y-3">
                 {% for request in requests %}
                     <div class="rounded-2xl border border-slate-200 px-4 py-3">
-                        <div class="flex items-start justify-between gap-4">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                             <div class="min-w-0">
                                 <p class="text-sm font-semibold text-slate-900 truncate">{{ request.modality }}</p>
                                 <p class="text-xs text-slate-500 truncate">{{ request.patient.full_name }} · {{ request.patient.patient_number }}</p>
@@ -49,7 +49,9 @@
                             </span>
                         </div>
                         <div class="mt-3 flex justify-end">
-                            <a href="{% url 'imaging:report' request.pk %}" class="text-sm font-semibold text-slate-950">Report &rarr;</a>
+                            <a href="{% url 'imaging:report' request.pk %}" class="inline-flex w-full items-center justify-center rounded-full border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-950 transition-colors hover:bg-slate-50 sm:w-auto">
+                                Report
+                            </a>
                         </div>
                     </div>
                 {% empty %}

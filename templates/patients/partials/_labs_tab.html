@@ -1,7 +1,7 @@
 <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 class="text-xl font-bold text-ink-900">Laboratory & Imaging Results</h2>
-        <a href="{% url 'laboratory:order' patient.pk %}" class="btn-primary text-sm font-semibold py-2 px-4 shadow-sm">Order Lab Test</a>
+        <a href="{% url 'laboratory:order' patient.pk %}" class="btn-primary text-sm font-semibold py-2 px-4 shadow-sm sm:w-auto w-full text-center">Order Lab Test</a>
     </div>
 
     <div>
@@ -9,7 +9,7 @@
         {% if pending_orders %}
             <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-xl overflow-hidden">
                 {% for order in pending_orders %}
-                    <div class="flex items-center justify-between px-4 py-3 bg-white hover:bg-paper transition-colors duration-150">
+                    <div class="flex flex-col gap-2 px-4 py-3 bg-white hover:bg-paper transition-colors duration-150 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <p class="text-sm font-semibold text-ink-900">{{ order.test }}</p>
                             <p class="text-xs text-ink-500">{{ order.get_status_display }}</p>
@@ -28,7 +28,7 @@
         {% if recent_results %}
             <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-xl overflow-hidden">
                 {% for result in recent_results %}
-                    <div class="flex items-center justify-between px-4 py-3 bg-white hover:bg-paper transition-colors duration-150">
+                    <div class="flex flex-col gap-2 px-4 py-3 bg-white hover:bg-paper transition-colors duration-150 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <p class="text-sm font-semibold text-ink-900">{{ result.order.test }}: {{ result.display_value }}</p>
                             <p class="text-xs text-ink-500">{{ result.entered_at|date:"M j, Y, H:i" }}</p>

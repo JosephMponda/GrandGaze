@@ -1,7 +1,7 @@
 <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 class="text-xl font-bold text-ink-900">Laboratory</h2>
-        <a href="{% url 'laboratory:order' patient.pk %}" class="btn-primary text-sm font-semibold py-2 px-4 shadow-sm hover:-translate-y-0.5 transition-all duration-200">Order Lab Test</a>
+        <a href="{% url 'laboratory:order' patient.pk %}" class="btn-primary inline-flex w-full items-center justify-center text-sm font-semibold py-2 px-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 sm:w-auto">Order Lab Test</a>
     </div>
 
     <div>
@@ -9,12 +9,12 @@
         {% if pending_orders %}
             <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-xl overflow-hidden">
                 {% for order in pending_orders %}
-                    <div class="flex items-center justify-between px-4 py-3 bg-white hover:bg-paper transition-colors duration-150">
-                        <div>
+                    <div class="flex flex-col gap-2 px-4 py-3 bg-white transition-colors duration-150 hover:bg-paper sm:flex-row sm:items-center sm:justify-between">
+                        <div class="min-w-0">
                             <p class="text-sm font-semibold text-ink-900">{{ order.test }}</p>
                             <p class="text-xs text-ink-500">{{ order.get_status_display }}</p>
                         </div>
-                        <a href="{% url 'laboratory:collect' order.pk %}" class="text-sm font-semibold text-brand hover:text-brand-dark transition-colors duration-200">Open &rarr;</a>
+                        <a href="{% url 'laboratory:collect' order.pk %}" class="inline-flex items-center text-sm font-semibold text-brand transition-colors duration-200 hover:text-brand-dark sm:ml-4">Open &rarr;</a>
                     </div>
                 {% endfor %}
             </div>
@@ -28,9 +28,12 @@
         {% if recent_results %}
             <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-xl overflow-hidden">
                 {% for result in recent_results %}
-                    <div class="flex items-center justify-between px-4 py-3 bg-white hover:bg-paper transition-colors duration-150">
-                        <div>
-                            <p class="text-sm font-semibold text-ink-900">{{ result.order.test }}: {{ result.display_value }}</p>
+                    <div class="flex flex-col gap-2 px-4 py-3 bg-white transition-colors duration-150 hover:bg-paper sm:flex-row sm:items-center sm:justify-between">
+                        <div class="min-w-0">
+                            <p class="text-sm font-semibold text-ink-900 break-words">{{ result.order.test }}: {{ result.display_value }}</p>
+                            {% if result.collected_at %}
+                                <p class="mt-0.5 text-xs text-ink-500">{{ result.collected_at|date:"d M Y, H:i" }}</p>
+                            {% endif %}
                         </div>
                         {% if result.is_critical %}
                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Critical</span>
