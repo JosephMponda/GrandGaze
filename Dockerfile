@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 
 # Non-root user for security (P14)
-RUN groupadd -r django && useradd -r -g django django
+RUN groupadd -r django && useradd -r -g django -m -d /home/django django
 
 COPY --from=builder /root/.local /home/django/.local
 ENV PATH=/home/django/.local/bin:$PATH
