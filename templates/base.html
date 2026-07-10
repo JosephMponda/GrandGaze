@@ -18,65 +18,65 @@
 
     {% block nav %}
         {% if user.is_authenticated %}
-        <aside class="fixed inset-y-0 left-0 z-40 hidden w-72 flex-col border-r border-white/10 bg-slate-950/95 text-slate-100 shadow-2xl shadow-slate-950/20 lg:flex">
-            <div class="flex h-16 items-center gap-3 border-b border-white/10 px-6">
+        <aside class="fixed inset-y-0 left-0 z-40 hidden w-72 flex-col border-r border-gray-200/80 bg-white/95 text-gray-900 shadow-2xl shadow-slate-950/10 lg:flex">
+            <div class="flex h-16 items-center gap-3 border-b border-gray-200/80 px-6">
                 <div class="flex items-center gap-2">
-                    <span class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-white/5 ring-1 ring-white/10">
+                    <span class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-200/80">
                         <img src="{% static 'img/must-logo.png' %}" alt="MUST logo" class="h-full w-full object-contain p-1">
                     </span>
-                    <span class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-white/5 ring-1 ring-white/10">
+                    <span class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-200/80">
                         <img src="{% static 'img/logos/GSL-Official-Logo.png' %}" alt="GSL logo" class="h-full w-full object-contain p-1">
                     </span>
                 </div>
                 <div class="min-w-0">
-                    <p class="text-sm font-semibold tracking-tight text-white">MUST EMR</p>
-                    <p class="text-[10px] font-semibold uppercase tracking-[0.28em] text-slate-400">Clinical command center</p>
+                    <p class="text-sm font-semibold tracking-tight text-gray-900">MUST EMR</p>
+                    <p class="text-[10px] font-semibold uppercase tracking-[0.28em] text-gray-500">Clinical command center</p>
                 </div>
             </div>
 
             <div class="flex-1 overflow-y-auto px-4 py-5">
                 <div class="px-2">
-                    <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">Workspace</p>
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-gray-500">Workspace</p>
                     <nav aria-label="Main navigation" class="mt-3 space-y-1">
-                        <a href="{% url 'accounts:dashboard' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'accounts:dashboard' %}bg-white/10 text-white ring-1 ring-white/10{% else %}text-slate-300 hover:bg-white/5 hover:text-white{% endif %}">Dashboard</a>
-                        <a href="{% url 'patients:register' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'patients:register' %}bg-white/10 text-white ring-1 ring-white/10{% else %}text-slate-300 hover:bg-white/5 hover:text-white{% endif %}">Register Patient</a>
-                        <a href="{% url 'reporting:analytics_dashboard' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'reporting:analytics_dashboard' %}bg-white/10 text-white ring-1 ring-white/10{% else %}text-slate-300 hover:bg-white/5 hover:text-white{% endif %}">Analytics</a>
-                        <a href="{% url 'reporting:recent_alerts' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'reporting:recent_alerts' %}bg-white/10 text-white ring-1 ring-white/10{% else %}text-slate-300 hover:bg-white/5 hover:text-white{% endif %}">Alerts</a>
+                        <a href="{% url 'accounts:dashboard' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'accounts:dashboard' %}bg-brand-light text-brand ring-1 ring-brand/10{% else %}text-gray-700 hover:bg-gray-50 hover:text-gray-900{% endif %}">Dashboard</a>
+                        <a href="{% url 'patients:register' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'patients:register' %}bg-brand-light text-brand ring-1 ring-brand/10{% else %}text-gray-700 hover:bg-gray-50 hover:text-gray-900{% endif %}">Register Patient</a>
+                        <a href="{% url 'reporting:analytics_dashboard' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'reporting:analytics_dashboard' %}bg-brand-light text-brand ring-1 ring-brand/10{% else %}text-gray-700 hover:bg-gray-50 hover:text-gray-900{% endif %}">Analytics</a>
+                        <a href="{% url 'reporting:recent_alerts' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'reporting:recent_alerts' %}bg-brand-light text-brand ring-1 ring-brand/10{% else %}text-gray-700 hover:bg-gray-50 hover:text-gray-900{% endif %}">Alerts</a>
                     </nav>
                 </div>
 
                 <div class="mt-6 px-2">
-                    <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">Modules</p>
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-gray-500">Modules</p>
                     <nav aria-label="Module navigation" class="mt-3 space-y-1">
                         {% if user.is_superuser or user.profile.role == 'BILLING_OFFICER' or user.profile.role == 'ADMIN' or user.profile.role == 'ICT' %}
-                        <a href="{% url 'billing:dashboard' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'billing:dashboard' %}bg-white/10 text-white ring-1 ring-white/10{% else %}text-slate-300 hover:bg-white/5 hover:text-white{% endif %}">Billing</a>
+                        <a href="{% url 'billing:dashboard' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'billing:dashboard' %}bg-brand-light text-brand ring-1 ring-brand/10{% else %}text-gray-700 hover:bg-gray-50 hover:text-gray-900{% endif %}">Billing</a>
                         {% endif %}
                         {% if user.is_superuser or user.profile.role == 'PHARMACIST' or user.profile.role == 'ADMIN' or user.profile.role == 'ICT' %}
-                        <a href="{% url 'pharmacy:queue' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'pharmacy:queue' %}bg-white/10 text-white ring-1 ring-white/10{% else %}text-slate-300 hover:bg-white/5 hover:text-white{% endif %}">Pharmacy</a>
+                        <a href="{% url 'pharmacy:queue' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'pharmacy:queue' %}bg-brand-light text-brand ring-1 ring-brand/10{% else %}text-gray-700 hover:bg-gray-50 hover:text-gray-900{% endif %}">Pharmacy</a>
                         {% endif %}
                         {% if user.is_superuser or user.profile.role == 'ADMIN' or user.profile.role == 'ICT' %}
-                        <a href="{% url 'accounts:audit_trail' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'accounts:audit_trail' %}bg-white/10 text-white ring-1 ring-white/10{% else %}text-slate-300 hover:bg-white/5 hover:text-white{% endif %}">Audit Trail</a>
-                        <a href="{% url 'accounts:control_panel' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'accounts:control_panel' %}bg-white/10 text-white ring-1 ring-white/10{% else %}text-slate-300 hover:bg-white/5 hover:text-white{% endif %}">Control Panel</a>
+                        <a href="{% url 'accounts:audit_trail' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'accounts:audit_trail' %}bg-brand-light text-brand ring-1 ring-brand/10{% else %}text-gray-700 hover:bg-gray-50 hover:text-gray-900{% endif %}">Audit Trail</a>
+                        <a href="{% url 'accounts:control_panel' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'accounts:control_panel' %}bg-brand-light text-brand ring-1 ring-brand/10{% else %}text-gray-700 hover:bg-gray-50 hover:text-gray-900{% endif %}">Control Panel</a>
                         {% endif %}
                     </nav>
                 </div>
             </div>
 
-            <div class="border-t border-white/10 p-4">
-                <div class="flex items-center gap-3 rounded-2xl bg-white/5 px-3 py-3 ring-1 ring-white/10">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand/20 font-bold text-brand-light select-none">
+            <div class="border-t border-gray-200/80 p-4">
+                <div class="flex items-center gap-3 rounded-2xl bg-slate-50 px-3 py-3 ring-1 ring-gray-200/80">
+                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-light font-bold text-brand select-none">
                         {{ user.username|slice:":1"|upper }}
                     </span>
                     <div class="min-w-0 flex-1">
-                        <p class="truncate text-sm font-semibold text-white">{{ user.username }}</p>
-                        <p class="truncate text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">
+                        <p class="truncate text-sm font-semibold text-gray-900">{{ user.username }}</p>
+                        <p class="truncate text-[11px] font-semibold uppercase tracking-[0.22em] text-gray-500">
                             {% if user.profile %}{{ user.profile.get_role_display }}{% else %}Superuser{% endif %}
                         </p>
                     </div>
                 </div>
                 <form method="post" action="{% url 'accounts:logout' %}" class="mt-3">
                     {% csrf_token %}
-                    <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10">
+                    <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900">
                         Log out
                     </button>
                 </form>
