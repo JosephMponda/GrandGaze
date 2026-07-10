@@ -32,3 +32,9 @@ It supports phased growth from outpatient care into inpatient, diagnostics, dial
 - Alpine.js for lightweight client-side interactions
 - Chart.js for dashboard analytics
 
+## Assumptions and Limitations
+
+- The prototype uses synthetic or fictional patient data only.
+- It is designed for hackathon submission and demonstration, not production deployment.
+- Some interoperability, offline sync, and advanced governance features are represented as implementation-ready patterns rather than fully integrated external services.
+- Final operational controls such as hosting hardening, backup policy enforcement, and institution-specific security operations are deployment responsibilities.

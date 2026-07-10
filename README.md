@@ -7,5 +7,11 @@ Included documentation:
 - `WORKFLOW_DIAGRAMS.md`
 - `GOVERNANCE_SAFETY.md`
 - `SUSTAINABILITY_PLAN.md`
+- `CYBERSECURITY_COMPLIANCE.md`
+- `FINAL_PRESENTATION_DEMO.md`
+
+Notes:
+- All data in the prototype should be treated as synthetic or fictional.
+- This package includes assumptions and limitations in the design-oriented documents.
 
 The application code in this repository provides the functional prototype.
