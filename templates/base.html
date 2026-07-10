@@ -102,7 +102,7 @@
 
     {% if user.is_authenticated %}
     <div class="flex min-w-0 flex-1 flex-col lg:pl-72">
-        <header class="sticky top-0 z-30 border-b border-white/70 bg-white/85 backdrop-blur-xl">
+        <header class="sticky top-0 z-50 border-b border-white/70 bg-white/85 backdrop-blur-xl relative">
             <div class="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:px-8">
                 <button @click="mobileMenuOpen = !mobileMenuOpen" type="button" class="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white p-2 text-gray-600 shadow-sm transition-colors hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand lg:hidden">
                     <span class="sr-only">Open navigation menu</span>
@@ -114,8 +114,13 @@
                     </svg>
                 </button>
                 <a href="{% url 'accounts:dashboard' %}" class="flex items-center gap-3">
-                    <span class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-                        <img src="{% static 'img/must-logo.png' %}" alt="MUST logo" class="h-full w-full object-contain p-1">
+                    <span class="flex items-center gap-2">
+                        <span class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+                            <img src="{% static 'img/must-logo.png' %}" alt="MUST logo" class="h-full w-full object-contain p-1">
+                        </span>
+                        <span class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+                            <img src="{% static 'img/logos/GSL-Official-Logo.png' %}" alt="GSL logo" class="h-full w-full object-contain p-1">
+                        </span>
                     </span>
                     <div class="hidden sm:block">
                         <p class="text-sm font-semibold tracking-tight text-gray-900">MUST EMR</p>
@@ -142,7 +147,7 @@
              x-transition:leave="transition ease-in duration-150"
              x-transition:leave-start="opacity-100 translate-y-0"
              x-transition:leave-end="opacity-0 -translate-y-2"
-             class="fixed inset-x-0 top-16 z-40 max-h-[calc(100vh-4rem)] overflow-y-auto border-b border-gray-200 bg-white/95 backdrop-blur-xl lg:hidden">
+             class="fixed inset-x-0 top-16 z-[60] max-h-[calc(100vh-4rem)] overflow-y-auto border-b border-gray-200 bg-white/95 backdrop-blur-xl lg:hidden">
             <div class="px-4 py-4">
                 <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <a href="{% url 'accounts:dashboard' %}" class="rounded-xl border border-gray-200 px-3 py-3 text-sm font-semibold {% if request.resolver_match.view_name == 'accounts:dashboard' %}bg-brand-light text-brand{% else %}text-gray-700 hover:bg-gray-50{% endif %}">Dashboard</a>
