@@ -3,40 +3,40 @@
 @source "../../templates/**/*.html";
 @source "../../**/*.html";
 @theme {
-  /* Primary Ink - Slightly softer for better readability */
-  --color-ink: #1a2332;
+  /* Primary Ink - Very dark slate/forest green */
+  --color-ink: #0b1e1b;
   
-  /* Paper - Clean medical white with slight warmth */
-  --color-paper: #f8fafb;
+  /* Paper - Soft minty gray background matching Healthkia */
+  --color-paper: #f0f4f2;
   
-  /* Brand - Vibrant medical blue (trust, cleanliness) */
-  --color-brand: #0284c7;
-  --color-brand-hover: #0369a1;
+  /* Brand - Deep forest green (matching Healthkia sidebar/primary elements) */
+  --color-brand: #0f4a41;
+  --color-brand-hover: #135c51;
   
-  /* Brand Dark - Deep navy for headers/contrast */
-  --color-brand-dark: #0f2744;
+  /* Brand Dark - Even deeper forest green for high contrast */
+  --color-brand-dark: #082d27;
   
-  /* Brand Light - Soft blue background */
-  --color-brand-light: #e0f2fe;
+  /* Brand Light - Soft mint green/teal background for active states */
+  --color-brand-light: #e6e9e8;
   
-  /* Brand Accent - Medical teal/green (healing, vitality) */
-  --color-brand-accent: #0d9488;
-  --color-brand-accent-hover: #0f766e;
+  /* Brand Accent - Soft mint/green highlight */
+  --color-brand-accent: #1e7065;
+  --color-brand-accent-hover: #26897c;
   
-  /* Brand Silver - Warm gray for secondary elements */
-  --color-brand-silver: #b8bfc6;
+  /* Brand Silver - Warm gray border color */
+  --color-brand-silver: #d1dcd7;
   
   /* Additional clinical colors */
-  --color-clinical-success: #059669;
-  --color-clinical-warning: #d97706;
-  --color-clinical-critical: #dc2626;
-  --color-clinical-info: #0891b2;
+  --color-clinical-success: #10b981;
+  --color-clinical-warning: #f59e0b;
+  --color-clinical-critical: #ef4444;
+  --color-clinical-info: #06b6d4;
   
-  /* Status colors - more vibrant */
-  --color-status-active: #16a34a;
-  --color-status-pending: #ca8a04;
-  --color-status-completed: #0d9488;
-  --color-status-cancelled: #78716c;
+  /* Status colors */
+  --color-status-active: #10b981;
+  --color-status-pending: #f59e0b;
+  --color-status-completed: #10b981;
+  --color-status-cancelled: #6b7280;
 }
 
 @layer components {
