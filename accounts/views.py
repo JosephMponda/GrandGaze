@@ -59,6 +59,9 @@ def dashboard(request):
         warning=Count("pk", filter=Q(severity="warning")),
         info=Count("pk", filter=Q(severity="info")),
     )
+    alert_4h_critical = alert_severity_breakdown["critical"] or 0
+    alert_4h_warning = alert_severity_breakdown["warning"] or 0
+    alert_4h_info = alert_severity_breakdown["info"] or 0
 
     context = {
         "widgets": widgets_for_user(request.user),
@@ -69,6 +72,8 @@ def dashboard(request):
         "pending_prescriptions": pending_prescriptions,
         "unacknowledged_alerts": unacknowledged_alerts,
         "critical_alerts_4h": critical_alerts_4h,
+        "warning_count": alert_4h_warning,
+        "info_count": alert_4h_info,
         "recent_alerts": AlertEvent.objects.select_related("patient").order_by("-raised_at")[:5],
         "activity_chart": {
             "labels": activity_labels,
@@ -78,9 +83,9 @@ def dashboard(request):
         "severity_chart": {
             "labels": ["Critical", "Warning", "Info"],
             "values": [
-                alert_severity_breakdown["critical"] or 0,
-                alert_severity_breakdown["warning"] or 0,
-                alert_severity_breakdown["info"] or 0,
+                alert_4h_critical,
+                alert_4h_warning,
+                alert_4h_info,
             ],
         },
     }

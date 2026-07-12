@@ -7,7 +7,7 @@
 <div class="min-h-screen flex flex-col -mx-4 sm:-mx-6 lg:-mx-8 -mt-8 pb-12">
     
     {# ── Encounter Header ─────────────────────────────────────────────────── #}
-    <div class="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4 shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4 shrink-0 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0">
             <a href="{% url 'patients:profile' patient.pk|default:0 %}#encounters" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors mt-0.5 sm:mt-0 shrink-0">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
@@ -52,7 +52,7 @@
                 {# Profile Summary #}
                 <div class="bg-white rounded-xl border border-gray-200/80 p-4 shadow-sm">
                     <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">Demographics</h3>
-                    <div class="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
+                    <div class="grid grid-cols-1 gap-x-4 gap-y-3 text-sm sm:grid-cols-2">
                         <div>
                             <p class="text-gray-500 text-xs font-medium">Age / Sex</p>
                             <p class="text-gray-900 font-semibold">{{ encounter.patient.age|default:"-" }} yrs / {{ encounter.patient.get_sex_display }}</p>
@@ -76,7 +76,7 @@
                             {% if latest_vital.ews.risk_level == 'high' or latest_vital.ews.risk_level == 'critical' %}bg-red-500
                             {% elif latest_vital.ews.risk_level == 'medium' %}bg-amber-500
                             {% else %}bg-green-500{% endif %}"></div>
-                        <div class="flex justify-between items-start mb-4">
+                        <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                             <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500">Today's Vitals</h3>
                             {% if latest_vital.ews %}
                             <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-white
@@ -89,23 +89,23 @@
                         </div>
                         
                         <div class="space-y-3 text-sm">
-                            <div class="flex justify-between items-center border-b border-gray-50 pb-2">
+                            <div class="flex flex-col gap-1 border-b border-gray-50 pb-2 sm:flex-row sm:items-center sm:justify-between">
                                 <span class="text-gray-500 font-medium">Blood Pressure</span>
                                 <span class="font-bold text-gray-900">{{ latest_vital.blood_pressure_systolic }}/{{ latest_vital.blood_pressure_diastolic }} <span class="text-xs text-gray-400 font-normal">mmHg</span></span>
                             </div>
-                            <div class="flex justify-between items-center border-b border-gray-50 pb-2">
+                            <div class="flex flex-col gap-1 border-b border-gray-50 pb-2 sm:flex-row sm:items-center sm:justify-between">
                                 <span class="text-gray-500 font-medium">Heart Rate</span>
                                 <span class="font-bold text-gray-900">{{ latest_vital.pulse_rate }} <span class="text-xs text-gray-400 font-normal">bpm</span></span>
                             </div>
-                            <div class="flex justify-between items-center border-b border-gray-50 pb-2">
+                            <div class="flex flex-col gap-1 border-b border-gray-50 pb-2 sm:flex-row sm:items-center sm:justify-between">
                                 <span class="text-gray-500 font-medium">SpO2</span>
                                 <span class="font-bold text-gray-900">{{ latest_vital.oxygen_saturation }}% <span class="text-xs text-gray-400 font-normal">{% if latest_vital.supplemental_oxygen %}O2{% else %}RA{% endif %}</span></span>
                             </div>
-                            <div class="flex justify-between items-center border-b border-gray-50 pb-2">
+                            <div class="flex flex-col gap-1 border-b border-gray-50 pb-2 sm:flex-row sm:items-center sm:justify-between">
                                 <span class="text-gray-500 font-medium">Temperature</span>
                                 <span class="font-bold text-gray-900">{{ latest_vital.temperature_c }} <span class="text-xs text-gray-400 font-normal">°C</span></span>
                             </div>
-                            <div class="flex justify-between items-center">
+                            <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                                 <span class="text-gray-500 font-medium">Resp. Rate</span>
                                 <span class="font-bold text-gray-900">{{ latest_vital.respiratory_rate }} <span class="text-xs text-gray-400 font-normal">/min</span></span>
                             </div>

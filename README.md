@@ -1,11 +1,21 @@
-# MUST–GSL EMR — GrandGaze
+# MUST EMR
 
-Electronic Medical Record system for the MUST Teaching Hospital.
+![MUST logo](static/img/must-logo.png) ![GSL logo](static/img/logos/GSL-Official-Logo.png)
 
-**Trackers (repo root):**
-- `Requirements-Tracker.md` — every brief spec mapped to implementation status
-- `Untouched-Parts.md` — specifications not yet implemented
-- `UI-UX-concerns.md` — accessibility and usability issues
+Grand Gaze
 
-**Documentation:** see `docs/README.md` for full index.
-**Setup:** see `docs/README.md` for installation and test instructions.
+Submission package for the MUST-GSL Electronic Medical Record Innovation Challenge.
+
+Included documentation:
+- `SYSTEM_DESIGN.md`
+- `WORKFLOW_DIAGRAMS.md`
+- `GOVERNANCE_SAFETY.md`
+- `SUSTAINABILITY_PLAN.md`
+- `CYBERSECURITY_COMPLIANCE.md`
+- `FINAL_PRESENTATION_DEMO.md`
+
+Notes:
+- All data in the prototype should be treated as synthetic or fictional.
+- This package includes assumptions and limitations in the design-oriented documents.
+
+The application code in this repository provides the functional prototype.

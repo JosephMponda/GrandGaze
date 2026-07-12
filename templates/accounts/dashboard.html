@@ -2,18 +2,18 @@
 {% block title %}Dashboard - MUST EMR{% endblock %}
 {% block content %}
 <div class="mx-auto max-w-7xl space-y-6">
-    <section class="overflow-hidden rounded-[2rem] border border-slate-200/80 bg-ink text-white shadow-2xl shadow-slate-950/20">
+    <section class="overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white text-gray-900 shadow-lg shadow-slate-950/10">
         <div class="grid gap-6 px-6 py-6 sm:px-8 lg:grid-cols-[1.35fr,0.85fr] lg:px-10 lg:py-8">
             <div class="relative">
-                <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-300">
+                <div class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-700 shadow-sm">
                     Clinical command center
-                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
                     Live
                 </div>
-                <h1 class="mt-4 max-w-3xl text-3xl font-black tracking-tight text-white sm:text-4xl">
+                <h1 class="mt-4 max-w-3xl text-3xl font-black tracking-tight text-gray-900 sm:text-4xl">
                     Welcome back, {{ user.first_name|default:user.username }}
                 </h1>
-                <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
+                <p class="mt-3 max-w-2xl text-sm leading-6 text-gray-700 sm:text-base">
                     Scan current workload, jump into patient search, and watch the operational pulse across the EMR.
                 </p>
 
@@ -22,35 +22,35 @@
                         Register patient
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
                     </a>
-                    <a href="{% url 'reporting:analytics_dashboard' %}" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10">
+                    <a href="{% url 'reporting:analytics_dashboard' %}" class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 hover:text-gray-900">
                         View analytics
                     </a>
-                    <a href="{% url 'reporting:recent_alerts' %}" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10">
+                    <a href="{% url 'reporting:recent_alerts' %}" class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 hover:text-gray-900">
                         Review alerts
                     </a>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 sm:gap-4">
-                <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">Patients today</p>
-                    <p class="mt-2 text-3xl font-black text-white">{{ patients_today }}</p>
-                    <p class="mt-1 text-xs text-slate-400">New registrations captured today</p>
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+                <div class="rounded-2xl border border-white bg-white p-4 shadow-lg shadow-slate-950/10">
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Patients today</p>
+                    <p class="mt-2 text-3xl font-black text-gray-900">{{ patients_today }}</p>
+                    <p class="mt-1 text-xs text-gray-600">New registrations captured today</p>
                 </div>
-                <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">Open encounters</p>
-                    <p class="mt-2 text-3xl font-black text-white">{{ open_encounters }}</p>
-                    <p class="mt-1 text-xs text-slate-400">Unsigned clinical notes</p>
+                <div class="rounded-2xl border border-white bg-white p-4 shadow-lg shadow-slate-950/10">
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Open encounters</p>
+                    <p class="mt-2 text-3xl font-black text-gray-900">{{ open_encounters }}</p>
+                    <p class="mt-1 text-xs text-gray-600">Unsigned clinical notes</p>
                 </div>
-                <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">Critical alerts</p>
-                    <p class="mt-2 text-3xl font-black text-white">{{ critical_alerts_4h }}</p>
-                    <p class="mt-1 text-xs text-slate-400">Raised in the last 4 hours</p>
+                <div class="rounded-2xl border border-white bg-white p-4 shadow-lg shadow-slate-950/10">
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Critical alerts</p>
+                    <p class="mt-2 text-3xl font-black text-red-700">{{ critical_alerts_4h }}</p>
+                    <p class="mt-1 text-xs text-gray-600">Raised in the last 4 hours</p>
                 </div>
-                <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">Pending work</p>
-                    <p class="mt-2 text-3xl font-black text-white">{{ pending_labs|add:pending_imaging|add:pending_prescriptions }}</p>
-                    <p class="mt-1 text-xs text-slate-400">Labs, imaging, and prescriptions</p>
+                <div class="rounded-2xl border border-white bg-white p-4 shadow-lg shadow-slate-950/10">
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Pending work</p>
+                    <p class="mt-2 text-3xl font-black text-gray-900">{{ pending_labs|add:pending_imaging|add:pending_prescriptions }}</p>
+                    <p class="mt-1 text-xs text-gray-600">Labs, imaging, and prescriptions</p>
                 </div>
             </div>
         </div>
@@ -122,11 +122,11 @@
                         </div>
                         <div class="flex items-center justify-between rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3">
                             <span class="text-sm font-semibold text-amber-800">Warning</span>
-                            <span class="text-lg font-black text-amber-700">{{ unacknowledged_alerts }}</span>
+                            <span class="text-lg font-black text-amber-700">{{ warning_count|default:0 }}</span>
                         </div>
                         <div class="flex items-center justify-between rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3">
                             <span class="text-sm font-semibold text-blue-800">Info</span>
-                            <span class="text-lg font-black text-blue-700">{{ patients_today }}</span>
+                            <span class="text-lg font-black text-blue-700">{{ info_count|default:0 }}</span>
                         </div>
                     </div>
                 </div>
@@ -258,6 +258,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: { duration: 250 },
                     plugins: {
                         legend: { display: false },
                         tooltip: { intersect: false, mode: 'index' },
@@ -291,6 +292,7 @@
                 options: {
                     responsive: true,
                     cutout: '68%',
+                    animation: { duration: 250 },
                     plugins: {
                         legend: { display: false },
                         tooltip: { intersect: false, mode: 'nearest' },

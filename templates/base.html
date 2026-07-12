@@ -13,230 +13,207 @@
         .htmx-request.htmx-indicator { opacity: 1; }
     </style>
 </head>
-<body class="bg-paper text-ink min-h-screen flex font-sans antialiased" x-data="{ mobileMenuOpen: false }">
+<body class="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_top_left,_rgba(0,159,227,0.10),_transparent_34%),linear-gradient(180deg,_#f8fafc_0%,_#fafaf9_100%)] text-ink antialiased" hx-boost="true" x-data="{ mobileMenuOpen: false }">
+    {% if user.is_authenticated %}<div class="min-h-screen lg:flex">{% endif %}
 
-{% if user.is_authenticated %}
-<aside class="hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 lg:w-64 bg-brand-dark text-white z-30">
-    <div class="flex items-center gap-2.5 h-16 px-6 shrink-0 border-b border-white/10">
-        <span class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-brand-dark font-bold text-lg shadow-sm shrink-0">M</span>
-        <span class="text-[15px] font-bold tracking-tight text-white truncate">MUST EMR</span>
-    </div>
-
-    <nav class="flex-1 overflow-y-auto px-3 py-6 space-y-6">
-        <div>
-            <p class="px-3 text-[10px] font-bold text-white/35 uppercase tracking-wider mb-2">Main Menu</p>
-            <div class="space-y-0.5">
-                {% url 'accounts:dashboard' as dashboard_url %}
-                <a href="{{ dashboard_url }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'accounts:dashboard' %}bg-white/10 text-white{% else %}text-white/60 hover:text-white hover:bg-white/5{% endif %}">
-                    <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-                    Overview
-                </a>
-                {% url 'patients:register' as register_url %}
-                <a href="{{ register_url }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'patients:register' %}bg-white/10 text-white{% else %}text-white/60 hover:text-white hover:bg-white/5{% endif %}">
-                    <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M18 9v6m3-3h-6M7 20a4 4 0 01-4-4v-1a4 4 0 014-4h3a4 4 0 014 4M10 11a3 3 0 100-6 3 3 0 000 6z"/></svg>
-                    Register Patient
-                </a>
-            </div>
-        </div>
-
-        {% if user.is_superuser or user.profile.role == 'BILLING_OFFICER' or user.profile.role == 'ADMIN' or user.profile.role == 'ICT' or user.profile.role == 'PHARMACIST' %}
-        <div>
-            <p class="px-3 text-[10px] font-bold text-white/35 uppercase tracking-wider mb-2">Clinical Ops</p>
-            <div class="space-y-0.5">
-                {% if user.is_superuser or user.profile.role == 'BILLING_OFFICER' or user.profile.role == 'ADMIN' or user.profile.role == 'ICT' %}
-                {% url 'billing:dashboard' as billing_url %}
-                <a href="{{ billing_url }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'billing:dashboard' %}bg-white/10 text-white{% else %}text-white/60 hover:text-white hover:bg-white/5{% endif %}">
-                    <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 10h18M5 6h14a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2zm2 8h4"/></svg>
-                    Billing
-                </a>
-                {% endif %}
-                {% if user.is_superuser or user.profile.role == 'PHARMACIST' or user.profile.role == 'ADMIN' or user.profile.role == 'ICT' %}
-                {% url 'pharmacy:queue' as pharmacy_url %}
-                <a href="{{ pharmacy_url }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'pharmacy:queue' %}bg-white/10 text-white{% else %}text-white/60 hover:text-white hover:bg-white/5{% endif %}">
-                    <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
-                    Pharmacy
-                </a>
-                {% endif %}
-            </div>
-        </div>
-        {% endif %}
-
-        {% if user.is_superuser or user.profile.role == 'ADMIN' or user.profile.role == 'ICT' %}
-        <div>
-            <p class="px-3 text-[10px] font-bold text-white/35 uppercase tracking-wider mb-2">Administration</p>
-            <div class="space-y-0.5">
-                {% url 'accounts:audit_trail' as audit_url %}
-                <a href="{{ audit_url }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'accounts:audit_trail' %}bg-white/10 text-white{% else %}text-white/60 hover:text-white hover:bg-white/5{% endif %}">
-                    <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                    Audit Trail
-                </a>
-                {% url 'accounts:control_panel' as admin_url %}
-                <a href="{{ admin_url }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'accounts:control_panel' %}bg-white/10 text-white{% else %}text-white/60 hover:text-white hover:bg-white/5{% endif %}">
-                    <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065zM15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    Control Panel
-                </a>
-            </div>
-        </div>
-        {% endif %}
-    </nav>
-
-    <div class="shrink-0 border-t border-white/10 p-3">
-        <div class="flex items-center gap-3 px-2 py-2">
-            <span class="w-9 h-9 rounded-full bg-white/10 border border-white/10 flex items-center justify-center font-bold text-white text-sm select-none shrink-0">
-                {{ user.username|slice:":1"|upper }}
-            </span>
-            <div class="min-w-0 flex-1">
-                <p class="text-xs font-semibold text-white leading-4 truncate">{{ user.username }}</p>
-                <p class="text-[10px] font-medium text-white/45 uppercase tracking-wider mt-0.5 truncate">
-                    {% if user.profile %}{{ user.profile.get_role_display }}{% else %}Superuser{% endif %}
-                </p>
-            </div>
-        </div>
-        <form method="post" action="{% url 'accounts:logout' %}" class="mt-1">
-            {% csrf_token %}
-            <button type="submit" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 transition-colors cursor-pointer">
-                <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                Log Out
-            </button>
-        </form>
-    </div>
-</aside>
-
-<div x-show="mobileMenuOpen" style="display:none" class="lg:hidden fixed inset-0 z-40" x-transition.opacity>
-    <div class="absolute inset-0 bg-brand-dark/60 backdrop-blur-sm" @click="mobileMenuOpen = false"></div>
-    <aside x-show="mobileMenuOpen"
-           x-transition:enter="transition ease-out duration-200" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0"
-           x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full"
-           class="relative flex flex-col w-72 max-w-[85vw] h-full bg-brand-dark text-white">
-        <div class="flex items-center justify-between h-16 px-5 shrink-0 border-b border-white/10">
-            <div class="flex items-center gap-2.5">
-                <span class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-brand-dark font-bold text-lg shadow-sm">M</span>
-                <span class="text-[15px] font-bold tracking-tight text-white">MUST EMR</span>
-            </div>
-            <button @click="mobileMenuOpen = false" class="p-1.5 rounded-md text-white/60 hover:text-white hover:bg-white/10">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-        </div>
-        <nav class="flex-1 overflow-y-auto px-3 py-6 space-y-1">
-            <a href="{{ dashboard_url }}" class="block px-3 py-2.5 rounded-lg text-sm font-medium {% if request.resolver_match.view_name == 'accounts:dashboard' %}bg-white/10 text-white{% else %}text-white/60{% endif %}">Overview</a>
-            <a href="{{ register_url }}" class="block px-3 py-2.5 rounded-lg text-sm font-medium {% if request.resolver_match.view_name == 'patients:register' %}bg-white/10 text-white{% else %}text-white/60{% endif %}">Register Patient</a>
-            {% if user.is_superuser or user.profile.role == 'BILLING_OFFICER' or user.profile.role == 'ADMIN' or user.profile.role == 'ICT' %}
-            <a href="{{ billing_url }}" class="block px-3 py-2.5 rounded-lg text-sm font-medium {% if request.resolver_match.view_name == 'billing:dashboard' %}bg-white/10 text-white{% else %}text-white/60{% endif %}">Billing</a>
-            {% endif %}
-            {% if user.is_superuser or user.profile.role == 'PHARMACIST' or user.profile.role == 'ADMIN' or user.profile.role == 'ICT' %}
-            <a href="{{ pharmacy_url }}" class="block px-3 py-2.5 rounded-lg text-sm font-medium {% if request.resolver_match.view_name == 'pharmacy:queue' %}bg-white/10 text-white{% else %}text-white/60{% endif %}">Pharmacy</a>
-            {% endif %}
-            {% if user.is_superuser or user.profile.role == 'ADMIN' or user.profile.role == 'ICT' %}
-            <a href="{{ audit_url }}" class="block px-3 py-2.5 rounded-lg text-sm font-medium {% if request.resolver_match.view_name == 'accounts:audit_trail' %}bg-white/10 text-white{% else %}text-white/60{% endif %}">Audit Trail</a>
-            <a href="{{ admin_url }}" class="block px-3 py-2.5 rounded-lg text-sm font-medium {% if request.resolver_match.view_name == 'accounts:control_panel' %}bg-white/10 text-white{% else %}text-white/60{% endif %}">Control Panel</a>
-            {% endif %}
-        </nav>
-        <div class="shrink-0 border-t border-white/10 p-3">
-            <div class="flex items-center gap-3 px-2 py-2">
-                <span class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center font-bold text-white text-sm select-none shrink-0">{{ user.username|slice:":1"|upper }}</span>
+    {% block nav %}
+        {% if user.is_authenticated %}
+        <aside class="fixed inset-y-0 left-0 z-40 hidden w-72 flex-col border-r border-gray-200/80 bg-white/95 text-gray-900 shadow-2xl shadow-slate-950/10 lg:flex">
+            <div class="flex h-16 items-center gap-3 border-b border-gray-200/80 px-6">
+                <div class="flex items-center gap-2">
+                    <span class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-200/80">
+                        <img src="{% static 'img/must-logo.png' %}" alt="MUST logo" class="h-full w-full object-contain p-1">
+                    </span>
+                    <span class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-200/80">
+                        <img src="{% static 'img/logos/GSL-Official-Logo.png' %}" alt="GSL logo" class="h-full w-full object-contain p-1">
+                    </span>
+                </div>
                 <div class="min-w-0">
-                    <p class="text-xs font-semibold text-white truncate">{{ user.username }}</p>
-                    <p class="text-[10px] font-medium text-white/45 uppercase tracking-wider truncate">{% if user.profile %}{{ user.profile.get_role_display }}{% else %}Superuser{% endif %}</p>
+                    <p class="text-sm font-semibold tracking-tight text-gray-900">MUST EMR</p>
+                    <p class="text-[10px] font-semibold uppercase tracking-[0.28em] text-gray-500">Clinical command center</p>
                 </div>
             </div>
-            <form method="post" action="{% url 'accounts:logout' %}" class="mt-1">
-                {% csrf_token %}
-                <button type="submit" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/5">Log out</button>
-            </form>
-        </div>
-    </aside>
-</div>
-{% endif %}
 
-<div class="flex-1 flex flex-col min-h-screen w-full {% if user.is_authenticated %}lg:pl-64{% endif %}">
-
-{% block nav %}<header class="bg-white border-b border-gray-200/80 shadow-xs sticky top-0 z-20">
-    <div class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8 gap-4">
-
-        <div class="flex items-center gap-3 min-w-0">
-            {% if user.is_authenticated %}
-            <button @click="mobileMenuOpen = true" type="button" class="lg:hidden p-2 -ml-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
-            </button>
-            {# Quick patient search #}
-            <div class="hidden sm:block relative w-64 lg:w-80" x-data="{ open: false }" @click.outside="open = false">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <div class="flex-1 overflow-y-auto px-4 py-5">
+                <div class="px-2">
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-gray-500">Workspace</p>
+                    <nav aria-label="Main navigation" class="mt-3 space-y-1">
+                        <a href="{% url 'accounts:dashboard' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'accounts:dashboard' %}bg-brand-light text-brand ring-1 ring-brand/10{% else %}text-gray-700 hover:bg-gray-50 hover:text-gray-900{% endif %}">Dashboard</a>
+                        <a href="{% url 'patients:register' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'patients:register' %}bg-brand-light text-brand ring-1 ring-brand/10{% else %}text-gray-700 hover:bg-gray-50 hover:text-gray-900{% endif %}">Register Patient</a>
+                        <a href="{% url 'reporting:analytics_dashboard' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'reporting:analytics_dashboard' %}bg-brand-light text-brand ring-1 ring-brand/10{% else %}text-gray-700 hover:bg-gray-50 hover:text-gray-900{% endif %}">Analytics</a>
+                        <a href="{% url 'reporting:recent_alerts' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'reporting:recent_alerts' %}bg-brand-light text-brand ring-1 ring-brand/10{% else %}text-gray-700 hover:bg-gray-50 hover:text-gray-900{% endif %}">Alerts</a>
+                    </nav>
                 </div>
-                <input type="search" name="q" placeholder="Search anything here"
-                       class="block w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-ink placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand focus:bg-white transition-all"
-                       hx-get="{% url 'patients:search' %}"
-                       hx-trigger="keyup changed delay:300ms"
-                       hx-target="#topbar-search-results"
-                       hx-boost="false"
-                       @focus="open = true" @htmx:before-request="open = true"
-                       autocomplete="off">
-                <div x-show="open" style="display:none" x-transition
-                     class="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-96 overflow-y-auto z-30 p-3">
-                    <div id="topbar-search-results" class="text-sm"></div>
+
+                <div class="mt-6 px-2">
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-gray-500">Modules</p>
+                    <nav aria-label="Module navigation" class="mt-3 space-y-1">
+                        {% if user.is_superuser or user.profile.role == 'BILLING_OFFICER' or user.profile.role == 'ADMIN' or user.profile.role == 'ICT' %}
+                        <a href="{% url 'billing:dashboard' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'billing:dashboard' %}bg-brand-light text-brand ring-1 ring-brand/10{% else %}text-gray-700 hover:bg-gray-50 hover:text-gray-900{% endif %}">Billing</a>
+                        {% endif %}
+                        {% if user.is_superuser or user.profile.role == 'PHARMACIST' or user.profile.role == 'ADMIN' or user.profile.role == 'ICT' %}
+                        <a href="{% url 'pharmacy:queue' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'pharmacy:queue' %}bg-brand-light text-brand ring-1 ring-brand/10{% else %}text-gray-700 hover:bg-gray-50 hover:text-gray-900{% endif %}">Pharmacy</a>
+                        {% endif %}
+                        {% if user.is_superuser or user.profile.role == 'ADMIN' or user.profile.role == 'ICT' %}
+                        <a href="{% url 'accounts:audit_trail' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'accounts:audit_trail' %}bg-brand-light text-brand ring-1 ring-brand/10{% else %}text-gray-700 hover:bg-gray-50 hover:text-gray-900{% endif %}">Audit Trail</a>
+                        <a href="{% url 'accounts:control_panel' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {% if request.resolver_match.view_name == 'accounts:control_panel' %}bg-brand-light text-brand ring-1 ring-brand/10{% else %}text-gray-700 hover:bg-gray-50 hover:text-gray-900{% endif %}">Control Panel</a>
+                        {% endif %}
+                    </nav>
                 </div>
             </div>
-            {% endif %}
-        </div>
 
-        <div class="flex items-center gap-3 shrink-0">
-            {% if user.is_authenticated %}
-                {# Connection Dot #}
-                <div class="relative flex items-center justify-center" x-data="{ online: navigator.onLine }"
-                     @online.window="online = true" @offline.window="online = false" :title="online ? 'Online' : 'Offline'">
-                    <span :class="online ? 'bg-green-500' : 'bg-red-500'" class="w-2.5 h-2.5 rounded-full inline-block transition-colors duration-300"></span>
-                </div>
-
-                {# Session Idle Timer #}
-                <div x-data="idleTimer()" x-init="init()" @click="reset()" @keydown.window="reset()" @mousemove.window="reset()">
-                    <div x-show="showWarning" x-transition
-                         class="fixed top-4 right-4 z-[9999] bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-xl shadow-lg text-xs font-medium">
-                        Session idle - will lock in <span x-text="remaining"></span>s
-                    </div>
-                </div>
-
-                <div class="hidden md:flex items-center gap-2.5 pl-3 border-l border-gray-200">
-                    <span class="w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center font-bold text-gray-700 text-sm select-none">
+            <div class="border-t border-gray-200/80 p-4">
+                <div class="flex items-center gap-3 rounded-2xl bg-slate-50 px-3 py-3 ring-1 ring-gray-200/80">
+                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-light font-bold text-brand select-none">
                         {{ user.username|slice:":1"|upper }}
                     </span>
-                    <div class="text-left">
-                        <p class="text-xs font-semibold text-gray-900 leading-3">Dr, {{ user.username }}</p>
-                        <p class="text-[10px] font-medium text-gray-500 uppercase tracking-wider mt-0.5">
+                    <div class="min-w-0 flex-1">
+                        <p class="truncate text-sm font-semibold text-gray-900">{{ user.username }}</p>
+                        <p class="truncate text-[11px] font-semibold uppercase tracking-[0.22em] text-gray-500">
                             {% if user.profile %}{{ user.profile.get_role_display }}{% else %}Superuser{% endif %}
                         </p>
                     </div>
                 </div>
-            {% else %}
+                <form method="post" action="{% url 'accounts:logout' %}" class="mt-3">
+                    {% csrf_token %}
+                    <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900">
+                        Log out
+                    </button>
+                </form>
+            </div>
+        </aside>
+        {% else %}
+        <header class="border-b border-gray-200/80 bg-white/85 shadow-sm backdrop-blur-xl">
+            <div class="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-8">
+                <a href="{% url 'accounts:login' %}" class="flex items-center gap-3">
+                    <span class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+                        <img src="{% static 'img/must-logo.png' %}" alt="MUST logo" class="h-full w-full object-contain p-1">
+                    </span>
+                    <div>
+                        <p class="text-sm font-semibold tracking-tight text-gray-900">MUST EMR</p>
+                        <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-gray-500">Malawi health information system</p>
+                    </div>
+                </a>
                 <a href="{% url 'accounts:login' %}" class="btn-primary text-xs px-4 py-2 font-semibold">Sign In</a>
-            {% endif %}
+            </div>
+        </header>
+        {% endif %}
+    {% endblock nav %}
+
+    {% if user.is_authenticated %}
+    <div class="flex min-w-0 flex-1 flex-col lg:pl-72">
+        <header class="sticky top-0 z-50 border-b border-white/70 bg-white/85 backdrop-blur-xl relative">
+            <div class="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:px-8">
+                <button @click="mobileMenuOpen = !mobileMenuOpen" type="button" class="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white p-2 text-gray-600 shadow-sm transition-colors hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand lg:hidden">
+                    <span class="sr-only">Open navigation menu</span>
+                    <svg x-show="!mobileMenuOpen" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    <svg x-show="mobileMenuOpen" style="display: none;" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+                <a href="{% url 'accounts:dashboard' %}" class="flex items-center gap-3">
+                    <span class="flex items-center gap-2">
+                        <span class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+                            <img src="{% static 'img/must-logo.png' %}" alt="MUST logo" class="h-full w-full object-contain p-1">
+                        </span>
+                        <span class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+                            <img src="{% static 'img/logos/GSL-Official-Logo.png' %}" alt="GSL logo" class="h-full w-full object-contain p-1">
+                        </span>
+                    </span>
+                    <div class="hidden sm:block">
+                        <p class="text-sm font-semibold tracking-tight text-gray-900">MUST EMR</p>
+                        <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-gray-500">Fast clinical workspace</p>
+                    </div>
+                </a>
+                <div class="ml-auto flex items-center gap-2 sm:gap-3">
+                    <div class="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 shadow-sm">
+                        <span class="relative flex h-2.5 w-2.5">
+                            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+                            <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500"></span>
+                        </span>
+                        <span class="text-[11px] font-semibold uppercase tracking-[0.22em] text-gray-500">Online</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div
+            x-show="mobileMenuOpen"
+            style="display: none;"
+            class="fixed inset-0 z-[60] lg:hidden">
+            <button
+                type="button"
+                aria-label="Close mobile navigation"
+                @click="mobileMenuOpen = false"
+                class="absolute inset-0 h-full w-full bg-slate-950/20 backdrop-blur-[1px]">
+            </button>
+            <nav aria-label="Mobile navigation"
+                 @click.outside="mobileMenuOpen = false"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 -translate-y-2"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 -translate-y-2"
+                 class="pointer-events-auto absolute inset-x-0 top-16 max-h-[calc(100vh-4rem)] overflow-y-auto border-b border-gray-200 bg-white/95 shadow-2xl shadow-slate-950/10 backdrop-blur-xl isolate">
+            <div class="px-4 py-4">
+                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <a href="{% url 'accounts:dashboard' %}" @click="mobileMenuOpen = false" class="rounded-xl border border-gray-200 px-3 py-3 text-sm font-semibold {% if request.resolver_match.view_name == 'accounts:dashboard' %}bg-brand-light text-brand{% else %}text-gray-700 hover:bg-gray-50{% endif %}">Dashboard</a>
+                    <a href="{% url 'patients:register' %}" @click="mobileMenuOpen = false" class="rounded-xl border border-gray-200 px-3 py-3 text-sm font-semibold {% if request.resolver_match.view_name == 'patients:register' %}bg-brand-light text-brand{% else %}text-gray-700 hover:bg-gray-50{% endif %}">Register</a>
+                    <a href="{% url 'reporting:analytics_dashboard' %}" @click="mobileMenuOpen = false" class="rounded-xl border border-gray-200 px-3 py-3 text-sm font-semibold {% if request.resolver_match.view_name == 'reporting:analytics_dashboard' %}bg-brand-light text-brand{% else %}text-gray-700 hover:bg-gray-50{% endif %}">Analytics</a>
+                    <a href="{% url 'reporting:recent_alerts' %}" @click="mobileMenuOpen = false" class="rounded-xl border border-gray-200 px-3 py-3 text-sm font-semibold {% if request.resolver_match.view_name == 'reporting:recent_alerts' %}bg-brand-light text-brand{% else %}text-gray-700 hover:bg-gray-50{% endif %}">Alerts</a>
+                    {% if user.is_superuser or user.profile.role == 'BILLING_OFFICER' or user.profile.role == 'ADMIN' or user.profile.role == 'ICT' %}
+                    <a href="{% url 'billing:dashboard' %}" @click="mobileMenuOpen = false" class="rounded-xl border border-gray-200 px-3 py-3 text-sm font-semibold {% if request.resolver_match.view_name == 'billing:dashboard' %}bg-brand-light text-brand{% else %}text-gray-700 hover:bg-gray-50{% endif %}">Billing</a>
+                    {% endif %}
+                    {% if user.is_superuser or user.profile.role == 'PHARMACIST' or user.profile.role == 'ADMIN' or user.profile.role == 'ICT' %}
+                    <a href="{% url 'pharmacy:queue' %}" @click="mobileMenuOpen = false" class="rounded-xl border border-gray-200 px-3 py-3 text-sm font-semibold {% if request.resolver_match.view_name == 'pharmacy:queue' %}bg-brand-light text-brand{% else %}text-gray-700 hover:bg-gray-50{% endif %}">Pharmacy</a>
+                    {% endif %}
+                </div>
+                <div class="mt-4 flex flex-col gap-3 rounded-2xl border border-gray-200 bg-gray-50 px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div class="min-w-0">
+                        <p class="text-sm font-semibold text-gray-900">{{ user.username }}</p>
+                        <p class="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+                            {% if user.profile %}{{ user.profile.get_role_display }}{% else %}Superuser{% endif %}
+                        </p>
+                    </div>
+                    <form method="post" action="{% url 'accounts:logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" @click="mobileMenuOpen = false" class="btn-secondary text-xs px-3 py-2 font-semibold sm:w-auto">Log out</button>
+                    </form>
+                </div>
+            </div>
+            </nav>
         </div>
-    </div>
-</header>{% endblock nav %}
+        <main class="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+    {% else %}
+    <main class="mx-auto flex min-h-[calc(100vh-8rem)] w-full max-w-7xl flex-1 items-center px-4 py-8 sm:px-6 lg:px-8">
+        <div class="w-full">
+        {% endif %}
+            {% if messages %}
+            <script>
+                document.addEventListener('alpine:initialized', () => {
+                    /* {% for message in messages %} */
+                    window.showToast("{{ message.message|escapejs }}", "{{ message.tags|escapejs }}");
+                    /* {% endfor %} */
+                }, { once: true });
+            </script>
+            {% endif %}
 
-    {% if messages %}
-    <script>
-        document.addEventListener('alpine:initialized', () => {
-            /* {% for message in messages %} */
-            window.showToast(
-                "{{ message.message|escapejs }}",
-                "{{ message.tags|escapejs }}"
-            );
-            /* {% endfor %} */
-        }, { once: true });
-    </script>
-    {% endif %}
-
-    {# Main Content #}
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
-        {% block content %}{% endblock %}
+            {# Main Content #}
+            {% block content %}{% endblock %}
+        </div>
     </main>
+
+    {% if user.is_authenticated %}
     <footer class="border-t border-gray-200/80 bg-white/80 py-4">
         <div class="mx-auto flex max-w-7xl flex-col gap-2 px-4 text-center text-xs text-gray-500 sm:flex-row sm:items-center sm:justify-between sm:text-left sm:px-6 lg:px-8">
             <p>&copy; 2026 MUST Teaching Hospital. All rights reserved.</p>
             <p>MUST &middot; GSL | Malawi EMR Platform v1.0</p>
         </div>
     </footer>
-</div>
+    </div>
+    {% endif %}
 
     <div id="offline-indicator" class="fixed bottom-6 right-6 z-50 hidden animate-bounce">
         <div class="flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 shadow-lg shadow-red-950/5">

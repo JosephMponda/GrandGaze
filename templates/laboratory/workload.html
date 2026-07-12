@@ -10,7 +10,7 @@
                 <p class="max-w-2xl text-sm leading-6 text-slate-300">Live workload and turnaround snapshot for technicians and clinicians.</p>
                 <a href="{% url 'accounts:dashboard' %}" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10">Back to dashboard</a>
             </div>
-            <div class="grid gap-3 sm:grid-cols-2">
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
                     <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Pending</p>
                     <p class="mt-3 text-3xl font-black">{{ summary.pending }}</p>
@@ -64,6 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: { duration: 250 },
             plugins: { legend: { display: false } },
             scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
         },
