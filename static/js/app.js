@@ -158,6 +158,7 @@
         try {
           const response = await fetch('/api/sync/submit/', {
             method: 'POST',
+            credentials: 'include',
             headers: {
               'Content-Type': 'application/json',
               'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || '',
