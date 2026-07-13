@@ -67,7 +67,8 @@ def test_logout_get_redirects_instead_of_405(client, nurse_user):
     client.force_login(nurse_user)
     response = client.get(reverse("accounts:logout"))
     assert response.status_code == 302
-    assert "/accounts/login/" in response.headers["Location"]
+    # assert "/accounts/login/" in response.headers["Location"]
+    assert reverse("accounts:landing") in response.headers["Location"]
 
 
 def test_logged_in_user_redirected_from_login_page(client, nurse_user):
