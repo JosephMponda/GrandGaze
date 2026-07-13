@@ -106,34 +106,34 @@
 
   // for forms to be offline-capable for interception everytime it is marked offline=true kinda ...
   // Only intercept forms marked with data-offline-capable="true"
+  // === OFFLINE FORM HANDLING ===
   document.addEventListener('htmx:beforeRequest', async (event) => {
-    const form = event.detail.elt?.closest('[data-offline-capable="true"]');
-    if (!form) return;
+     const form = event.detail.elt?.closest('[data-offline-capable="true"]');
+      if (!form) return;
 
-    // Check if online
-    if (!navigator.onLine) {
-      event.preventDefault();
+      if (!navigator.onLine) {
+          event.preventDefault();
 
-      const clientUuid = crypto.randomUUID();
-      const formData = new FormData(form);
-      const payload = Object.fromEntries(formData);
+          const clientUuid = crypto.randomUUID();
+          const formData = new FormData(form);
+          const payload = Object.fromEntries(formData);
 
-      try {
-        await addToQueue({
-          client_uuid: clientUuid,
-          form_type: form.getAttribute('data-form-type') || 'unknown',
-          method: form.method.toUpperCase() || 'POST',
-          action: form.action,
-          payload: payload,
-        });
+          try {
+              await addToQueue({
+                  client_uuid: clientUuid,
+                  form_type: form.getAttribute('data-form-type') || 'unknown',
+                  method: form.method.toUpperCase() || 'POST',
+                  action: form.action,
+                  payload: payload,
+              });
 
-        // Show offline confirmation toast
-        showToast('Saved offline - will sync when connected', 'info');
-      } catch (error) {
-        console.error('Failed to queue form submission:', error);
-        showToast('Failed to save offline. Please try again.', 'critical');
+              showToast('Saved offline - will sync when connected', 'info');
+              // Optionally disable form or show success state
+          } catch (error) {
+              console.error('Failed to queue:', error);
+              showToast('Failed to save offline.', 'critical');
+          }
       }
-    }
   });
 
   //  Connection Status Indicator
@@ -247,9 +247,21 @@
   });
 
   document.body.addEventListener('htmx:sendError', () => {
-    restoreButtons();
-    window.showToast('Cannot reach server. You may be offline.', 'warning');
-  });
+        const now = Date.now();
+        if (now - (window.__lastOfflineToast || 0) > 8000) {
+            window.showToast('Cannot reach server. Working in offline mode.', 'warning');
+            window.__lastOfflineToast = now;
+        }
+    });
+
+    // Better offline form support
+    document.body.addEventListener('htmx:beforeRequest', (event) => {
+        const form = event.detail.elt?.closest('[data-offline-capable="true"]');
+        if (form && !navigator.onLine) {
+            event.preventDefault();
+            console.log('Offline form intercepted for queuing');
+        }
+    });
 
   // Also restore on regular (non-HTMX) form submit
   document.addEventListener('submit', (e) => {

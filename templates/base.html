@@ -227,17 +227,17 @@
     </div> {# Close <div class="flex min-w-0 flex-1 flex-col lg:pl-64"> #}
     {% if user.is_authenticated %}</div>{% endif %} {# Close outer <div class="min-h-screen lg:flex"> #}
 
-    <div id="offline-indicator" class="fixed bottom-6 right-6 z-50 hidden animate-bounce">
-        <div class="flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 shadow-lg shadow-red-950/5">
-            <span class="relative flex h-3 w-3">
-                <span class="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-ping"></span>
-                <span class="relative inline-flex h-3 w-3 rounded-full bg-red-500"></span>
-            </span>
-            <div class="text-xs">
-                <p class="font-bold text-red-800">Offline Mode Active</p>
-                <p class="text-red-700">Changes will be queued and synchronized on reconnection.</p>
-            </div>
+    <div id="offline-indicator" class="fixed bottom-6 right-6 z-50 hidden">
+      <div class="flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 shadow-lg shadow-amber-950/5">
+        <span class="relative flex h-3 w-3">
+            <span class="absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75 animate-ping"></span>
+            <span class="relative inline-flex h-3 w-3 rounded-full bg-amber-500"></span>
+        </span>
+        <div class="text-xs">
+            <p class="font-bold text-amber-800">Offline Mode Active</p>
+            <p class="text-amber-700">You can continue working. Changes will sync when back online.</p>
         </div>
+      </div>
     </div>
 
     <div
