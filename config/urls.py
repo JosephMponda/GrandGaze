@@ -19,6 +19,10 @@ handler500 = "config.error_views.server_error"
 
 urlpatterns = [
     path("django-admin/", admin.site.urls),
+    
+    # Root URL - Redirect to landing page
+    path("", RedirectView.as_view(pattern_name="accounts:landing", permanent=False)),
+    
     path("accounts/", include("accounts.urls")),
     path("patients/", include("patients.urls")),
     path("encounters/", include("encounters.urls")),
@@ -37,6 +41,5 @@ urlpatterns = [
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
     path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
     path("health/", health_check, name="health_check"),
-    path("", RedirectView.as_view(pattern_name="accounts:dashboard", permanent=False)),
     path("<path:unmatched>", catch_all_404, name="catch_all"),
 ]

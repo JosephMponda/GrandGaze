@@ -26,7 +26,7 @@ User = get_user_model()
 def logout_view(request):
     if request.method == "POST":
         auth_logout(request)
-    return redirect("accounts:login")
+    return redirect("accounts:landing")
 
 
 @login_required
@@ -91,6 +91,11 @@ def dashboard(request):
     }
     return render(request, "accounts/dashboard.html", context)
 
+def landing_page(request):
+    """Public landing page for the EMR system."""
+    if request.user.is_authenticated:
+        return redirect('accounts:dashboard')
+    return render(request, 'landing.html')
 
 @role_required("Admin", "ICT")
 def audit_trail(request):

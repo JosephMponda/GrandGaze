@@ -130,7 +130,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "accounts:dashboard"
-LOGOUT_REDIRECT_URL = "accounts:login"
+LOGOUT_REDIRECT_URL = "accounts:landing"
 
 # --- Security baseline, AGENTS.md §7 / brief §9.4 ---
 SESSION_COOKIE_AGE = config("SESSION_COOKIE_AGE", default=15 * 60, cast=int)  # 15 min idle, clinical roles
