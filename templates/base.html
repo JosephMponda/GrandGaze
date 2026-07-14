@@ -14,7 +14,8 @@
         .htmx-request.htmx-indicator { opacity: 1; }
     </style>
 </head>
-<body class="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_top_left,_rgba(0,159,227,0.10),_transparent_34%),linear-gradient(180deg,_#f8fafc_0%,_#fafaf9_100%)] text-ink antialiased" hx-boost="true" x-data="{ mobileMenuOpen: false }">
+<body data-offline-user="{% if user.is_authenticated %}{{ user.pk }}{% endif %}" class="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_top_left,_rgba(0,159,227,0.10),_transparent_34%),linear-gradient(180deg,_#f8fafc_0%,_#fafaf9_100%)] text-ink antialiased" hx-boost="true" x-data="{ mobileMenuOpen: false }">
+    {% if user.is_authenticated %}<div id="offline-session" data-user="{{ user.pk }}" hidden></div>{% endif %}
     {% if user.is_authenticated %}<div class="min-h-screen lg:flex">{% endif %}
 
     {% block nav %}
@@ -44,6 +45,9 @@
                         </a>
                         <a href="{% url 'patients:register' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition-colors {% if request.resolver_match.view_name == 'patients:register' %}bg-[#1c5c52] text-white shadow-sm{% else %}text-[#b8d6d2] hover:bg-[#144f46] hover:text-white{% endif %}">
                             Register Patient
+                        </a>
+                        <a href="{% static 'offline-workspace.html' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-[#b8d6d2] transition-colors hover:bg-[#144f46] hover:text-white">
+                            Offline Workspace
                         </a>
                         <a href="{% url 'reporting:analytics_dashboard' %}" class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition-colors {% if request.resolver_match.view_name == 'reporting:analytics_dashboard' %}bg-[#1c5c52] text-white shadow-sm{% else %}text-[#b8d6d2] hover:bg-[#144f46] hover:text-white{% endif %}">
                             Analytics
@@ -140,12 +144,16 @@
                     <p class="text-sm font-semibold tracking-tight text-gray-900">Workspace Dashboard</p>
                 </div>
                 <div class="ml-auto flex items-center gap-2 sm:gap-3">
-                    <div class="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 shadow-sm">
+                    <div id="connection-online" class="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 shadow-sm">
                         <span class="relative flex h-2.5 w-2.5">
                             <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
                             <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500"></span>
                         </span>
                         <span class="text-[11px] font-semibold uppercase tracking-[0.22em] text-gray-500">Online</span>
+                    </div>
+                    <div id="connection-offline" class="hidden items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 shadow-sm">
+                        <span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span>
+                        <span class="text-[11px] font-semibold uppercase tracking-[0.22em] text-amber-800">Offline</span>
                     </div>
                 </div>
             </div>
@@ -173,6 +181,7 @@
                 <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <a href="{% url 'accounts:dashboard' %}" @click="mobileMenuOpen = false" class="rounded-xl border border-gray-200 px-3 py-3 text-sm font-semibold {% if request.resolver_match.view_name == 'accounts:dashboard' %}bg-brand-light text-brand{% else %}text-gray-700 hover:bg-gray-50{% endif %}">Dashboard</a>
                     <a href="{% url 'patients:register' %}" @click="mobileMenuOpen = false" class="rounded-xl border border-gray-200 px-3 py-3 text-sm font-semibold {% if request.resolver_match.view_name == 'patients:register' %}bg-brand-light text-brand{% else %}text-gray-700 hover:bg-gray-50{% endif %}">Register</a>
+                    <a href="{% static 'offline-workspace.html' %}" @click="mobileMenuOpen = false" class="rounded-xl border border-gray-200 px-3 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">Offline Workspace</a>
                     <a href="{% url 'reporting:analytics_dashboard' %}" @click="mobileMenuOpen = false" class="rounded-xl border border-gray-200 px-3 py-3 text-sm font-semibold {% if request.resolver_match.view_name == 'reporting:analytics_dashboard' %}bg-brand-light text-brand{% else %}text-gray-700 hover:bg-gray-50{% endif %}">Analytics</a>
                     <a href="{% url 'reporting:recent_alerts' %}" @click="mobileMenuOpen = false" class="rounded-xl border border-gray-200 px-3 py-3 text-sm font-semibold {% if request.resolver_match.view_name == 'reporting:recent_alerts' %}bg-brand-light text-brand{% else %}text-gray-700 hover:bg-gray-50{% endif %}">Alerts</a>
                     {% if user.is_superuser or user.profile.role == 'BILLING_OFFICER' or user.profile.role == 'ADMIN' or user.profile.role == 'ICT' %}
@@ -237,6 +246,13 @@
             <p class="font-bold text-amber-800">Offline Mode Active</p>
             <p class="text-amber-700">You can continue working. Changes will sync when back online.</p>
         </div>
+      </div>
+    </div>
+
+    <div id="offline-queue-status" class="fixed bottom-6 left-6 z-50 hidden" aria-live="polite">
+      <div class="rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-xs shadow-lg shadow-sky-950/5">
+        <p class="font-bold text-sky-900">Offline changes saved</p>
+        <p id="offline-queue-count" class="mt-0.5 text-sky-800">0 waiting to sync</p>
       </div>
     </div>
 
@@ -330,6 +346,7 @@
     </script>
     <script src="{% static 'js/alpinejs.min.js' %}" defer></script>
     <script src="{% static 'js/htmx.min.js' %}" defer></script>
-    <script src="{% static 'js/app.js' %}"></script>
+    <script src="{% static 'js/offline-client.js' %}?v=11"></script>
+    <script src="{% static 'js/app.js' %}?v=9"></script>
 </body>
 </html>

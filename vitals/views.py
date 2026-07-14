@@ -26,7 +26,7 @@ def vitals_entry(request, patient_id):
             return render(request, "vitals/_result.html", {"vitals": vitals, "trend": services.vitals_trend(patient)})
     else:
         form = VitalSignSetForm()
-    return render(request, "vitals/entry.html", {"form": form, "patient": patient})
+    return render(request, "vitals/entry.html", {"form": form, "patient": patient, "encounter": encounter})
 
 
 @login_required

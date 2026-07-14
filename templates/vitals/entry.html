@@ -99,7 +99,7 @@
         </div>
     </div>
 
-    <form hx-post="{% url 'vitals:entry' patient.pk %}" hx-target="#vitals-result" hx-swap="innerHTML" class="space-y-6 sm:space-y-8">
+    <form hx-post="{% url 'vitals:entry' patient.pk %}" hx-target="#vitals-result" hx-swap="innerHTML" data-offline-capable="true" data-form-type="vitals_entry" data-offline-encounter-id="{{ encounter.pk }}" class="space-y-6 sm:space-y-8">
         {% csrf_token %}
 
         <!-- Primary Vitals Card -->

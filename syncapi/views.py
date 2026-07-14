@@ -9,6 +9,19 @@ from .models import SyncConflict, SyncSubmission
 from .serializers import SyncStatusSerializer, SyncSubmitSerializer
 
 
+def _result_payload(result):
+    """Stable server identifiers returned to the local-first client."""
+    if result is None:
+        return {}
+    if hasattr(result, "patient_number"):
+        return {"patient_id": result.pk, "patient_number": result.patient_number}
+    if hasattr(result, "encounter_id"):
+        return {"vitals_id": result.pk, "encounter_id": result.encounter_id, "patient_id": result.patient_id}
+    if hasattr(result, "patient_id"):
+        return {"encounter_id": result.pk, "patient_id": result.patient_id}
+    return {"record_id": result.pk}
+
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def sync_submit(request):
@@ -20,7 +33,7 @@ def sync_submit(request):
     existing = SyncSubmission.objects.filter(client_uuid=client_uuid).first()
     if existing:
         if existing.status == SyncSubmission.Status.APPLIED:
-            return Response({"status": "already_applied", "submission_id": existing.pk})
+            return Response({"status": "already_applied", "submission_id": existing.pk, "result": existing.result_json})
         return Response({"status": existing.status, "submission_id": existing.pk})
 
     submission = SyncSubmission.objects.create(
@@ -45,10 +58,44 @@ def sync_submit(request):
         SyncConflict.objects.create(submission=submission, conflicting_record_description=conflict_note)
         return Response({"status": "conflict", "conflict_note": conflict_note})
 
+    result_json = _result_payload(result)
+    submission.patient_id = result_json.get("patient_id")
+    submission.result_json = result_json
     submission.status = SyncSubmission.Status.APPLIED
     submission.applied_at = timezone.now()
-    submission.save(update_fields=["status", "applied_at"])
-    return Response({"status": "applied", "submission_id": submission.pk})
+    submission.save(update_fields=["patient", "result_json", "status", "applied_at"])
+    return Response({"status": "applied", "submission_id": submission.pk, "result": result_json})
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def offline_bootstrap(request):
+    """Initial local replica for the offline clinical workspace.
+
+    This project currently has no ward/clinician assignment model to limit the
+    data set, so it mirrors active patients visible to the logged-in user.
+    """
+    from patients.models import Patient
+
+    patients = Patient.objects.filter(is_active=True).order_by("last_name", "first_name")
+    return Response(
+        {
+            "generated_at": timezone.now().isoformat(),
+            "patients": [
+                {
+                    "server_id": patient.pk,
+                    "patient_number": patient.patient_number,
+                    "first_name": patient.first_name,
+                    "last_name": patient.last_name,
+                    "other_names": patient.other_names,
+                    "sex": patient.sex,
+                    "date_of_birth": patient.date_of_birth.isoformat() if patient.date_of_birth else "",
+                    "phone_number": patient.phone_number,
+                }
+                for patient in patients
+            ],
+        }
+    )
 
 
 @api_view(["GET"])

@@ -56,6 +56,7 @@ def test_duplicate_client_uuid_returns_same_result(api_client, nurse_user):
             "first_name": "John",
             "last_name": "Phiri",
             "sex": "male",
+            "age_estimated": True,
         },
     }
     r1 = api_client.post("/api/sync/submit/", payload, format="json")
@@ -121,6 +122,7 @@ def test_patient_registration_with_matching_national_id_produces_conflict(api_cl
         "payload_json": {
             "first_name": "Jon", "last_name": "Phiri", "sex": "male",
             "national_id": "MW-12345",
+            "age_estimated": True,
         },
     }
     r = api_client.post("/api/sync/submit/", payload, format="json")
@@ -143,6 +145,7 @@ def test_patient_registration_confirmed_not_duplicate_proceeds(api_client, nurse
         "payload_json": {
             "first_name": "Jonathan", "last_name": "Phiri", "sex": "male",
             "confirmed_not_duplicate_of": candidate.pk,
+            "age_estimated": True,
         },
     }
     r = api_client.post("/api/sync/submit/", payload, format="json")
@@ -166,6 +169,13 @@ def test_sync_status_returns_user_submissions(api_client, nurse_user):
     assert r.status_code == 200
     uuids = [s["client_uuid"] for s in r.data]
     assert "status-test-1" in uuids
+
+
+def test_offline_bootstrap_returns_local_patient_directory(api_client, nurse_user, patient):
+    api_client.force_authenticate(user=nurse_user)
+    response = api_client.get("/api/offline/bootstrap/")
+    assert response.status_code == 200
+    assert any(item["server_id"] == patient.pk for item in response.data["patients"])
 
 
 # --- validation ---

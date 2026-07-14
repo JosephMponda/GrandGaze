@@ -12,6 +12,9 @@ class SyncSubmission(models.Model):
     client_uuid = models.CharField(max_length=255, unique=True)
     form_type = models.CharField(max_length=50)
     payload_json = models.JSONField()
+    # Returned on every idempotent replay so a client can map a local record
+    # to its server record even if it lost the first successful response.
+    result_json = models.JSONField(default=dict, blank=True)
     patient = models.ForeignKey("patients.Patient", on_delete=models.SET_NULL, null=True, blank=True)
     submitted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)

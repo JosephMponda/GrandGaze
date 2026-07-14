@@ -6,7 +6,19 @@ Each handler receives (payload_json, submitted_by) and returns
 
 from django.db import transaction
 
+from encounters.forms import EncounterForm
+from vitals.forms import VitalSignSetForm
+
 from patients.services import check_possible_duplicate, confirm_not_duplicate, register_patient
+from patients.forms import PatientRegistrationForm
+
+
+def _validated_payload(form_class, payload):
+    """Apply the same ModelForm validation used by online clinical workflows."""
+    form = form_class(payload)
+    if not form.is_valid():
+        raise ValueError(form.errors.get_json_data())
+    return form.cleaned_data
 
 
 def _handle_patient_registration(payload, submitted_by):
@@ -15,14 +27,14 @@ def _handle_patient_registration(payload, submitted_by):
     # must. Skipping it here would let offline-synced registrations bypass
     # duplicate-patient detection entirely.
     confirmed_id = payload.get("confirmed_not_duplicate_of")
-    duplicates = check_possible_duplicate(payload)
+    patient_data = _validated_payload(PatientRegistrationForm, payload)
+    duplicates = check_possible_duplicate(patient_data)
     confirmed = duplicates.filter(pk=confirmed_id).first() if confirmed_id else None
     remaining = duplicates.exclude(pk=confirmed.pk) if confirmed else duplicates
     if remaining.exists() or (confirmed_id and not confirmed):
         candidates = ", ".join(p.patient_number for p in remaining[:5])
         return None, f"Possible duplicate patient(s): {candidates}. Confirm on next sync."
 
-    patient_data = {k: v for k, v in payload.items() if k != "confirmed_not_duplicate_of"}
     patient = register_patient(patient_data, registered_by=submitted_by)
     if confirmed:
         confirm_not_duplicate(patient, confirmed, confirmed_by=submitted_by)
@@ -34,7 +46,7 @@ def _handle_encounter_note(payload, submitted_by):
     from patients.models import Patient
 
     patient = Patient.objects.get(pk=payload["patient_id"])
-    encounter = create_encounter(patient=patient, clinician=submitted_by, data=payload)
+    encounter = create_encounter(patient=patient, clinician=submitted_by, data=_validated_payload(EncounterForm, payload))
     return encounter, None
 
 
@@ -45,7 +57,7 @@ def _handle_vitals_entry(payload, submitted_by):
     encounter = Encounter.objects.get(pk=payload["encounter_id"])
     if encounter.signed_at:
         return None, f"Encounter #{encounter.pk} is already signed; cannot add vitals."
-    vitals = record_vitals(encounter=encounter, recorded_by=submitted_by, data=payload)
+    vitals = record_vitals(encounter=encounter, recorded_by=submitted_by, data=_validated_payload(VitalSignSetForm, payload))
     return vitals, None
 
 
