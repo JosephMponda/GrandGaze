@@ -9,6 +9,7 @@ from accounts.permissions import role_required
 from patients.services import get_patient_or_404
 
 from . import services
+from .forms import DialysisPrescriptionForm
 from .models import DialysisPrescription, VascularAccess
 
 
@@ -44,6 +45,29 @@ def record_session(request, prescription_id):
             return redirect(reverse("dialysis:patient_tab", args=[prescription.patient_id]))
     return render(request, "dialysis/record_session.html", {
         "prescription": prescription,
+    })
+
+
+@role_required("Clinician", "Admin")
+def create_prescription(request, patient_id):
+    patient = get_patient_or_404(patient_id)
+    if request.method == "POST":
+        form = DialysisPrescriptionForm(request.POST)
+        if form.is_valid():
+            prescription = services.prescribe_dialysis(
+                patient=patient,
+                frequency_per_week=form.cleaned_data["frequency_per_week"],
+                prescribed_by=request.user,
+                target_fluid_removal_l=form.cleaned_data.get("target_fluid_removal_l"),
+                vascular_access=form.cleaned_data["vascular_access"],
+            )
+            messages.success(request, "Dialysis prescription created.")
+            return redirect(reverse("dialysis:patient_tab", args=[patient.pk]))
+    else:
+        form = DialysisPrescriptionForm()
+    return render(request, "dialysis/create_prescription.html", {
+        "form": form,
+        "patient": patient,
     })
 
 

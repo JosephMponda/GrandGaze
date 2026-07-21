@@ -69,8 +69,9 @@
         </div>
     </div>
 
-    <form method="post" class="space-y-8">
+    <form method="post" class="space-y-8" data-offline-capable="true" data-form-type="pharmacy_dispense">
         {% csrf_token %}
+        <input type="hidden" name="prescription_id" value="{{ prescription.pk }}">
 
         {% if form.non_field_errors %}
             <div class="space-y-2 mb-6">

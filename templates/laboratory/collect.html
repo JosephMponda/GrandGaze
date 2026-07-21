@@ -41,8 +41,9 @@
         {% endif %}
 
         <!-- Collection Form -->
-        <form method="post" class="space-y-4">
+        <form method="post" data-offline-capable="true" class="space-y-4">
             {% csrf_token %}
+            <input type="hidden" name="order_id" data-offline-field="order_id" value="{{ order.pk }}">
             <button type="submit" 
                     class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:shadow-brand/30 hover:-translate-y-0.5 transition-all duration-200 w-full sm:w-auto">
                 Mark Specimen Collected

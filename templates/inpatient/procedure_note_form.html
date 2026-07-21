@@ -10,8 +10,9 @@
     </div>
     <p class="text-sm text-ink-500 mb-4">{{ admission.patient.full_name }}</p>
 
-    <form method="post" class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-6 space-y-4">
+    <form method="post" class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-6 space-y-4" data-offline-capable="true" data-form-type="procedure_note">
         {% csrf_token %}
+        <input type="hidden" name="admission_id" value="{{ admission.pk }}">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label for="procedure_name" class="block text-sm font-semibold text-ink-900 mb-1">Procedure Name</label>

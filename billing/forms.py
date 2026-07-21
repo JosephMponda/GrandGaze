@@ -22,3 +22,19 @@ class PaymentForm(forms.ModelForm):
 
 
 LineItemFormSet = forms.formset_factory(LineItemForm, extra=1, can_delete=False)
+
+
+# ── Offline sync forms ──────────────────────────────────────────────────
+
+
+class OfflineInvoiceCreateForm(forms.Form):
+    patient_id = forms.IntegerField()
+    payer_type = forms.ChoiceField(choices=Invoice.PayerType.choices)
+    line_items = forms.CharField(max_length=5000, help_text='JSON: [{"service_item_id": 1, "quantity": 1}]')
+
+
+class OfflinePaymentForm(forms.Form):
+    invoice_id = forms.IntegerField()
+    amount_mwk = forms.DecimalField(max_digits=12, decimal_places=2, min_value=0.01)
+    method = forms.ChoiceField(choices=Payment.Method.choices)
+    reference = forms.CharField(required=False, max_length=255)

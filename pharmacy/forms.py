@@ -25,3 +25,28 @@ class StockAdjustForm(forms.Form):
     drug = forms.ModelChoiceField(queryset=Drug.objects.all(), label="Drug")
     quantity = forms.IntegerField(min_value=1, label="Quantity to add")
     note = forms.CharField(widget=forms.TextInput(attrs={"placeholder": "e.g. delivery from Central Medical Stores"}), required=False, label="Note")
+
+
+# ── Offline sync forms ──────────────────────────────────────────────────
+
+
+class OfflinePrescribeForm(forms.Form):
+    patient_id = forms.IntegerField()
+    drug_id = forms.IntegerField()
+    encounter_id = forms.IntegerField(required=False)
+    dose = forms.CharField(max_length=80)
+    route = forms.CharField(max_length=40)
+    frequency = forms.CharField(max_length=80)
+    duration_days = forms.IntegerField(required=False)
+    safety_override_reason = forms.CharField(required=False)
+    notes = forms.CharField(required=False)
+
+
+class OfflineApproveForm(forms.Form):
+    prescription_id = forms.IntegerField()
+
+
+class OfflineDispenseForm(forms.Form):
+    prescription_id = forms.IntegerField()
+    quantity_dispensed = forms.CharField(max_length=80)
+    stock_note = forms.CharField(required=False, max_length=200)

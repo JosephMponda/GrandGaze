@@ -122,9 +122,10 @@
     <!-- Ward Round Note Form -->
     <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-6 mb-6">
         <h3 class="text-sm font-bold text-ink-900 mb-4">Add Ward Round Note</h3>
-        <form method="post" class="space-y-3">
+        <form method="post" class="space-y-3" data-offline-capable="true" data-form-type="ward_round_note">
             {% csrf_token %}
             <input type="hidden" name="action" value="ward_round">
+            <input type="hidden" name="admission_id" value="{{ admission.pk }}">
             <div>
                 <textarea name="note" rows="3" required placeholder="Clinical note" 
                           class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-colors resize-y"></textarea>

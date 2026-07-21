@@ -4,6 +4,13 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from patients.models import Patient
+from inpatient.models import Ward, Bed
+from pharmacy.models import Drug
+from laboratory.models import LabTest
+from imaging.models import ImagingModality
+from billing.models import ServiceCatalogItem
+
 from .dispatch import dispatch
 from .models import SyncConflict, SyncSubmission
 from .serializers import SyncStatusSerializer, SyncSubmitSerializer
@@ -15,9 +22,15 @@ def _result_payload(result):
         return {}
     if hasattr(result, "patient_number"):
         return {"patient_id": result.pk, "patient_number": result.patient_number}
-    if hasattr(result, "encounter_id"):
+    if hasattr(result, "encounter_id") and hasattr(result, "patient_id") and hasattr(result, "recorded_at"):
         return {"vitals_id": result.pk, "encounter_id": result.encounter_id, "patient_id": result.patient_id}
-    if hasattr(result, "patient_id"):
+    if hasattr(result, "test") and hasattr(result, "patient_id"):
+        # LabOrder
+        return {"order_id": result.pk, "patient_id": result.patient_id}
+    if hasattr(result, "order_id") and hasattr(result, "entered_by_id"):
+        # LabResult
+        return {"result_id": result.pk, "order_id": result.order_id}
+    if hasattr(result, "patient_id") and hasattr(result, "encounter"):
         return {"encounter_id": result.pk, "patient_id": result.patient_id}
     return {"record_id": result.pk}
 
@@ -78,6 +91,87 @@ def offline_bootstrap(request):
     from patients.models import Patient
 
     patients = Patient.objects.filter(is_active=True).order_by("last_name", "first_name")
+
+    # Inpatient reference data
+    from inpatient.models import Admission, AdmissionStatus, Bed, Ward
+    from pharmacy.models import Prescription, PrescriptionStatus
+
+    wards = [
+        {"server_id": w.pk, "name": w.name, "department": w.department, "bed_count": w.bed_count}
+        for w in Ward.objects.all()
+    ]
+    beds = [
+        {"server_id": b.pk, "ward_id": b.ward_id, "label": b.label, "is_occupied": b.is_occupied}
+        for b in Bed.objects.select_related("ward").all()
+    ]
+    active_admissions = Admission.objects.filter(status=AdmissionStatus.ACTIVE).select_related("patient", "bed__ward")
+    admissions = [
+        {
+            "server_id": a.pk,
+            "patient_id": a.patient_id,
+            "admission_diagnosis": a.admission_diagnosis,
+            "bed_id": a.bed_id,
+            "ward_name": a.bed.ward.name if a.bed else "",
+            "bed_label": a.bed.label if a.bed else "",
+            "admitted_at": a.admitted_at.isoformat(),
+        }
+        for a in active_admissions
+    ]
+    # Active prescriptions needed for MAR entry
+    prescription_ids = set(active_admissions.values_list("patient_id", flat=True))
+    prescriptions = [
+        {
+            "server_id": p.pk,
+            "patient_id": p.patient_id,
+            "drug_name": p.drug.name if p.drug else "",
+            "dose": p.dose,
+            "route": p.route,
+            "frequency": p.frequency,
+        }
+        for p in Prescription.objects.filter(
+            patient_id__in=prescription_ids,
+            status__in=[PrescriptionStatus.PRESCRIBED, PrescriptionStatus.APPROVED, PrescriptionStatus.DISPENSED],
+        ).select_related("drug")
+    ]
+
+    # Drug catalog for offline prescribing
+    drugs = [
+        {
+            "server_id": d.pk,
+            "name": d.name,
+            "generic_name": d.generic_name,
+            "formulation": d.formulation,
+            "is_controlled": d.is_controlled,
+        }
+        for d in Drug.objects.all()
+    ]
+
+    # Lab test catalog for offline ordering
+    lab_tests = [
+        {
+            "server_id": t.pk,
+            "name": t.name,
+            "loinc_code": t.loinc_code,
+            "specimen_type": t.specimen_type,
+            "normal_range_low": float(t.normal_range_low) if t.normal_range_low is not None else None,
+            "normal_range_high": float(t.normal_range_high) if t.normal_range_high is not None else None,
+            "unit": t.unit,
+            "is_critical_if_outside_range": t.is_critical_if_outside_range,
+        }
+        for t in LabTest.objects.all()
+    ]
+
+    # Imaging modality catalog for offline ordering
+    imaging_modalities = [
+        {
+            "server_id": m.pk,
+            "name": m.name,
+            "requires_pregnancy_check": m.requires_pregnancy_check,
+            "is_mvp_supported": m.is_mvp_supported,
+        }
+        for m in ImagingModality.objects.all()
+    ]
+
     return Response(
         {
             "generated_at": timezone.now().isoformat(),
@@ -94,6 +188,13 @@ def offline_bootstrap(request):
                 }
                 for patient in patients
             ],
+            "wards": wards,
+            "beds": beds,
+            "admissions": admissions,
+            "prescriptions": prescriptions,
+            "drugs": drugs,
+            "lab_tests": lab_tests,
+            "imaging_modalities": imaging_modalities,
         }
     )
 

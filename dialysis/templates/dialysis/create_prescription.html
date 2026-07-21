@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}New Dialysis Prescription{% endblock %}
+{% block content %}
+{% block nav %}{% endblock %}
+<div class="max-w-2xl mx-auto py-6">
+    <div class="flex flex-col gap-4 mb-8 border-b border-gray-200 pb-5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight text-ink-900">New Dialysis Prescription</h1>
+            <p class="text-sm text-ink-500 mt-2">{{ patient.full_name }}</p>
+        </div>
+        <a href="{% url 'patients:profile' patient.pk %}#dialysis" class="btn-secondary text-sm font-semibold flex items-center justify-center gap-2 hover:-translate-y-0.5 transition-all duration-200 sm:w-auto">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            Back to Patient
+        </a>
+    </div>
+
+    <form method="post" data-offline-capable="true" class="space-y-6">
+        {% csrf_token %}
+        <input type="hidden" name="patient_id" data-offline-field="patient_id">
+        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 space-y-6">
+            {% if form.non_field_errors %}
+                <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 text-sm">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-xs font-bold text-ink-700 uppercase tracking-wider mb-1">Sessions per Week</label>
+                    <input type="number" name="frequency_per_week" min="1" max="7" required
+                           value="{{ form.frequency_per_week.value|default:'3' }}"
+                           class="w-full form-input rounded-lg border-gray-900 bg-gray-50 text-sm focus:border-brand focus:ring-brand">
+                    {% if form.frequency_per_week.errors %}
+                        <p class="text-red-600 text-xs mt-1">{{ form.frequency_per_week.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-ink-700 uppercase tracking-wider mb-1">Vascular Access</label>
+                    <select name="vascular_access" required
+                           class="w-full form-input rounded-lg border-gray-900 bg-gray-50 text-sm focus:border-brand focus:ring-brand">
+                        {% for value, label in form.fields.vascular_access.choices %}
+                            <option value="{{ value }}"{% if value == form.vascular_access.value %} selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.vascular_access.errors %}
+                        <p class="text-red-600 text-xs mt-1">{{ form.vascular_access.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-ink-700 uppercase tracking-wider mb-1">Target Fluid Removal (litres)</label>
+                <input type="number" name="target_fluid_removal_l" step="0.1" min="0"
+                       value="{{ form.target_fluid_removal_l.value|default:'' }}"
+                       class="w-full form-input rounded-lg border-gray-900 bg-gray-50 text-sm focus:border-brand focus:ring-brand"
+                       placeholder="e.g. 2.5">
+                {% if form.target_fluid_removal_l.errors %}
+                    <p class="text-red-600 text-xs mt-1">{{ form.target_fluid_removal_l.errors.0 }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+            <a href="{% url 'patients:profile' patient.pk %}#dialysis" class="btn-secondary text-sm sm:w-auto">Cancel</a>
+            <button type="submit" class="btn-primary text-sm sm:w-auto">Create Prescription</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,10 +1,10 @@
-const VERSION = 'v11';
+const VERSION = 'v12';
 const STATIC_CACHE = `must-emr-static-${VERSION}`;
 const PAGE_CACHE = `must-emr-pages-${VERSION}`;
 const APP_SHELL = [
   '/', '/accounts/login/', '/static/css/app.css', '/static/js/htmx.min.js',
   '/static/js/alpinejs.min.js', '/static/js/chart.min.js', '/static/js/app.js?v=9',
-  '/static/js/offline-client.js?v=11', '/static/css/offline-workspace.css?v=11',
+  '/static/js/offline-client.js?v=12', '/static/css/offline-workspace.css?v=11',
   '/static/offline-workspace.html', '/static/img/must-logo.png',
   '/static/img/logos/GSL-Official-Logo.png', '/static/offline.html',
 ];

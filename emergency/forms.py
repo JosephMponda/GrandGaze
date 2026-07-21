@@ -54,3 +54,20 @@ class RapidRegisterForm(forms.Form):
             rapid_registration=True,
         )
         return patient, encounter
+
+
+# ── Offline sync forms ──────────────────────────────────────────────────
+
+
+class OfflineTriageForm(forms.Form):
+    patient_id = forms.IntegerField()
+    triage_category = forms.ChoiceField(choices=TriageCategory.choices)
+    presenting_condition = forms.CharField(max_length=500)
+    outcome = forms.ChoiceField(choices=[("", "---")] + list(TriageEncounter._meta.get_field("outcome").flatchoices), required=False)
+    disposition_note = forms.CharField(required=False, max_length=500)
+
+
+class OfflineResolveTriageForm(forms.Form):
+    triage_id = forms.IntegerField()
+    outcome = forms.ChoiceField(choices=list(TriageEncounter._meta.get_field("outcome").flatchoices))
+    disposition_note = forms.CharField(required=False, max_length=500)

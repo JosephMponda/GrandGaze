@@ -29,8 +29,9 @@
     <!-- Entry Form -->
     <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-6 mb-6">
         <h3 class="text-sm font-bold text-ink-900 mb-4">Record Fluid</h3>
-        <form method="post" class="flex flex-col sm:flex-row gap-3">
+        <form method="post" class="flex flex-col sm:flex-row gap-3" data-offline-capable="true" data-form-type="fluid_balance_entry">
             {% csrf_token %}
+            <input type="hidden" name="admission_id" value="{{ admission.pk }}">
             <select name="fluid_type" required class="flex-1 rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
                 <option value="">- Type -</option>
                 <optgroup label="Intake">
