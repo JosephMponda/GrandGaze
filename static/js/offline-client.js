@@ -3,8 +3,8 @@
  * initial replication and later synchronization. */
 (function () {
   const DB_NAME = 'must_emr_local';
-  const DB_VERSION = 7;
-  const STORES = ['meta', 'patients', 'encounters', 'vitals', 'outbox', 'admissions', 'wards', 'prescriptions', 'ward_rounds', 'mar_entries', 'care_plans', 'fluid_entries', 'procedure_notes', 'nursing_assessments', 'referrals', 'drugs', 'lab_orders', 'lab_results', 'lab_tests', 'imaging_requests', 'imaging_results', 'imaging_modalities', 'triage_encounters', 'dialysis_prescriptions', 'dialysis_sessions'];
+  const DB_VERSION = 8;
+  const STORES = ['meta', 'patients', 'encounters', 'vitals', 'outbox', 'admissions', 'wards', 'prescriptions', 'ward_rounds', 'mar_entries', 'care_plans', 'fluid_entries', 'procedure_notes', 'nursing_assessments', 'referrals', 'drugs', 'lab_orders', 'lab_results', 'lab_tests', 'imaging_requests', 'imaging_results', 'imaging_modalities', 'triage_encounters', 'dialysis_prescriptions', 'dialysis_sessions', 'invoices', 'payments', 'service_catalog'];
   let database;
   let ownerId = localStorage.getItem('must_emr_offline_owner') || '';
 
@@ -103,6 +103,11 @@
     if (snapshot.imaging_modalities) {
       await Promise.all(snapshot.imaging_modalities.map((mod) => put('imaging_modalities', {
         ...mod, id: `server:${mod.server_id}`, owner_id: ownerId, sync_state: 'synced',
+      })));
+    }
+    if (snapshot.service_catalog) {
+      await Promise.all(snapshot.service_catalog.map((svc) => put('service_catalog', {
+        ...svc, id: `server:${svc.server_id}`, owner_id: ownerId, sync_state: 'synced',
       })));
     }
     await put('meta', { id: 'snapshot', owner_id: ownerId, updated_at: snapshot.generated_at });

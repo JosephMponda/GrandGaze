@@ -172,6 +172,17 @@ def offline_bootstrap(request):
         for m in ImagingModality.objects.all()
     ]
 
+    # Service catalog for offline billing
+    service_catalog = [
+        {
+            "server_id": s.pk,
+            "name": s.name,
+            "code": s.code,
+            "price_mwk": float(s.price_mwk),
+        }
+        for s in ServiceCatalogItem.objects.all()
+    ]
+
     return Response(
         {
             "generated_at": timezone.now().isoformat(),
@@ -195,6 +206,7 @@ def offline_bootstrap(request):
             "drugs": drugs,
             "lab_tests": lab_tests,
             "imaging_modalities": imaging_modalities,
+            "service_catalog": service_catalog,
         }
     )
 
