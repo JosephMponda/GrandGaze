@@ -152,6 +152,17 @@
     return { applied, review };
   }
 
+  const TIP_STORAGE_KEY = 'must_emr_offline_tips_dismissed';
+
+  function tipsDismissed() {
+    return localStorage.getItem(TIP_STORAGE_KEY) === 'true';
+  }
+
+  function dismissTips(root) {
+    localStorage.setItem(TIP_STORAGE_KEY, 'true');
+    root.querySelector('.offline-tip')?.remove();
+  }
+
   async function state() {
     return {
       patients: await all('patients'),
@@ -174,10 +185,11 @@
       const patientVitals = data.vitals.filter((v) => v.patient_local_id === selected?.id);
       const reviewItems = data.outbox.filter((item) => item.state === 'needs_review');
       const syncMessage = root.dataset.syncMessage || '';
-      root.innerHTML = `<header class="offline-head"><div><p>Local-first clinical workspace</p><h1>MUST EMR Offline</h1></div><div><span class="offline-pill ${navigator.onLine ? 'online' : ''}">${navigator.onLine ? 'Connection available' : 'Working offline'}</span><a class="offline-return" href="/accounts/dashboard/">Return online</a><button data-action="sync">Sync now</button></div></header>
+      root.innerHTML = `<header class="offline-head"><div><p>Local-first clinical workspace</p><p class="offline-reload-warning"><strong>PLEASE RELOAD THE PAGE IF THE TEXT IS NOT DISPLAYING CORRECTLY</strong></p><h1>MUST EMR Offline</h1></div><div><span class="offline-pill ${navigator.onLine ? 'online' : ''}">${navigator.onLine ? 'Connection available' : 'Working offline'}</span><a class="offline-return" href="/accounts/dashboard/">Return online</a><button data-action="sync">Sync now</button></div></header>
+        ${!tipsDismissed() ? `<section class="offline-tip"><div><strong>Offline workspace quick start</strong><button data-action="dismiss-tips" aria-label="Dismiss tips">×</button></div><ol><li>Open this page while online, then click <strong>Refresh directory</strong> to download the patient snapshot.</li><li>Create or select a patient, add an encounter, then record vitals.</li><li>When you next go online, click <strong>Sync now</strong> to send local changes to the server.</li></ol><p>If the workspace appears empty on first load, reload the page once and then refresh the directory again.</p></section>` : ''}
         <p class="offline-status">${data.outbox.length} change${data.outbox.length === 1 ? '' : 's'} waiting. Directory snapshot: ${data.snapshot?.updated_at ? new Date(data.snapshot.updated_at).toLocaleString() : 'not downloaded yet'}. ${escape(syncMessage)}</p>
         ${reviewItems.length ? `<section class="offline-review"><strong>${reviewItems.length} item${reviewItems.length === 1 ? '' : 's'} needs review</strong>${reviewItems.map((item) => `<p>${escape(item.form_type)}: ${escape(item.error || 'The server rejected this change. Create a corrected record before retrying.')}</p>`).join('')}</section>` : ''}
-        <section class="offline-grid"><aside><div class="offline-actions"><button data-action="new-patient">Register patient</button><button data-action="refresh">Refresh directory</button></div><input id="offline-search" placeholder="Search local patients" autocomplete="off"><div id="offline-patients">${patientRows || '<p class="offline-empty">No local patients. Connect once and refresh the directory.</p>'}</div></aside>
+        <section class="offline-grid"><aside><div class="offline-actions"><button data-action="new-patient">Register patient</button><button data-action="refresh" title="Refresh the local patient directory">Refresh directory</button></div><div class="offline-button-guidance"><span><strong>Refresh</strong> downloads the most recent local patient snapshot.</span><span><strong>Sync</strong> sends your offline edits when you reconnect.</span></div><input id="offline-search" placeholder="Search local patients" autocomplete="off"><div id="offline-patients">${patientRows || '<p class="offline-empty">No local patients. Connect once and refresh the directory.</p>'}</div></aside>
         <main>${selected ? `<h2>${escape(selected.first_name)} ${escape(selected.other_names || '')} ${escape(selected.last_name)}</h2><p class="offline-muted">${escape(selected.patient_number || 'Local patient')} · ${escape(selected.sex || 'Unknown')} · ${escape(selected.phone_number || 'No phone')}</p><div class="offline-cards"><article><h3>Encounters</h3><p>${patientEncounters.length} local record(s)</p><button data-action="new-encounter">Add encounter</button></article><article><h3>Vitals</h3><p>${patientVitals.length} local record(s)</p><button data-action="new-vitals" ${patientEncounters.length ? '' : 'disabled'}>Record vitals</button></article></div><div class="offline-history">${patientEncounters.map((e) => `<p><strong>Encounter:</strong> ${escape(e.presenting_complaint)} <small>${e.sync_state}</small></p>`).join('')}${patientVitals.map((v) => `<p><strong>Vitals:</strong> pulse ${escape(v.pulse_rate || '-')} · BP ${escape(v.blood_pressure_systolic || '-')}/${escape(v.blood_pressure_diastolic || '-')} <small>${v.sync_state}</small></p>`).join('')}</div>` : '<h2>Select or register a patient</h2>'}</main></section>`;
       root.querySelectorAll('[data-patient-id]').forEach((button) => button.addEventListener('click', () => { root.dataset.patientId = button.dataset.patientId; refresh(); }));
       root.querySelector('[data-action="sync"]')?.addEventListener('click', async (event) => {
@@ -189,6 +201,7 @@
           : outcome.review ? 'No changes synced. Review the item below.' : 'Nothing ready to sync.';
         await refresh();
       });
+      root.querySelector('[data-action="dismiss-tips"]')?.addEventListener('click', () => dismissTips(root));
       root.querySelector('[data-action="refresh"]')?.addEventListener('click', async () => { try { await bootstrap(); } catch (error) { alert(error.message); } await refresh(); });
       root.querySelector('[data-action="new-patient"]')?.addEventListener('click', () => patientForm(root, refresh));
       root.querySelector('[data-action="new-encounter"]')?.addEventListener('click', () => encounterForm(root, selected, refresh));
