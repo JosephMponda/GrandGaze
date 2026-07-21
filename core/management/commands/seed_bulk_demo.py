@@ -24,6 +24,7 @@ Usage:
 
 from datetime import date
 from decimal import Decimal
+import random
 
 from django.contrib.auth.models import Group, User
 from django.core.management.base import BaseCommand
@@ -165,43 +166,51 @@ VILLAGES = ["Kawale", "Chimutu", "Mkanda", "Bwaila", "Nkhotakota Boma", "Chilind
 
 PATIENT_FIRST_NAMES_F = ["Chifundo", "Grace", "Memory", "Mary", "Tadala", "Ellen",
                           "Loveness", "Precious", "Winnie", "Agnes", "Beatrice",
-                          "Joyce", "Faith", "Violet", "Naomi"]
+                          "Joyce", "Faith", "Violet", "Naomi", "Patricia", "Fatima",
+                          "Mercy", "Ruth", "Nadia", "Esther", "Jane", "Lilian",
+                          "Olivia", "Zione", "Danielle", "Hilda", "Christine", "Esther",
+                          "Rachael", "Julia"]
 PATIENT_FIRST_NAMES_M = ["Kondwani", "Yamikani", "Chisomo", "Thomas", "Isaac",
                           "Moses", "Frank", "Enock", "Bright", "Owen", "Elias",
-                          "Steven", "Boniface", "Andrew", "Fred"]
+                          "Steven", "Boniface", "Andrew", "Fred", "Gabriel", "Austin",
+                          "Daniel", "James", "Alex", "Joseph", "Patrick", "Kenneth",
+                          "Hastings", "Felix", "Jonathan", "Maxwell", "Samson", "Michael",
+                          "Victor"]
 PATIENT_LAST_NAMES = ["Mkandawire", "Banda", "Phiri", "Njewa", "Kumwenda", "Gondwe",
                        "Chirwa", "Nyirenda", "Mvula", "Zimba", "Mbewe", "Chikapa",
-                       "Kaunda", "Chisale", "Longwe"]
+                       "Kaunda", "Chisale", "Longwe", "Moya", "Mhone", "Mwale",
+                       "Nkhata", "Phiri", "Piri", "Kambale", "Ndhlovu", "Mkwayi",
+                       "Jumbe", "Sitali", "Masangano", "Nkhoma", "Mbewe"]
 
 _next_of_kin_relationships = ["Spouse", "Mother", "Father", "Son", "Daughter",
-                               "Brother", "Sister", "Guardian"]
+                               "Brother", "Sister", "Guardian", "Aunt", "Uncle"]
 
 
 def _phone(seq: int) -> str:
-    return f"09{90000000 + seq * 137 % 9999999:09d}"[:10]
+    return f"09{random.randint(900000, 999999):06d}"
 
 
 def _demographics(seq: int, sex: str, dob: date, category: str = "outpatient"):
-    region = REGIONS[seq % len(REGIONS)]
-    district = DISTRICTS[region][seq % len(DISTRICTS[region])]
-    village = VILLAGES[seq % len(VILLAGES)]
-    first = (PATIENT_FIRST_NAMES_F if sex == "female" else PATIENT_FIRST_NAMES_M)[seq % 15]
-    last = PATIENT_LAST_NAMES[seq % len(PATIENT_LAST_NAMES)]
-    kin_first = (PATIENT_FIRST_NAMES_M if sex == "female" else PATIENT_FIRST_NAMES_F)[(seq + 3) % 15]
+    region = random.choice(REGIONS)
+    district = random.choice(DISTRICTS[region])
+    village = random.choice(VILLAGES)
+    first = random.choice(PATIENT_FIRST_NAMES_F if sex == "female" else PATIENT_FIRST_NAMES_M)
+    last = random.choice(PATIENT_LAST_NAMES)
+    kin_first = random.choice(PATIENT_FIRST_NAMES_M if sex == "female" else PATIENT_FIRST_NAMES_F)
     return {
         "first_name": first,
         "last_name": last,
         "sex": sex,
         "date_of_birth": dob,
         "village": village,
-        "traditional_authority": f"T/A {village[:6]}",
+        "traditional_authority": f"T/A {village}",
         "district": district,
         "region": region,
         "phone_number": _phone(seq),
         "patient_category": category,
         "next_of_kin": {
-            "name": f"{kin_first} {last}",
-            "relationship": _next_of_kin_relationships[seq % len(_next_of_kin_relationships)],
+            "name": f"{kin_first} {random.choice(PATIENT_LAST_NAMES)}",
+            "relationship": random.choice(_next_of_kin_relationships),
             "phone_number": _phone(seq + 500),
         },
     }

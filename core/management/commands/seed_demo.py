@@ -307,10 +307,10 @@ def create_users():
 
 def create_wards_and_beds():
     wards_data = [
-        ("Medical Ward", "Medicine", 8),
-        ("Surgical Ward", "Surgery", 6),
-        ("Paediatric Ward", "Paediatrics", 6),
-        ("Maternity Ward", "Obstetrics", 6),
+        ("Medical Ward", "Medicine", 18),
+        ("Surgical Ward", "Surgery", 16),
+        ("Paediatric Ward", "Paediatrics", 16),
+        ("Maternity Ward", "Obstetrics", 16),
     ]
     for name, dept, bed_count in wards_data:
         ward, _ = Ward.objects.get_or_create(name=name, defaults={"department": dept, "bed_count": bed_count})
