@@ -12,5 +12,5 @@ class VitalsConfig(AppConfig):
             title="Patients with abnormal vitals (last 4h)",
             url_name="reporting:recent_alerts",
             roles=["Nurse", "Clinician", "Admin"],
-            icon="alert-triangle",
+            icon="vital-signs",
         )

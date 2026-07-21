@@ -209,7 +209,7 @@ def fluid_balance(request, admission_id):
 # ── Procedure Notes (§8.1.4(i)) ─────────────────────────────────────────
 
 
-@role_required("Clinician", "Admin")
+@role_required("Nurse", "Clinician", "Admin")
 def procedure_note_create(request, admission_id):
     admission = get_object_or_404(Admission.objects.select_related("patient"), pk=admission_id, status=AdmissionStatus.ACTIVE)
     if request.method == "POST":

@@ -12,5 +12,5 @@ class EmergencyConfig(AppConfig):
             title="Triage Queue",
             url_name="emergency:queue",
             roles=["Nurse", "Clinician", "Admin"],
-            icon="activity",
+            icon="emergency",
         )

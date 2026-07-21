@@ -12,5 +12,5 @@ class InpatientConfig(AppConfig):
             title="Bed Occupancy",
             url_name="inpatient:dashboard",
             roles=["Clinician", "Nurse", "Admin"],
-            icon="activity",
+            icon="bed",
         )

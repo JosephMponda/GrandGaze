@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Dashboard - MUST EMR{% endblock %}
 {% block content %}
 <div class="mx-auto max-w-7xl space-y-6">
@@ -197,12 +198,34 @@
                 {% for w in widgets %}
                 <a href="{% url w.url_name %}" class="group flex items-center gap-4 rounded-2xl border border-gray-200/80 bg-slate-50/60 px-4 py-4 transition-all hover:-translate-y-0.5 hover:border-brand/30 hover:bg-white hover:shadow-md">
                     <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-light text-brand transition-colors group-hover:bg-brand group-hover:text-white">
-                        {% if w.icon == 'flask' %}
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
-                        {% elif w.icon == 'users' %}
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                        {% if w.icon == 'chart' %}
+                            <img class="h-6 w-6 object-contain" src="{% static 'img/analytics.png' %}" alt="{{ w.title }}" />
+                        {% elif w.icon == 'bill' %}
+                            <img class="h-6 w-6 object-contain" src="{% static 'img/billing.png' %}" alt="{{ w.title }}" />
+                        {% elif w.icon == 'vital-signs' %}
+                            <img class="h-6 w-6 object-contain" src="{% static 'img/vitals.png' %}" alt="{{ w.title }}" />
+                        {% elif w.icon == 'emergency' %}
+                            <img class="h-6 w-6 object-contain" src="{% static 'img/triage.png' %}" alt="{{ w.title }}" />
+                        {% elif w.icon == 'dialysis' %}
+                            <img class="h-6 w-6 object-contain" src="{% static 'img/dialysis.png' %}" alt="{{ w.title }}" />
+                        {% elif w.icon == 'bed' %}
+                            <img class="h-6 w-6 object-contain" src="{% static 'img/hospital-bed.png' %}" alt="{{ w.title }}" />
+                        {% elif w.icon == 'box' %}
+                            <img class="h-6 w-6 object-contain" src="{% static 'img/stock_management.png' %}" alt="{{ w.title }}" />
+                        {% elif w.icon == 'flask' %}
+                            <img class="h-6 w-6 object-contain" src="{% static 'img/lab workload.png' %}" alt="{{ w.title }}" />
+                        {% elif w.icon == 'pill' %}
+                            <img class="h-6 w-6 object-contain" src="{% static 'img/pharmacy.png' %}" alt="{{ w.title }}" />
+                        {% elif w.icon == 'image' %}
+                            <img class="h-6 w-6 object-contain" src="{% static 'img/imaging.png' %}" alt="{{ w.title }}" />
                         {% else %}
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            {% if w.icon == 'activity' %}
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.5 13.5h4.5l1.5 4.5 3-10.5 1.5 4.5h4.5"/></svg>
+                            {% elif w.icon == 'users' %}
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 10.5a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.75 19.5a7.5 7.5 0 0115 0"/></svg>
+                            {% else %}
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            {% endif %}
                         {% endif %}
                     </div>
                     <div class="min-w-0 flex-1">

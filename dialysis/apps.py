@@ -12,5 +12,5 @@ class DialysisConfig(AppConfig):
             title="Dialysis Sessions Today",
             url_name="dialysis:dashboard",
             roles=["Clinician", "Nurse", "Admin"],
-            icon="activity",
+            icon="dialysis",
         )
