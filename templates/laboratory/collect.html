@@ -41,7 +41,7 @@
         {% endif %}
 
         <!-- Collection Form -->
-        <form method="post" data-offline-capable="true" class="space-y-4">
+        <form method="post" data-offline-capable="true" data-form-type="lab_collect" class="space-y-4">
             {% csrf_token %}
             <input type="hidden" name="order_id" data-offline-field="order_id" value="{{ order.pk }}">
             <button type="submit" 

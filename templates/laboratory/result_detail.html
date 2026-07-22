@@ -74,7 +74,7 @@
                 </p>
             </div>
         {% else %}
-            <form method="post" action="{% url 'laboratory:verify_result' result.pk %}" data-offline-capable="true" class="pt-2">
+            <form method="post" action="{% url 'laboratory:verify_result' result.pk %}" data-offline-capable="true" data-form-type="lab_verify" class="pt-2">
                 {% csrf_token %}
                 <input type="hidden" name="result_id" data-offline-field="result_id" value="{{ result.pk }}">
                 <button type="submit" 

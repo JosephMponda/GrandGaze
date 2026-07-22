@@ -272,6 +272,20 @@
     await queue('dialysis_session', 'dialysis_sessions', id);
   }
 
+  async function createInvoice(patient, lineItems, data) {
+    const id = `local:${uuid()}`;
+    const record = { id, owner_id: ownerId, patient_local_id: patient.id, line_items: lineItems, sync_state: 'pending', ...data, created_at: new Date().toISOString() };
+    await put('invoices', record);
+    await queue('invoice_create', 'invoices', id);
+  }
+
+  async function recordPayment(invoice, data) {
+    const id = `local:${uuid()}`;
+    const record = { id, owner_id: ownerId, invoice_local_id: invoice.id, sync_state: 'pending', ...data, received_at: new Date().toISOString() };
+    await put('payments', record);
+    await queue('payment', 'payments', id);
+  }
+
   async function payloadFor(item, record) {
     if (item.entity === 'patients') {
       const { id, owner_id, server_id, sync_state, created_at, updated_at, ...payload } = record;
@@ -375,6 +389,28 @@
       payload.prescription_id = prescription.server_id;
       return payload;
     }
+    if (item.entity === 'invoices') {
+      const patient = await get('patients', record.patient_local_id);
+      if (!patient?.server_id) return null;
+      const { id, owner_id, patient_local_id, line_items, server_id, sync_state, created_at, ...payload } = record;
+      payload.patient_id = patient.server_id;
+      // Resolve service catalog item IDs in line_items
+      const resolvedItems = [];
+      for (const item of (line_items || [])) {
+        const svc = await get('service_catalog', item.service_item_local_id);
+        if (svc?.server_id) resolvedItems.push({ service_item_id: svc.server_id, quantity: item.quantity });
+        else if (item.service_item_id) resolvedItems.push({ service_item_id: item.service_item_id, quantity: item.quantity });
+      }
+      payload.line_items = JSON.stringify(resolvedItems);
+      return payload;
+    }
+    if (item.entity === 'payments') {
+      const invoice = await get('invoices', record.invoice_local_id);
+      if (!invoice?.server_id) return null;
+      const { id, owner_id, invoice_local_id, server_id, sync_state, created_at, received_at, ...payload } = record;
+      payload.invoice_id = invoice.server_id;
+      return payload;
+    }
     return null;
   }
 
@@ -451,6 +487,9 @@
       triage_encounters: await all('triage_encounters'),
       dialysis_prescriptions: await all('dialysis_prescriptions'),
       dialysis_sessions: await all('dialysis_sessions'),
+      invoices: await all('invoices'),
+      payments: await all('payments'),
+      service_catalog: await all('service_catalog'),
     };
   }
 
@@ -494,40 +533,22 @@
       const patientLabOrders = selected ? data.lab_orders.filter((o) => o.patient_local_id === selected.id) : [];
       const pendingOrders = patientLabOrders.filter((o) => ['ordered', 'specimen_collected'].includes(o.status));
       const pendingResults = data.lab_results.filter((r) => patientLabOrders.some((o) => o.id === r.order_local_id) && !r.verified);
-      const labSection = `<section class="offline-inpatient"><h3>Laboratory</h3><div class="offline-cards">
-        <article><h3>Order Test</h3><p>${data.lab_tests.length} tests in catalog</p><button data-action="new-lab-order">Order test</button></article>
-        ${pendingOrders.length ? `<article><h3>Pending Orders</h3><p>${pendingOrders.length} waiting</p>${pendingOrders.slice(0, 5).map((o) => `<p class="offline-rx">${escape(o.test_name)} <small>${o.status}</small></p><div class="offline-rx-actions">${o.status === 'ordered' ? `<button data-action="collect-specimen" data-order-id="${o.id}">Collect</button>` : `<button data-action="enter-result" data-order-id="${o.id}">Enter result</button>`}</div>`).join('')}</article>` : ''}
-        ${pendingResults.length ? `<article><h3>Pending Verification</h3><p>${pendingResults.length} result(s)</p>${pendingResults.slice(0, 5).map((r) => `<p class="offline-rx">${escape(r.test_name)}: ${escape(r.value_text || r.value_numeric || '-')} <small>${r.verified ? 'verified' : 'pending'}</small></p>${!r.verified ? `<div class="offline-rx-actions"><button data-action="verify-result" data-result-id="${r.id}">Verify</button></div>` : ''}`).join('')}</article>` : ''}
-      </div></section>`;
       // Imaging
       const patientImagingRequests = selected ? data.imaging_requests.filter((r) => r.patient_local_id === selected.id) : [];
       const pendingImaging = patientImagingRequests.filter((r) => r.status !== 'reported');
       const imagingResults = data.imaging_results.filter((r) => patientImagingRequests.some((req) => req.id === r.request_local_id));
-      const imagingSection = `<section class="offline-inpatient"><h3>Imaging</h3><div class="offline-cards">
-        <article><h3>Request Imaging</h3><p>${data.imaging_modalities.length} modalities</p><button data-action="new-imaging-request">New request</button></article>
-        ${pendingImaging.length ? `<article><h3>Pending</h3><p>${pendingImaging.length} request(s)</p>${pendingImaging.slice(0, 5).map((r) => `<p class="offline-rx">${escape(r.modality_name)} — ${escape(r.clinical_indication?.substring(0, 40))} <small>${r.status}</small></p>${r.status !== 'reported' ? `<div class="offline-rx-actions"><button data-action="enter-imaging-report" data-request-id="${r.id}">Enter report</button></div>` : ''}`).join('')}</article>` : ''}
-        ${imagingResults.length ? `<article><h3>Reports</h3><p>${imagingResults.length} report(s)</p>${imagingResults.slice(0, 5).map((r) => `<p class="offline-rx">${escape(r.modality_name)}: ${escape(r.impression?.substring(0, 40))} ${r.is_critical_finding ? '<strong>CRITICAL</strong>' : ''} <small>${r.sync_state}</small></p>`).join('')}</article>` : ''}
-      </div></section>`;
       // Emergency
       const activeTriage = data.triage_encounters.filter((t) => !t.outcome);
-      const emergencySection = `<section class="offline-inpatient"><h3>Emergency</h3><div class="offline-cards">
-        <article><h3>Triage</h3><p>${activeTriage.length} active</p><button data-action="new-triage">Triage patient</button></article>
-        ${activeTriage.length ? `<article><h3>Waiting</h3><p>${activeTriage.length} patient(s)</p>${activeTriage.slice(0, 5).map((t) => `<p class="offline-rx">${escape(t.triage_category)} — ${escape(t.presenting_condition?.substring(0, 40))} <small>${t.sync_state}</small></p><div class="offline-rx-actions"><button data-action="resolve-triage" data-triage-id="${t.id}">Resolve</button></div>`).join('')}</article>` : ''}
-      </div></section>`;
       // Dialysis
       const patientDialysisPrescriptions = selected ? data.dialysis_prescriptions.filter((p) => p.patient_local_id === selected.id) : [];
       const activeDialysis = patientDialysisPrescriptions.filter((p) => p.is_active !== false);
       const patientDialysisSessions = selected ? data.dialysis_sessions.filter((s) => patientDialysisPrescriptions.some((p) => p.id === s.prescription_local_id)) : [];
-      const dialysisSection = `<section class="offline-inpatient"><h3>Dialysis</h3><div class="offline-cards">
-        <article><h3>Prescribe</h3><p>${activeDialysis.length} active prescription(s)</p><button data-action="new-dialysis-prescription">New prescription</button></article>
-        ${activeDialysis.length ? `<article><h3>Record Session</h3><p>${patientDialysisSessions.length} session(s) recorded</p><button data-action="new-dialysis-session">Record session</button></article>` : ''}
-      </div></section>`;
       root.innerHTML = `<header class="offline-head"><div><p>Local-first clinical workspace</p><p class="offline-reload-warning"><strong>PLEASE RELOAD THE PAGE IF THE TEXT IS NOT DISPLAYING CORRECTLY</strong></p><h1>MUST EMR Offline</h1></div><div><span class="offline-pill ${navigator.onLine ? 'online' : ''}">${navigator.onLine ? 'Connection available' : 'Working offline'}</span><a class="offline-return" href="/accounts/dashboard/">Return online</a><button data-action="sync">Sync now</button></div></header>
         ${!tipsDismissed() ? `<section class="offline-tip"><div><strong>Offline workspace quick start</strong><button data-action="dismiss-tips" aria-label="Dismiss tips">×</button></div><ol><li>Open this page while online, then click <strong>Refresh directory</strong> to download the patient snapshot.</li><li>Create or select a patient, add an encounter, then record vitals.</li><li>When you next go online, click <strong>Sync now</strong> to send local changes to the server.</li></ol><p>If the workspace appears empty on first load, reload the page once and then refresh the directory again.</p></section>` : ''}
         <p class="offline-status">${data.outbox.length} change${data.outbox.length === 1 ? '' : 's'} waiting. Directory snapshot: ${data.snapshot?.updated_at ? new Date(data.snapshot.updated_at).toLocaleString() : 'not downloaded yet'}. ${escape(syncMessage)}</p>
         ${reviewItems.length ? `<section class="offline-review"><strong>${reviewItems.length} item${reviewItems.length === 1 ? '' : 's'} needs review</strong>${reviewItems.map((item) => `<p>${escape(item.form_type)}: ${escape(item.error || 'The server rejected this change. Create a corrected record before retrying.')}</p>`).join('')}</section>` : ''}
         <section class="offline-grid"><aside><div class="offline-actions"><button data-action="new-patient">Register patient</button><button data-action="refresh" title="Refresh the local patient directory">Refresh directory</button></div><div class="offline-button-guidance"><span><strong>Refresh</strong> downloads the most recent local patient snapshot.</span><span><strong>Sync</strong> sends your offline edits when you reconnect.</span></div><input id="offline-search" placeholder="Search local patients" autocomplete="off"><div id="offline-patients">${patientRows || '<p class="offline-empty">No local patients. Connect once and refresh the directory.</p>'}</div></aside>
-        <main>${selected ? `<h2>${escape(selected.first_name)} ${escape(selected.other_names || '')} ${escape(selected.last_name)}</h2><p class="offline-muted">${escape(selected.patient_number || 'Local patient')} · ${escape(selected.sex || 'Unknown')} · ${escape(selected.phone_number || 'No phone')}</p><div class="offline-cards"><article><h3>Encounters</h3><p>${patientEncounters.length} local record(s)</p><button data-action="new-encounter">Add encounter</button></article><article><h3>Vitals</h3><p>${patientVitals.length} local record(s)</p><button data-action="new-vitals" ${patientEncounters.length ? '' : 'disabled'}>Record vitals</button></article></div>${inpatientSection}${pharmacySection}${labSection}${imagingSection}${emergencySection}${dialysisSection}<div class="offline-history">${patientEncounters.map((e) => `<p><strong>Encounter:</strong> ${escape(e.presenting_complaint)} <small>${e.sync_state}</small></p>`).join('')}${patientVitals.map((v) => `<p><strong>Vitals:</strong> pulse ${escape(v.pulse_rate || '-')} · BP ${escape(v.blood_pressure_systolic || '-')}/${escape(v.blood_pressure_diastolic || '-')} <small>${v.sync_state}</small></p>`).join('')}${admissionWardRounds.map((r) => `<p><strong>Ward Round:</strong> ${escape(r.note)} <small>${r.sync_state}</small></p>`).join('')}${admissionCarePlans.map((c) => `<p><strong>Care Plan:</strong> ${escape(c.problem)} — ${escape(c.goal_status || 'ongoing')} <small>${c.sync_state}</small></p>`).join('')}${admissionFluid.map((f) => `<p><strong>Fluid:</strong> ${escape(f.fluid_type)} ${escape(f.volume_ml)}ml <small>${f.sync_state}</small></p>`).join('')}${admissionProcedures.map((p) => `<p><strong>Procedure:</strong> ${escape(p.procedure_name)} <small>${p.sync_state}</small></p>`).join('')}${admissionAssessments.map((a) => `<p><strong>Assessment:</strong> ${escape(a.assessment_note?.substring(0, 80))} <small>${a.sync_state}</small></p>`).join('')}${admissionMAR.map((m) => `<p><strong>MAR:</strong> Rx#${escape(m.prescription_local_id)} ${escape(m.dose_given)} <small>${m.sync_state}</small></p>`).join('')}${patientReferrals.map((r) => `<p><strong>Referral:</strong> ${escape(r.destination)} <small>${r.sync_state}</small></p>`).join('')}</div>` : '<h2>Select or register a patient</h2>'}</main></section>`;
+        <main>${selected ? `<h2>${escape(selected.first_name)} ${escape(selected.other_names || '')} ${escape(selected.last_name)}</h2><p class="offline-muted">${escape(selected.patient_number || 'Local patient')} · ${escape(selected.sex || 'Unknown')} · ${escape(selected.phone_number || 'No phone')}</p><div class="offline-cards"><article><h3>Encounters</h3><p>${patientEncounters.length} local record(s)</p><button data-action="new-encounter">Add encounter</button></article><article><h3>Vitals</h3><p>${patientVitals.length} local record(s)</p><button data-action="new-vitals" ${patientEncounters.length ? '' : 'disabled'}>Record vitals</button></article><article><h3>Laboratory</h3><p>${data.lab_tests.length} tests in catalog</p><button data-action="new-lab-order">Order test</button></article><article><h3>Imaging</h3><p>${data.imaging_modalities.length} modalities</p><button data-action="new-imaging-request">New request</button></article><article><h3>Emergency</h3><p>${activeTriage.length} active triage(s)</p><button data-action="new-triage">Triage patient</button></article><article><h3>Dialysis</h3><p>${activeDialysis.length} active prescription(s)</p><button data-action="new-dialysis-prescription">New prescription</button></article></div>${pendingOrders.length ? `<div class="offline-cards"><article><h3>Pending Lab Orders</h3><p>${pendingOrders.length} waiting</p>${pendingOrders.slice(0, 5).map((o) => `<p class="offline-rx">${escape(o.test_name)} <small>${o.status}</small></p><div class="offline-rx-actions">${o.status === 'ordered' ? `<button data-action="collect-specimen" data-order-id="${o.id}">Collect</button>` : `<button data-action="enter-result" data-order-id="${o.id}">Enter result</button>`}</div>`).join('')}</article></div>` : ''}${pendingResults.length ? `<div class="offline-cards"><article><h3>Pending Lab Verification</h3><p>${pendingResults.length} result(s)</p>${pendingResults.slice(0, 5).map((r) => `<p class="offline-rx">${escape(r.test_name)}: ${escape(r.value_text || r.value_numeric || '-')} <small>${r.verified ? 'verified' : 'pending'}</small></p>${!r.verified ? `<div class="offline-rx-actions"><button data-action="verify-result" data-result-id="${r.id}">Verify</button></div>` : ''}`).join('')}</article></div>` : ''}${pendingImaging.length ? `<div class="offline-cards"><article><h3>Pending Imaging</h3><p>${pendingImaging.length} request(s)</p>${pendingImaging.slice(0, 5).map((r) => `<p class="offline-rx">${escape(r.modality_name)} — ${escape(r.clinical_indication?.substring(0, 40))} <small>${r.status}</small></p><div class="offline-rx-actions"><button data-action="enter-imaging-report" data-request-id="${r.id}">Enter report</button></div>`).join('')}</article></div>` : ''}${imagingResults.length ? `<div class="offline-cards"><article><h3>Imaging Reports</h3><p>${imagingResults.length} report(s)</p>${imagingResults.slice(0, 5).map((r) => `<p class="offline-rx">${escape(r.modality_name)}: ${escape(r.impression?.substring(0, 40))} ${r.is_critical_finding ? '<strong>CRITICAL</strong>' : ''} <small>${r.sync_state}</small></p>`).join('')}</article></div>` : ''}${activeTriage.length ? `<div class="offline-cards"><article><h3>Waiting Triage</h3><p>${activeTriage.length} patient(s)</p>${activeTriage.slice(0, 5).map((t) => `<p class="offline-rx">${escape(t.triage_category)} — ${escape(t.presenting_condition?.substring(0, 40))} <small>${t.sync_state}</small></p><div class="offline-rx-actions"><button data-action="resolve-triage" data-triage-id="${t.id}">Resolve</button></div>`).join('')}</article></div>` : ''}${activeDialysis.length ? `<div class="offline-cards"><article><h3>Dialysis Sessions</h3><p>${patientDialysisSessions.length} session(s) recorded</p><button data-action="new-dialysis-session">Record session</button></article></div>` : ''}<div class="offline-history">${patientEncounters.map((e) => `<p><strong>Encounter:</strong> ${escape(e.presenting_complaint)} <small>${e.sync_state}</small></p>`).join('')}${patientVitals.map((v) => `<p><strong>Vitals:</strong> pulse ${escape(v.pulse_rate || '-')} · BP ${escape(v.blood_pressure_systolic || '-')}/${escape(v.blood_pressure_diastolic || '-')} <small>${v.sync_state}</small></p>`).join('')}${admissionWardRounds.map((r) => `<p><strong>Ward Round:</strong> ${escape(r.note)} <small>${r.sync_state}</small></p>`).join('')}${admissionCarePlans.map((c) => `<p><strong>Care Plan:</strong> ${escape(c.problem)} — ${escape(c.goal_status || 'ongoing')} <small>${c.sync_state}</small></p>`).join('')}${admissionFluid.map((f) => `<p><strong>Fluid:</strong> ${escape(f.fluid_type)} ${escape(f.volume_ml)}ml <small>${f.sync_state}</small></p>`).join('')}${admissionProcedures.map((p) => `<p><strong>Procedure:</strong> ${escape(p.procedure_name)} <small>${p.sync_state}</small></p>`).join('')}${admissionAssessments.map((a) => `<p><strong>Assessment:</strong> ${escape(a.assessment_note?.substring(0, 80))} <small>${a.sync_state}</small></p>`).join('')}${admissionMAR.map((m) => `<p><strong>MAR:</strong> Rx#${escape(m.prescription_local_id)} ${escape(m.dose_given)} <small>${m.sync_state}</small></p>`).join('')}${patientReferrals.map((r) => `<p><strong>Referral:</strong> ${escape(r.destination)} <small>${r.sync_state}</small></p>`).join('')}</div>` : '<h2>Select or register a patient</h2>'}</main></section>`;
       root.querySelectorAll('[data-patient-id]').forEach((button) => button.addEventListener('click', () => { root.dataset.patientId = button.dataset.patientId; refresh(); }));
       root.querySelector('[data-action="sync"]')?.addEventListener('click', async (event) => {
         event.currentTarget.disabled = true;
