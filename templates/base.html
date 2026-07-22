@@ -106,6 +106,10 @@
             </div>
         </aside>
         {% else %}
+        <div class="fixed inset-0 -z-10">
+            <img src="{% static 'img/Backgrounds/MUST Campus.jpg' %}" alt="" class="h-full w-full object-cover" aria-hidden="true">
+            <div class="absolute inset-0 bg-black/35"></div>
+        </div>
         <header class="relative z-20 border-b border-gray-200/80 bg-white/95 shadow-sm" style="background-image: url('{% static "img/Backgrounds/MUST Campus Garden.png" %}'); background-size: cover; background-position: center;">
             <div class="absolute inset-0 bg-white/95"></div>
             <div class="relative mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-8">
