@@ -10,6 +10,8 @@ from pharmacy.models import Drug
 from laboratory.models import LabTest
 from imaging.models import ImagingModality
 from billing.models import ServiceCatalogItem
+from emergency.models import TriageEncounter
+from dialysis.models import DialysisPrescription, DialysisSession
 
 from .dispatch import dispatch
 from .models import SyncConflict, SyncSubmission
@@ -88,12 +90,10 @@ def offline_bootstrap(request):
     This project currently has no ward/clinician assignment model to limit the
     data set, so it mirrors active patients visible to the logged-in user.
     """
-    from patients.models import Patient
-
     patients = Patient.objects.filter(is_active=True).order_by("last_name", "first_name")
 
     # Inpatient reference data
-    from inpatient.models import Admission, AdmissionStatus, Bed, Ward
+    from inpatient.models import Admission, AdmissionStatus
     from pharmacy.models import Prescription, PrescriptionStatus
 
     wards = [
@@ -184,7 +184,6 @@ def offline_bootstrap(request):
     ]
 
     # Triage encounters (active/unresolved only)
-    from emergency.models import TriageEncounter
     triage_encounters = [
         {
             "server_id": t.pk,
@@ -199,7 +198,6 @@ def offline_bootstrap(request):
     ]
 
     # Active dialysis prescriptions and their sessions
-    from dialysis.models import DialysisPrescription, DialysisSession
     dialysis_prescriptions = [
         {
             "server_id": p.pk,
