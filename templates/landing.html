@@ -7,6 +7,11 @@
 <div class="min-h-[calc(100vh-8rem)]">
     <!-- Hero Section -->
     <section class="relative overflow-hidden bg-gradient-to-br from-brand-dark via-brand to-brand-accent">
+        <!-- Campus Background Image -->
+        <div class="absolute inset-0">
+            <img src="{% static 'img/Backgrounds/MUST Campus.jpg' %}" alt="" class="h-full w-full object-cover" aria-hidden="true">
+            <div class="absolute inset-0 bg-gradient-to-br from-brand-dark/85 via-brand/80 to-brand-accent/85"></div>
+        </div>
         <!-- Background Pattern -->
         <div class="absolute inset-0 opacity-10">
             <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -44,14 +49,14 @@
                 
                 <div class="mt-10 flex flex-col sm:flex-row mb-12 items-center justify-center gap-4">
                     <a href="{% url 'accounts:login' %}" 
-                       class="w-full sm:w-auto btn-primary inline-flex items-center justify-center px-8 py-4 text-brand-dark rounded-xl font-bold text-lg hover:scale-105 active:scale-95 transition-all duration-200">
+                       class="w-full sm:w-auto btn-primary inline-flex items-center justify-center px-8 py-4 text-white rounded-xl font-bold text-lg hover:scale-105 active:scale-95 transition-all duration-200">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
                         </svg>
                         Sign In to EMR
                     </a>
                     <a href="#features" 
-                       class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-white/10 backdrop-blur-sm text-ink hover:text-brand rounded-xl font-bold text-lg border-2 border-white/30 hover:bg-white/20 hover:border-white/50 transition-all duration-200">
+                       class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-white/10 backdrop-blur-sm text-white hover:text-gray-300 rounded-xl font-bold text-lg border-2 border-white/30 hover:bg-white/20 hover:border-white/50 transition-all duration-200">
                         Learn More
                         <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>

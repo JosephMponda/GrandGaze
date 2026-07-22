@@ -183,6 +183,48 @@ def offline_bootstrap(request):
         for s in ServiceCatalogItem.objects.all()
     ]
 
+    # Triage encounters (active/unresolved only)
+    from emergency.models import TriageEncounter
+    triage_encounters = [
+        {
+            "server_id": t.pk,
+            "patient_id": t.patient_id,
+            "triage_category": t.triage_category,
+            "presenting_condition": t.presenting_condition,
+            "outcome": t.outcome,
+            "disposition_note": t.disposition_note,
+            "created_at": t.created_at.isoformat(),
+        }
+        for t in TriageEncounter.objects.select_related("patient").all()
+    ]
+
+    # Active dialysis prescriptions and their sessions
+    from dialysis.models import DialysisPrescription, DialysisSession
+    dialysis_prescriptions = [
+        {
+            "server_id": p.pk,
+            "patient_id": p.patient_id,
+            "frequency_per_week": p.frequency_per_week,
+            "vascular_access": p.vascular_access,
+            "target_fluid_removal_l": float(p.target_fluid_removal_l) if p.target_fluid_removal_l else None,
+            "is_active": p.is_active,
+            "created_at": p.created_at.isoformat(),
+        }
+        for p in DialysisPrescription.objects.filter(is_active=True).select_related("patient")
+    ]
+    dialysis_sessions = [
+        {
+            "server_id": s.pk,
+            "prescription_id": s.prescription_id,
+            "pre_weight_kg": float(s.pre_weight_kg),
+            "post_weight_kg": float(s.post_weight_kg),
+            "complications": s.complications or "",
+            "notes": s.notes or "",
+            "created_at": s.created_at.isoformat(),
+        }
+        for s in DialysisSession.objects.select_related("prescription").all()
+    ]
+
     return Response(
         {
             "generated_at": timezone.now().isoformat(),
@@ -207,6 +249,9 @@ def offline_bootstrap(request):
             "lab_tests": lab_tests,
             "imaging_modalities": imaging_modalities,
             "service_catalog": service_catalog,
+            "triage_encounters": triage_encounters,
+            "dialysis_prescriptions": dialysis_prescriptions,
+            "dialysis_sessions": dialysis_sessions,
         }
     )
 

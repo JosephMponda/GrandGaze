@@ -1,10 +1,10 @@
-const VERSION = 'v12';
+const VERSION = 'v13';
 const STATIC_CACHE = `must-emr-static-${VERSION}`;
 const PAGE_CACHE = `must-emr-pages-${VERSION}`;
 const APP_SHELL = [
   '/', '/accounts/login/', '/static/css/app.css', '/static/js/htmx.min.js',
-  '/static/js/alpinejs.min.js', '/static/js/chart.min.js', '/static/js/app.js?v=9',
-  '/static/js/offline-client.js?v=12', '/static/css/offline-workspace.css?v=11',
+  '/static/js/alpinejs.min.js', '/static/js/chart.min.js', '/static/js/app.js?v=10',
+  '/static/js/offline-client.js?v=15', '/static/css/offline-workspace.css?v=13',
   '/static/offline-workspace.html', '/static/img/must-logo.png',
   '/static/img/logos/GSL-Official-Logo.png', '/static/offline.html',
 ];
@@ -17,7 +17,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(caches.keys().then((names) => Promise.all(names
     .filter((name) => name.startsWith('must-emr-') && ![STATIC_CACHE, PAGE_CACHE].includes(name))
-    .map((name) => caches.delete(name)))));
+    .map((name) => caches.delete(name))).then(() => caches.delete(PAGE_CACHE))));
   self.clients.claim();
 });
 

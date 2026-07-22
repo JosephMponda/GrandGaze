@@ -110,6 +110,21 @@
         ...svc, id: `server:${svc.server_id}`, owner_id: ownerId, sync_state: 'synced',
       })));
     }
+    if (snapshot.triage_encounters) {
+      await Promise.all(snapshot.triage_encounters.map((t) => put('triage_encounters', {
+        ...t, id: `server:${t.server_id}`, owner_id: ownerId, sync_state: 'synced',
+      })));
+    }
+    if (snapshot.dialysis_prescriptions) {
+      await Promise.all(snapshot.dialysis_prescriptions.map((p) => put('dialysis_prescriptions', {
+        ...p, id: `server:${p.server_id}`, owner_id: ownerId, sync_state: 'synced',
+      })));
+    }
+    if (snapshot.dialysis_sessions) {
+      await Promise.all(snapshot.dialysis_sessions.map((s) => put('dialysis_sessions', {
+        ...s, id: `server:${s.server_id}`, owner_id: ownerId, sync_state: 'synced',
+      })));
+    }
     await put('meta', { id: 'snapshot', owner_id: ownerId, updated_at: snapshot.generated_at });
     return true;
   }
@@ -160,7 +175,6 @@
   }
 
   async function evaluateCarePlan(plan, data) {
-    const id = `local:${uuid()}`;
     await put('care_plans', { ...plan, evaluation: data.evaluation, goal_status: data.goal_status, sync_state: 'pending', evaluated_at: new Date().toISOString() });
     await queue('care_plan_evaluate', 'care_plans', plan.id);
   }
@@ -197,20 +211,18 @@
   }
 
   async function approvePrescription(rx, data) {
-    const id = `local:${uuid()}`;
     await put('prescriptions', { ...rx, status: 'approved', sync_state: 'pending' });
     await queue('pharmacy_approve', 'prescriptions', rx.id);
   }
 
   async function dispensePrescription(rx, data) {
-    const id = `local:${uuid()}`;
     await put('prescriptions', { ...rx, status: 'dispensed', sync_state: 'pending' });
     await queue('pharmacy_dispense', 'prescriptions', rx.id);
   }
 
   async function createLabOrder(patient, labTest, data) {
     const id = `local:${uuid()}`;
-    const record = { id, owner_id: ownerId, patient_local_id: patient.id, test_local_id: labTest.id, test_name: labTest.name, sync_state: 'pending', ...data, created_at: new Date().toISOString() };
+    const record = { id, owner_id: ownerId, patient_local_id: patient.id, test_local_id: labTest.id, test_name: labTest.name, status: 'ordered', sync_state: 'pending', ...data, created_at: new Date().toISOString() };
     await put('lab_orders', record);
     await queue('lab_order', 'lab_orders', id);
   }
@@ -234,7 +246,7 @@
 
   async function createImagingRequest(patient, modality, data) {
     const id = `local:${uuid()}`;
-    const record = { id, owner_id: ownerId, patient_local_id: patient.id, modality_local_id: modality.id, modality_name: modality.name, sync_state: 'pending', ...data, created_at: new Date().toISOString() };
+    const record = { id, owner_id: ownerId, patient_local_id: patient.id, modality_local_id: modality.id, modality_name: modality.name, status: 'requested', sync_state: 'pending', ...data, created_at: new Date().toISOString() };
     await put('imaging_requests', record);
     await queue('imaging_request', 'imaging_requests', id);
   }
@@ -260,7 +272,7 @@
 
   async function createDialysisPrescription(patient, data) {
     const id = `local:${uuid()}`;
-    const record = { id, owner_id: ownerId, patient_local_id: patient.id, sync_state: 'pending', ...data, created_at: new Date().toISOString() };
+    const record = { id, owner_id: ownerId, patient_local_id: patient.id, is_active: true, sync_state: 'pending', ...data, created_at: new Date().toISOString() };
     await put('dialysis_prescriptions', record);
     await queue('dialysis_prescription', 'dialysis_prescriptions', id);
   }
@@ -327,7 +339,7 @@
     if (item.entity === 'prescriptions') {
       const patient = await get('patients', record.patient_local_id);
       if (!patient?.server_id) return null;
-      const drug = record.drug_local_id ? await get('prescriptions', record.drug_local_id) : null;
+      const drug = record.drug_local_id ? await get('drugs', record.drug_local_id) : null;
       const { id, owner_id, patient_local_id, drug_local_id, drug_name, server_id, sync_state, created_at, ...payload } = record;
       payload.patient_id = patient.server_id;
       if (drug?.server_id) payload.drug_id = drug.server_id;
@@ -598,7 +610,7 @@
       if (type === 'textarea') return `<label>${label}<textarea name="${name}" rows="3" ${required ? 'required' : ''}>${defaultValue}</textarea></label>`;
       return `<label>${label}<input name="${name}" type="${type}" ${required ? 'required' : ''} value="${defaultValue}"></label>`;
     };
-    root.innerHTML = `<section class="offline-form"><button data-back>Back</button><h2>${title}</h2><form>${fields.map(control).join('')}<button type="submit">Save on this device</button></form></section>`;
+    root.innerHTML = `<section class="offline-form"><button data-back>Back</button><h2>${escape(title)}</h2><form>${fields.map(control).join('')}<button type="submit">Save on this device</button></form></section>`;
     root.querySelector('[data-back]').addEventListener('click', () => renderWorkspace(root));
     root.querySelector('form').addEventListener('submit', async (event) => { event.preventDefault(); await submit(Object.fromEntries(new FormData(event.target))); await renderWorkspace(root); });
   }
@@ -612,14 +624,14 @@
   const nursingAssessmentForm = (root, admission, done) => form(root, 'Nursing Assessment', [['assessment_note', 'Assessment note', 'textarea', true]], async (data) => { data.problems = []; await createNursingAssessment(admission, data); await done(); });
   const marForm = (root, admission, prescriptions, done) => form(root, 'MAR Entry', [['prescription_local_id', 'Prescription', 'select', true, prescriptions.map((p) => [p.id, `${p.drug_name} ${p.dose} ${p.frequency}`])], ['dose_given', 'Dose given', 'text', true], ['route', 'Route', 'select', true, [['oral', 'Oral'], ['iv', 'IV'], ['im', 'IM'], ['sc', 'SC'], ['topical', 'Topical'], ['rectal', 'Rectal'], ['other', 'Other']]], ['site', 'Site'], ['notes', 'Notes']], async (data) => { const rx = prescriptions.find((p) => p.id === data.prescription_local_id); data.route = data.route; await createMAREntry(admission, rx, data); await done(); });
   const referralForm = (root, patient, done) => form(root, 'Create Referral', [['destination', 'Destination department', 'select', true, [['Laboratory', 'Laboratory'], ['Imaging', 'Imaging / Radiology'], ['Pharmacy', 'Pharmacy'], ['Theatre', 'Theatre'], ['ICU', 'ICU / HDU'], ['Ward', 'Ward'], ['Physiotherapy', 'Physiotherapy'], ['Other facility', 'Other facility']]], ['reason', 'Reason'], ['source', 'Source', 'text', false, [], 'Ward']], async (data) => { if (!data.source) data.source = 'Ward'; await createReferral(patient, data); await done(); });
-  const prescribeForm = (root, patient, drugs, done) => form(root, `Prescribe for ${patient.first_name} ${patient.last_name}`, [['drug_id', 'Drug', 'select', true, drugs.map((d) => [d.id, `${d.generic_name} (${d.formulation})`])], ['dose', 'Dose', 'text', true], ['route', 'Route', 'select', true, [['oral', 'Oral'], ['iv', 'IV'], ['im', 'IM'], ['sc', 'SC'], ['topical', 'Topical'], ['rectal', 'Rectal'], ['other', 'Other']]], ['frequency', 'Frequency', 'text', true], ['duration_days', 'Duration (days)', 'number'], ['notes', 'Notes']], async (data) => { data.duration_days = data.duration_days ? parseInt(data.duration_days) : null; const drug = drugs.find((d) => String(d.id) === String(data.drug_id)); data.drug_id = parseInt(data.drug_id); await prescribeDrug(patient, drug, data); await done(); });
+  const prescribeForm = (root, patient, drugs, done) => form(root, `Prescribe for ${patient.first_name} ${patient.last_name}`, [['drug_id', 'Drug', 'select', true, drugs.map((d) => [d.id, `${d.generic_name} (${d.formulation})`])], ['dose', 'Dose', 'text', true], ['route', 'Route', 'select', true, [['oral', 'Oral'], ['iv', 'IV'], ['im', 'IM'], ['sc', 'SC'], ['topical', 'Topical'], ['rectal', 'Rectal'], ['other', 'Other']]], ['frequency', 'Frequency', 'text', true], ['duration_days', 'Duration (days)', 'number'], ['notes', 'Notes']], async (data) => { data.duration_days = data.duration_days ? parseInt(data.duration_days) : null; const drug = drugs.find((d) => String(d.id) === String(data.drug_id)); delete data.drug_id; await prescribeDrug(patient, drug, data); await done(); });
   const approveForm = (root, rx, done) => form(root, `Approve: ${rx.drug_name || 'Prescription'}`, [], async (data) => { await approvePrescription(rx, data); await done(); });
   const dispenseForm = (root, rx, done) => form(root, `Dispense: ${rx.drug_name || 'Prescription'}`, [['quantity_dispensed', 'Quantity', 'text', true], ['stock_note', 'Stock note']], async (data) => { await dispensePrescription(rx, data); await done(); });
-  const labOrderForm = (root, patient, labTests, done) => form(root, `Order Lab Test for ${patient.first_name} ${patient.last_name}`, [['test_id', 'Test', 'select', true, labTests.map((t) => [t.id, `${t.name} (${t.specimen_type})`])], ['encounter_id', 'Encounter ID (optional)', 'text']], async (data) => { data.encounter_id = data.encounter_id ? parseInt(data.encounter_id) : null; const labTest = labTests.find((t) => String(t.id) === String(data.test_id)); data.test_id = parseInt(data.test_id); await createLabOrder(patient, labTest, data); await done(); });
+  const labOrderForm = (root, patient, labTests, done) => form(root, `Order Lab Test for ${patient.first_name} ${patient.last_name}`, [['test_id', 'Test', 'select', true, labTests.map((t) => [t.id, `${t.name} (${t.specimen_type})`])], ['encounter_id', 'Encounter ID (optional)', 'text']], async (data) => { data.encounter_id = data.encounter_id ? parseInt(data.encounter_id) : null; const labTest = labTests.find((t) => String(t.id) === String(data.test_id)); delete data.test_id; await createLabOrder(patient, labTest, data); await done(); });
   const collectSpecimenForm = (root, order, done) => form(root, `Collect: ${order.test_name || 'Specimen'}`, [], async (data) => { await collectLabSpecimen(order, data); await done(); });
   const labResultForm = (root, order, done) => form(root, `Enter Result: ${order.test_name || 'Test'}`, [['value_text', 'Result (text)', 'text', true], ['value_numeric', 'Result (numeric)', 'number'], ['notes', 'Notes']], async (data) => { data.value_numeric = data.value_numeric ? parseFloat(data.value_numeric) : null; await enterLabResult(order, data); await done(); });
   const verifyResultForm = (root, result, done) => form(root, `Verify: ${result.test_name || 'Result'}`, [], async (data) => { await verifyLabResult(result, data); await done(); });
-  const imagingRequestForm = (root, patient, modalities, done) => form(root, `Request Imaging for ${patient.first_name} ${patient.last_name}`, [['modality_id', 'Modality', 'select', true, modalities.map((m) => [m.id, m.name])], ['clinical_indication', 'Clinical indication', 'textarea', true], ['pregnancy_status_checked', 'Pregnancy status checked', 'checkbox']], async (data) => { data.clinical_indication = data.clinical_indication || ''; data.pregnancy_status_checked = data.pregnancy_status_checked === 'on'; const modality = modalities.find((m) => String(m.id) === String(data.modality_id)); data.modality_id = parseInt(data.modality_id); await createImagingRequest(patient, modality, data); await done(); });
+  const imagingRequestForm = (root, patient, modalities, done) => form(root, `Request Imaging for ${patient.first_name} ${patient.last_name}`, [['modality_id', 'Modality', 'select', true, modalities.map((m) => [m.id, m.name])], ['clinical_indication', 'Clinical indication', 'textarea', true], ['pregnancy_status_checked', 'Pregnancy status checked', 'checkbox']], async (data) => { data.clinical_indication = data.clinical_indication || ''; data.pregnancy_status_checked = data.pregnancy_status_checked === 'on'; const modality = modalities.find((m) => String(m.id) === String(data.modality_id)); delete data.modality_id; await createImagingRequest(patient, modality, data); await done(); });
   const imagingReportForm = (root, imagingReq, done) => form(root, `Report: ${imagingReq.modality_name || 'Imaging'}`, [['findings', 'Findings', 'textarea', true], ['impression', 'Impression', 'textarea', true], ['is_critical_finding', 'Critical finding', 'checkbox'], ['image_reference', 'Image reference']], async (data) => { data.findings = data.findings || ''; data.impression = data.impression || ''; data.is_critical_finding = data.is_critical_finding === 'on'; await enterImagingReport(imagingReq, data); await done(); });
   const triageForm = (root, patient, done) => form(root, `Triage: ${patient.first_name} ${patient.last_name}`, [['triage_category', 'Category', 'select', true, [['immediate', 'Immediate (Resuscitation)'], ['emergency', 'Emergency'], ['urgent', 'Urgent'], ['standard', 'Standard'], ['non_urgent', 'Non-Urgent']]], ['presenting_condition', 'Presenting condition', 'textarea', true], ['outcome', 'Outcome', 'select', false, [['', '---'], ['discharged', 'Discharged'], ['admitted', 'Admitted'], ['referred', 'Referred'], ['dead', 'Dead']]], ['disposition_note', 'Disposition note']], async (data) => { await createTriage(patient, data); await done(); });
   const resolveTriageForm = (root, triage, done) => form(root, `Resolve: ${triage.triage_category || 'Triage'}`, [['outcome', 'Outcome', 'select', true, [['discharged', 'Discharged'], ['admitted', 'Admitted'], ['referred', 'Referred'], ['dead', 'Dead']]], ['disposition_note', 'Disposition note']], async (data) => { await resolveTriage(triage, data); await done(); });

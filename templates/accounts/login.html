@@ -3,8 +3,14 @@
 {% block title %}Sign In - MUST EMR{% endblock %}
 
 {% block content %}
-<div class="flex flex-col justify-center items-center py-4 px-4 sm:px-6 lg:px-8 mt-10">
-    <div class="max-w-md w-full">
+<!-- Full-page campus background -->
+<div class="fixed inset-0 -z-10">
+    <img src="{% static 'img/Backgrounds/MUST Campus.jpg' %}" alt="" class="h-full w-full object-cover" aria-hidden="true">
+    <div class="absolute inset-0 bg-black/35"></div>
+</div>
+
+<div class="flex flex-col justify-center items-center py-4 px-4 sm:px-6 lg:px-8 mt-10 relative">
+    <div class="max-w-md w-full relative">
         <!-- Logo and Heading -->
         <div class="text-center mb-8">
             <div class="inline-flex items-center justify-center gap-2 sm:gap-3 rounded-2xl bg-white border border-gray-200/80 px-3 sm:px-4 py-2.5 sm:py-3 shadow-lg shadow-ink/5 mb-6" style="max-width: 100%; flex-wrap: wrap;">
@@ -12,8 +18,8 @@
                 <span class="h-10 w-px bg-gray-200" aria-hidden="true"></span>
                 <img src="{% static 'img/logos/GSL-Official-Logo.png' %}" alt="GSL logo" class="object-contain" style="width: clamp(2rem, 6vw, 3.5rem); height: clamp(2rem, 6vw, 3.5rem);">
             </div>
-            <h2 class="text-3xl font-bold tracking-tight text-ink-900">Sign in to MUST EMR</h2>
-            <p class="mt-2 text-sm text-ink-500">Malawi Master Patient Index & Clinical Portal</p>
+            <h2 class="text-3xl font-bold tracking-tight text-white">Sign in to MUST EMR</h2>
+            <p class="mt-2 text-sm text-white">Malawi Master Patient Index & Clinical Portal</p>
         </div>
 
         <!-- Login Card -->

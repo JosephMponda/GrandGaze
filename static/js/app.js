@@ -176,7 +176,7 @@
           const response = await fetch('/api/sync/submit/', {
             method: 'POST', credentials: 'same-origin',
             headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken() },
-            body: JSON.stringify(item),
+            body: JSON.stringify({ client_uuid: item.client_uuid, form_type: item.form_type, payload_json: item.payload_json }),
           });
           const data = await response.json().catch(() => ({}));
           if (response.ok && ['applied', 'already_applied'].includes(data.status)) {
