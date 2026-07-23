@@ -211,35 +211,34 @@ def control_panel(request):
         .order_by("profile__role")
     )
     role_dist_items = list(role_distribution)
-    return render(
-        request,
-        "accounts/control_panel.html",
-        {
-            "users": users,
-            "wards": wards,
-            "user_total": User.objects.count(),
-            "ward_total": wards.count(),
-            "bed_total": bed_total,
-            "occupied_beds": occupied_beds,
-            "available_beds": max(bed_total - occupied_beds, 0),
-            "role_filter": role_filter,
-            "role_distribution": {
-                "labels": [dict(Role.choices).get(item["profile__role"], item["profile__role"]) for item in role_dist_items],
-                "values": [item["total"] for item in role_dist_items],
-                "roles": [item["profile__role"] for item in role_dist_items],
-            },
-            "ward_rows": [
-                {
-                    "name": ward.name,
-                    "department": ward.department or "General Medicine",
-                    "beds": ward.bed_count,
-                    "occupied": ward.beds.filter(is_occupied=True).count(),
-                    "occupied_pct": round((ward.beds.filter(is_occupied=True).count() / ward.bed_count) * 100) if ward.bed_count else 0,
-                }
-                for ward in wards
-            ],
-        }
-    )
+    context = {
+        "users": users,
+        "wards": wards,
+        "user_total": User.objects.count(),
+        "ward_total": wards.count(),
+        "bed_total": bed_total,
+        "occupied_beds": occupied_beds,
+        "available_beds": max(bed_total - occupied_beds, 0),
+        "role_filter": role_filter,
+        "role_distribution": {
+            "labels": [dict(Role.choices).get(item["profile__role"], item["profile__role"]) for item in role_dist_items],
+            "values": [item["total"] for item in role_dist_items],
+            "roles": [item["profile__role"] for item in role_dist_items],
+        },
+        "ward_rows": [
+            {
+                "name": ward.name,
+                "department": ward.department or "General Medicine",
+                "beds": ward.bed_count,
+                "occupied": ward.beds.filter(is_occupied=True).count(),
+                "occupied_pct": round((ward.beds.filter(is_occupied=True).count() / ward.bed_count) * 100) if ward.bed_count else 0,
+            }
+            for ward in wards
+        ],
+    }
+    if request.headers.get("HX-Request") == "true":
+        return render(request, "accounts/_staff_directory.html", context)
+    return render(request, "accounts/control_panel.html", context)
 
 
 @role_required("Admin", "ICT")

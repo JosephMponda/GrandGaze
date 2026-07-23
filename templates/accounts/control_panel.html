@@ -85,51 +85,7 @@
     </section>
 
     <section class="grid grid-cols-1 gap-6 xl:grid-cols-[1fr,1fr]">
-        <div class="rounded-none border border-gray-200/80 bg-white shadow-sm">
-            <div class="flex flex-col gap-3 px-6 pt-6 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-                <div>
-                    <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Staff directory</p>
-                    <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900">Active users</h2>
-                </div>
-            </div>
-            <div class="mt-5 overflow-hidden border-t border-gray-100">
-                <div class="flex flex-wrap gap-2 px-6 pt-4 pb-2">
-                    <a href="{% url 'accounts:control_panel' %}" class="rounded-none px-3 py-1 text-xs font-semibold transition-colors {% if not role_filter %}bg-brand text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">All</a>
-                    {% for item in role_distribution.roles %}
-                    <a href="?role={{ item }}" class="rounded-none px-3 py-1 text-xs font-semibold transition-colors {% if role_filter == item %}bg-brand text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">{{ item|title }}</a>
-                    {% endfor %}
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>User</th>
-                                <th>Role</th>
-                                <th>Department</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for u in users %}
-                            <tr class="hover:bg-gray-50 transition-colors cursor-pointer" onclick="window.location='{% url 'accounts:user_detail' u.pk %}'">
-                                <td>
-                                    <div class="min-w-0">
-                                        <p class="font-semibold text-gray-900">{{ u.get_full_name|default:u.username }}</p>
-                                        <p class="text-xs text-gray-400">{{ u.username }}</p>
-                                    </div>
-                                </td>
-                                <td>{{ u.profile.get_role_display|default:"Superuser" }}</td>
-                                <td>{{ u.profile.department|default:"-" }}</td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="3" class="px-6 py-12 text-center text-sm text-gray-500">No users found for this role.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+        {% include "accounts/_staff_directory.html" %}
 
         <div class="rounded-none border border-gray-200/80 bg-white shadow-sm">
             <div class="flex flex-col gap-3 px-6 pt-6 sm:flex-row sm:items-center sm:justify-between sm:px-8">
