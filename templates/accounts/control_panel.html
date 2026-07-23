@@ -92,7 +92,13 @@
                     <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900">Active users</h2>
                 </div>
             </div>
-            <div class="mt-5 overflow-hidden rounded-b-[2rem] border-t border-gray-100">
+            <div class="mt-5 overflow-hidden border-t border-gray-100">
+                <div class="flex flex-wrap gap-2 px-6 pt-4 pb-2">
+                    <a href="{% url 'accounts:control_panel' %}" class="rounded-none px-3 py-1 text-xs font-semibold transition-colors {% if not role_filter %}bg-brand text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">All</a>
+                    {% for item in role_distribution.roles %}
+                    <a href="?role={{ item }}" class="rounded-none px-3 py-1 text-xs font-semibold transition-colors {% if role_filter == item %}bg-brand text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">{{ item|title }}</a>
+                    {% endfor %}
+                </div>
                 <div class="overflow-x-auto">
                     <table class="data-table">
                         <thead>
@@ -113,6 +119,10 @@
                                 </td>
                                 <td>{{ u.profile.get_role_display|default:"Superuser" }}</td>
                                 <td>{{ u.profile.department|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="px-6 py-12 text-center text-sm text-gray-500">No users found for this role.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -175,6 +185,12 @@
                     maintainAspectRatio: false,
                     animation: { duration: 250 },
                     plugins: { legend: { display: false } },
+                    onClick: function (e) {
+                        const bars = this.getElementsAtEventForMode(e, 'index', { intersect: true });
+                        if (bars.length && payload.roles && payload.roles[bars[0].index]) {
+                            window.location = '?role=' + payload.roles[bars[0].index];
+                        }
+                    },
                     scales: {
                         x: { grid: { display: false }, ticks: { color: '#64748b' } },
                         y: { beginAtZero: true, grid: { color: 'rgba(148, 163, 184, 0.18)' }, ticks: { color: '#64748b' } },

@@ -135,7 +135,11 @@ def audit_trail(request):
 @role_required("Admin", "ICT")
 def control_panel(request):
     """System configuration and user management dashboard."""
+    role_filter = request.GET.get("role", "")
     users = User.objects.select_related("profile").all().order_by("username")
+    if role_filter and role_filter in dict(Role.choices):
+        users = users.filter(profile__role=role_filter)
+
     wards = Ward.objects.all().order_by("name")
     bed_total = Bed.objects.count()
     occupied_beds = Bed.objects.filter(is_occupied=True).count()
@@ -145,20 +149,23 @@ def control_panel(request):
         .annotate(total=Count("pk"))
         .order_by("profile__role")
     )
+    role_dist_items = list(role_distribution)
     return render(
         request,
         "accounts/control_panel.html",
         {
             "users": users,
             "wards": wards,
-            "user_total": users.count(),
+            "user_total": User.objects.count(),
             "ward_total": wards.count(),
             "bed_total": bed_total,
             "occupied_beds": occupied_beds,
             "available_beds": max(bed_total - occupied_beds, 0),
+            "role_filter": role_filter,
             "role_distribution": {
-                "labels": [dict(Role.choices).get(item["profile__role"], item["profile__role"]) for item in role_distribution],
-                "values": [item["total"] for item in role_distribution],
+                "labels": [dict(Role.choices).get(item["profile__role"], item["profile__role"]) for item in role_dist_items],
+                "values": [item["total"] for item in role_dist_items],
+                "roles": [item["profile__role"] for item in role_dist_items],
             },
             "ward_rows": [
                 {
