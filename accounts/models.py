@@ -40,14 +40,28 @@ def assign_user_role_group(user, role: str) -> None:
     user.groups.add(group)
 
 
+class Gender(models.TextChoices):
+    MALE = "male", "Male"
+    FEMALE = "female", "Female"
+    OTHER = "other", "Other"
+
+
 class Profile(models.Model):
     """One-to-one extension of Django's built-in User. Do not replace User."""
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile")
     role = models.CharField(max_length=32, choices=Role.choices)
-    department = models.CharField(max_length=100, blank=True)  # free text for MVP; FK in Phase 2
+    department = models.CharField(max_length=100, blank=True)
     phone_number = EncryptedCharField(max_length=32, blank=True)
     is_active_staff = models.BooleanField(default=True)
+    photo = models.ImageField(upload_to="staff_photos/", blank=True)
+    qualifications = models.TextField(blank=True)
+    bio = models.TextField(blank=True)
+    specialty = models.CharField(max_length=100, blank=True)
+    employee_id = models.CharField(max_length=50, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    gender = models.CharField(max_length=10, choices=Gender.choices, blank=True)
+    emergency_contact = EncryptedCharField(max_length=32, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -104,7 +104,7 @@
                         </thead>
                         <tbody>
                             {% for u in users %}
-                            <tr>
+                            <tr class="hover:bg-gray-50 transition-colors cursor-pointer" onclick="window.location='{% url 'accounts:user_detail' u.pk %}'">
                                 <td>
                                     <div class="min-w-0">
                                         <p class="font-semibold text-gray-900">{{ u.get_full_name|default:u.username }}</p>

@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model, logout as auth_logout
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse, reverse_lazy
 from django.db import transaction
 from django.db.models import Count, Q
@@ -17,8 +17,8 @@ from pharmacy.models import Prescription
 from reporting.models import AlertEvent
 from .dashboard_widgets import widgets_for_user
 from .permissions import role_required
-from .forms import StaffUserForm
-from .models import Role
+from .forms import StaffUserForm, StaffProfileForm
+from .models import Profile, Role
 
 User = get_user_model()
 
@@ -186,6 +186,31 @@ def add_user(request):
     else:
         form = StaffUserForm()
     return render(request, "accounts/add_user.html", {"form": form})
+
+
+@login_required
+def user_detail(request, pk):
+    user = get_object_or_404(User.objects.select_related("profile"), pk=pk)
+    if not request.user.profile or request.user.profile.role not in ("Admin", "ICT"):
+        if request.user.pk != user.pk:
+            return redirect("accounts:user_detail", pk=request.user.pk)
+    return render(request, "accounts/user_detail.html", {"staff_user": user})
+
+
+@login_required
+def edit_user(request, pk):
+    user = get_object_or_404(User.objects.select_related("profile"), pk=pk)
+    if not request.user.profile or request.user.profile.role not in ("Admin", "ICT"):
+        if request.user.pk != user.pk:
+            return redirect("accounts:user_detail", pk=request.user.pk)
+    profile = user.profile
+    form = StaffProfileForm(request.POST or None, request.FILES or None, instance=profile, user=user)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        display_name = user.get_full_name() or user.username
+        messages.success(request, f"Profile for {display_name} updated.")
+        return redirect("accounts:user_detail", pk=user.pk)
+    return render(request, "accounts/edit_user.html", {"form": form, "staff_user": user})
 
 
 @role_required("Admin", "ICT")

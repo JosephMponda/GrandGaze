@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ staff_user.get_full_name|default:staff_user.username }} - Staff Profile{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-5xl space-y-6 px-4 sm:px-6 lg:px-8 py-6">
+    <div class="flex items-center gap-4">
+        <a href="{% if request.user.profile.role in 'Admin,ICT' %}{% url 'accounts:control_panel' %}{% else %}{% url 'accounts:dashboard' %}{% endif %}" class="w-8 h-8 flex items-center justify-center rounded-none bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        </a>
+        <div class="flex-1">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Staff profile</p>
+            <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-gray-900">{{ staff_user.get_full_name|default:staff_user.username }}</h1>
+        </div>
+        <a href="{% url 'accounts:edit_user' staff_user.pk %}" class="inline-flex items-center gap-2 rounded-none bg-brand px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand/20 transition-colors hover:bg-brand-hover">
+            Edit profile
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-[280px,1fr]">
+        <div class="space-y-6">
+            <div class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm text-center">
+                {% if staff_user.profile.photo %}
+                <img src="{{ staff_user.profile.photo.url }}" alt="" class="mx-auto h-40 w-40 rounded-none object-cover border border-gray-200">
+                {% else %}
+                <div class="mx-auto flex h-40 w-40 items-center justify-center rounded-none bg-gray-100 border border-gray-200">
+                    <span class="text-5xl font-bold text-gray-400">{{ staff_user.get_full_name|first|upper|default:staff_user.username|first|upper }}</span>
+                </div>
+                {% endif %}
+                <p class="mt-4 text-lg font-bold text-gray-900">{{ staff_user.get_full_name|default:staff_user.username }}</p>
+                <p class="text-sm font-semibold text-brand">{{ staff_user.profile.get_role_display }}</p>
+                {% if staff_user.profile.department %}
+                <p class="text-xs text-gray-500 mt-1">{{ staff_user.profile.department }}</p>
+                {% endif %}
+            </div>
+
+            <div class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm">
+                <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wider">Quick info</h2>
+                <dl class="mt-4 space-y-3 text-sm">
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Username</dt>
+                        <dd class="font-medium text-gray-900">{{ staff_user.username }}</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Employee ID</dt>
+                        <dd class="font-medium text-gray-900">{{ staff_user.profile.employee_id|default:"—" }}</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Status</dt>
+                        <dd class="font-medium {% if staff_user.is_active %}text-green-600{% else %}text-red-600{% endif %}">{{ staff_user.is_active|yesno:"Active,Inactive" }}</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Joined</dt>
+                        <dd class="font-medium text-gray-900">{{ staff_user.date_joined|date:"Y-m-d" }}</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Last login</dt>
+                        <dd class="font-medium text-gray-900">{{ staff_user.last_login|date:"Y-m-d H:i"|default:"—" }}</dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+                <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wider">Personal details</h2>
+                <dl class="mt-6 grid grid-cols-1 gap-x-8 gap-y-5 sm:grid-cols-2">
+                    <div>
+                        <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">First name</dt>
+                        <dd class="mt-1 text-sm font-medium text-gray-900">{{ staff_user.first_name|default:"—" }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">Last name</dt>
+                        <dd class="mt-1 text-sm font-medium text-gray-900">{{ staff_user.last_name|default:"—" }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">Email</dt>
+                        <dd class="mt-1 text-sm font-medium text-gray-900">{{ staff_user.email|default:"—" }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">Phone</dt>
+                        <dd class="mt-1 text-sm font-medium text-gray-900">{{ staff_user.profile.phone_number|default:"—" }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">Gender</dt>
+                        <dd class="mt-1 text-sm font-medium text-gray-900">{{ staff_user.profile.get_gender_display|default:"—" }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">Date of birth</dt>
+                        <dd class="mt-1 text-sm font-medium text-gray-900">{{ staff_user.profile.date_of_birth|date:"Y-m-d"|default:"—" }}</dd>
+                    </div>
+                </dl>
+            </div>
+
+            <div class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+                <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wider">Professional</h2>
+                <dl class="mt-6 grid grid-cols-1 gap-x-8 gap-y-5 sm:grid-cols-2">
+                    <div>
+                        <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">Role</dt>
+                        <dd class="mt-1 text-sm font-medium text-gray-900">{{ staff_user.profile.get_role_display }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">Department</dt>
+                        <dd class="mt-1 text-sm font-medium text-gray-900">{{ staff_user.profile.department|default:"—" }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">Specialty</dt>
+                        <dd class="mt-1 text-sm font-medium text-gray-900">{{ staff_user.profile.specialty|default:"—" }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">Employee ID</dt>
+                        <dd class="mt-1 text-sm font-medium text-gray-900">{{ staff_user.profile.employee_id|default:"—" }}</dd>
+                    </div>
+                </dl>
+                {% if staff_user.profile.qualifications %}
+                <div class="mt-6">
+                    <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">Qualifications</dt>
+                    <dd class="mt-2 text-sm text-gray-700 whitespace-pre-line">{{ staff_user.profile.qualifications }}</dd>
+                </div>
+                {% endif %}
+                {% if staff_user.profile.bio %}
+                <div class="mt-6">
+                    <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">Bio</dt>
+                    <dd class="mt-2 text-sm text-gray-700 whitespace-pre-line">{{ staff_user.profile.bio }}</dd>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+                <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wider">Emergency contact</h2>
+                <p class="mt-4 text-sm font-medium text-gray-900">{{ staff_user.profile.emergency_contact|default:"—" }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

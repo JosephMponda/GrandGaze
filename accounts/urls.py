@@ -13,6 +13,8 @@ urlpatterns = [
     path("admin/audit/", views.audit_trail, name="audit_trail"),
     path("admin/control-panel/", views.control_panel, name="control_panel"),
     path("admin/users/add/", views.add_user, name="add_user"),
+    path("admin/users/<int:pk>/", views.user_detail, name="user_detail"),
+    path("admin/users/<int:pk>/edit/", views.edit_user, name="edit_user"),
     path("admin/wards/add/", views.add_ward, name="add_ward"),
     path(
         "password-reset/",
