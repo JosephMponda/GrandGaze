@@ -16,7 +16,7 @@ def patient_list(request):
     patients_today_count = Patient.objects.filter(created_at__date=today).count()
     query = request.GET.get("q", "")
     date_from = request.GET.get("date_from", "")
-    date_to = request.GET.get("date_to", "")
+    time_to = request.GET.get("time_to", "")
 
     patients = Patient.objects.all()
     if query:
@@ -27,15 +27,15 @@ def patient_list(request):
         )
     if date_from:
         patients = patients.filter(created_at__date__gte=date_from)
-    if date_to:
-        patients = patients.filter(created_at__date__lte=date_to)
+    if time_to:
+        patients = patients.filter(created_at__time__lte=time_to)
 
     return render(request, "patients/list.html", {
         "patients": patients,
         "patients_today_count": patients_today_count,
         "query": query,
         "date_from": date_from,
-        "date_to": date_to,
+        "time_to": time_to,
     })
 
 

@@ -20,7 +20,7 @@
                class="w-full sm:max-w-xs rounded-none border border-gray-300 px-4 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none">
         <input type="date" name="date_from" value="{{ date_from }}"
                class="w-full sm:w-auto rounded-none border border-gray-300 px-4 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none">
-        <input type="date" name="date_to" value="{{ date_to }}"
+        <input type="time" name="time_to" value="{{ time_to }}"
                class="w-full sm:w-auto rounded-none border border-gray-300 px-4 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none">
         <button type="submit" class="rounded-none bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-200 transition-colors">Filter</button>
         <a href="{% url 'patients:list' %}" class="rounded-none border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors text-center">Clear</a>
