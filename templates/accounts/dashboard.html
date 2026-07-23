@@ -3,7 +3,7 @@
 {% block title %}Dashboard - MUST EMR{% endblock %}
 {% block content %}
 <div class="mx-auto max-w-7xl space-y-6">
-    <section class="overflow-hidden rounded-none border border-slate-200/80 bg-white text-gray-900 shadow-lg shadow-slate-950/10">
+    <section id="welcome-card" class="overflow-hidden rounded-none border border-slate-200/80 bg-white text-gray-900 shadow-lg shadow-slate-950/10">
         <div class="grid grid-cols-1 gap-6 px-6 py-6 sm:px-8 lg:grid-cols-[1.35fr,0.85fr] lg:px-10 lg:py-8">
             <div class="relative">
                 <div class="inline-flex items-center gap-2 rounded-none border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-700 shadow-sm">
@@ -32,7 +32,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+            <div id="stat-cards" class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
                 <a href="{% url 'patients:list' %}" class="block rounded-none border border-white bg-white p-4 shadow-lg shadow-slate-950/10 transition-opacity hover:opacity-80">
                     <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Patients today</p>
                     <p class="mt-2 text-3xl font-black text-gray-900">{{ patients_today }}</p>
@@ -58,7 +58,7 @@
     </section>
 
     {% if tasks %}
-    <section class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+    <section id="tasks-section" class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
         <div class="flex items-center justify-between gap-3">
             <div>
                 <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Tasks &amp; duties</p>
@@ -191,11 +191,70 @@
                     </div>
                 </div>
             </section>
+
+            <section id="quick-links-section" class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+                <div class="flex items-center justify-between gap-3">
+                    <div>
+                        <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Quick links</p>
+                        <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900">Role-specific actions</h2>
+                    </div>
+                    <span class="rounded-none bg-gray-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-gray-600">{{ widgets|length }} items</span>
+                </div>
+
+                {% if widgets %}
+                <div class="mt-5 grid gap-3">
+                    {% for w in widgets %}
+                    <a href="{% url w.url_name %}" class="group flex items-center gap-4 rounded-none border border-gray-200/80 bg-slate-50/60 px-4 py-4 transition-all hover:-translate-y-0.5 hover:border-brand/30 hover:bg-white hover:shadow-md">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-none bg-brand-light text-brand transition-colors group-hover:bg-brand group-hover:text-white">
+                            {% if w.icon == 'chart' %}
+                                <img class="h-6 w-6 object-contain" src="{% static 'img/analytics.png' %}" alt="{{ w.title }}" />
+                            {% elif w.icon == 'bill' %}
+                                <img class="h-6 w-6 object-contain" src="{% static 'img/billing.png' %}" alt="{{ w.title }}" />
+                            {% elif w.icon == 'vital-signs' %}
+                                <img class="h-6 w-6 object-contain" src="{% static 'img/vitals.png' %}" alt="{{ w.title }}" />
+                            {% elif w.icon == 'emergency' %}
+                                <img class="h-6 w-6 object-contain" src="{% static 'img/triage.png' %}" alt="{{ w.title }}" />
+                            {% elif w.icon == 'dialysis' %}
+                                <img class="h-6 w-6 object-contain" src="{% static 'img/dialysis.png' %}" alt="{{ w.title }}" />
+                            {% elif w.icon == 'bed' %}
+                                <img class="h-6 w-6 object-contain" src="{% static 'img/hospital-bed.png' %}" alt="{{ w.title }}" />
+                            {% elif w.icon == 'box' %}
+                                <img class="h-6 w-6 object-contain" src="{% static 'img/stock_management.png' %}" alt="{{ w.title }}" />
+                            {% elif w.icon == 'flask' %}
+                                <img class="h-6 w-6 object-contain" src="{% static 'img/lab workload.png' %}" alt="{{ w.title }}" />
+                            {% elif w.icon == 'pill' %}
+                                <img class="h-6 w-6 object-contain" src="{% static 'img/pharmacy.png' %}" alt="{{ w.title }}" />
+                            {% elif w.icon == 'image' %}
+                                <img class="h-6 w-6 object-contain" src="{% static 'img/imaging.png' %}" alt="{{ w.title }}" />
+                            {% else %}
+                                {% if w.icon == 'activity' %}
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.5 13.5h4.5l1.5 4.5 3-10.5 1.5 4.5h4.5"/></svg>
+                                {% elif w.icon == 'users' %}
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 10.5a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.75 19.5a7.5 7.5 0 0115 0"/></svg>
+                                {% else %}
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-bold text-gray-900">{{ w.title }}</p>
+                            <p class="text-xs uppercase tracking-[0.18em] text-gray-400">Open module</p>
+                        </div>
+                        <svg class="h-4 w-4 flex-shrink-0 text-gray-300 transition-colors group-hover:text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="mt-5">
+                    {% include "components/_empty_state.html" with icon="document" title="No widgets registered" message="Your role does not currently have any quick links configured." %}
+                </div>
+                {% endif %}
+            </section>
         </div>
     </section>
 
     <section class="grid grid-cols-1 gap-6 lg:grid-cols-[1.05fr,0.95fr]">
-        <div class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <div id="recent-alerts-section" class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
             <div class="flex items-center justify-between gap-3">
                 <div>
                     <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Recent alerts</p>
@@ -243,64 +302,62 @@
             </div>
         </div>
 
+        {% if tasks %}
         <div class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
             <div class="flex items-center justify-between gap-3">
                 <div>
-                    <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Quick links</p>
-                    <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900">Role-specific actions</h2>
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Tasks &amp; duties</p>
+                    <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900">Assigned to me</h2>
                 </div>
-                <span class="rounded-none bg-gray-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-gray-600">{{ widgets|length }} items</span>
+                <span class="rounded-none bg-brand-light px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-brand">{{ task_count }} active</span>
             </div>
-
-            {% if widgets %}
-            <div class="mt-5 grid gap-3">
-                {% for w in widgets %}
-                <a href="{% url w.url_name %}" class="group flex items-center gap-4 rounded-none border border-gray-200/80 bg-slate-50/60 px-4 py-4 transition-all hover:-translate-y-0.5 hover:border-brand/30 hover:bg-white hover:shadow-md">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-none bg-brand-light text-brand transition-colors group-hover:bg-brand group-hover:text-white">
-                        {% if w.icon == 'chart' %}
-                            <img class="h-6 w-6 object-contain" src="{% static 'img/analytics.png' %}" alt="{{ w.title }}" />
-                        {% elif w.icon == 'bill' %}
-                            <img class="h-6 w-6 object-contain" src="{% static 'img/billing.png' %}" alt="{{ w.title }}" />
-                        {% elif w.icon == 'vital-signs' %}
-                            <img class="h-6 w-6 object-contain" src="{% static 'img/vitals.png' %}" alt="{{ w.title }}" />
-                        {% elif w.icon == 'emergency' %}
-                            <img class="h-6 w-6 object-contain" src="{% static 'img/triage.png' %}" alt="{{ w.title }}" />
-                        {% elif w.icon == 'dialysis' %}
-                            <img class="h-6 w-6 object-contain" src="{% static 'img/dialysis.png' %}" alt="{{ w.title }}" />
-                        {% elif w.icon == 'bed' %}
-                            <img class="h-6 w-6 object-contain" src="{% static 'img/hospital-bed.png' %}" alt="{{ w.title }}" />
-                        {% elif w.icon == 'box' %}
-                            <img class="h-6 w-6 object-contain" src="{% static 'img/stock_management.png' %}" alt="{{ w.title }}" />
-                        {% elif w.icon == 'flask' %}
-                            <img class="h-6 w-6 object-contain" src="{% static 'img/lab workload.png' %}" alt="{{ w.title }}" />
-                        {% elif w.icon == 'pill' %}
-                            <img class="h-6 w-6 object-contain" src="{% static 'img/pharmacy.png' %}" alt="{{ w.title }}" />
-                        {% elif w.icon == 'image' %}
-                            <img class="h-6 w-6 object-contain" src="{% static 'img/imaging.png' %}" alt="{{ w.title }}" />
-                        {% else %}
-                            {% if w.icon == 'activity' %}
-                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.5 13.5h4.5l1.5 4.5 3-10.5 1.5 4.5h4.5"/></svg>
-                            {% elif w.icon == 'users' %}
-                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 10.5a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.75 19.5a7.5 7.5 0 0115 0"/></svg>
-                            {% else %}
-                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                            {% endif %}
-                        {% endif %}
+            <div class="mt-5 divide-y divide-gray-100 overflow-hidden rounded-none border border-gray-200/80">
+                {% for task in tasks %}
+                <article class="flex items-start gap-4 px-4 py-4 transition-colors hover:bg-slate-50/70">
+                    <div class="mt-0.5 flex-shrink-0">
+                        <form method="post" action="{% url 'accounts:update_task_status' task.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="status" value="{% if task.status == 'pending' %}in_progress{% elif task.status == 'in_progress' %}completed{% else %}cancelled{% endif %}">
+                            <button type="submit" class="h-5 w-5 rounded-none border-2 flex items-center justify-center transition-colors
+                                {% if task.status == 'completed' %}bg-green-500 border-green-500 text-white
+                                {% elif task.status == 'in_progress' %}border-amber-400 bg-amber-50
+                                {% else %}border-gray-300 hover:border-brand{% endif %}">
+                                {% if task.status == 'completed' %}
+                                <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                {% endif %}
+                            </button>
+                        </form>
                     </div>
                     <div class="min-w-0 flex-1">
-                        <p class="text-sm font-bold text-gray-900">{{ w.title }}</p>
-                        <p class="text-xs uppercase tracking-[0.18em] text-gray-400">Open module</p>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <p class="text-sm font-semibold text-gray-900">{{ task.title }}</p>
+                            <span class="rounded-none px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em]
+                                {% if task.priority == 'urgent' %}bg-red-50 text-red-700 border border-red-100
+                                {% elif task.priority == 'high' %}bg-amber-50 text-amber-700 border border-amber-100
+                                {% elif task.priority == 'medium' %}bg-blue-50 text-blue-700 border border-blue-100
+                                {% else %}bg-gray-50 text-gray-600 border border-gray-200{% endif %}">
+                                {{ task.get_priority_display }}
+                            </span>
+                            <span class="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-400">
+                                {% if task.status == 'in_progress' %}In progress{% else %}{{ task.get_status_display }}{% endif %}
+                            </span>
+                        </div>
+                        {% if task.description %}
+                        <p class="mt-1 text-sm leading-6 text-gray-600">{{ task.description }}</p>
+                        {% endif %}
+                        <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-400">
+                            {% if task.patient %}
+                            <a href="{% url 'patients:profile' task.patient.pk %}" class="font-medium text-brand hover:text-brand-hover">{{ task.patient.full_name }}</a>
+                            {% endif %}
+                            <span>Due {{ task.due_date|date:"M j, Y" }}</span>
+                            <span>Assigned by {{ task.assigned_by.get_full_name|default:task.assigned_by.username }}</span>
+                        </div>
                     </div>
-                    <svg class="h-4 w-4 flex-shrink-0 text-gray-300 transition-colors group-hover:text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                </a>
+                </article>
                 {% endfor %}
             </div>
-            {% else %}
-            <div class="mt-5">
-                {% include "components/_empty_state.html" with icon="document" title="No widgets registered" message="Your role does not currently have any quick links configured." %}
-            </div>
-            {% endif %}
         </div>
+        {% endif %}
     </section>
 </div>
 

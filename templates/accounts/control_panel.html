@@ -151,7 +151,14 @@
                     onClick: function (e) {
                         const bars = this.getElementsAtEventForMode(e, 'index', { intersect: true });
                         if (bars.length && payload.roles && payload.roles[bars[0].index]) {
-                            window.location = '?role=' + payload.roles[bars[0].index];
+                            const role = payload.roles[bars[0].index];
+                            const pill = document.querySelector('a[hx-get="?role=' + role + '"]');
+                            if (pill) {
+                                pill.click();
+                                setTimeout(function () {
+                                    document.getElementById('staff-directory').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                }, 50);
+                            }
                         }
                     },
                     scales: {

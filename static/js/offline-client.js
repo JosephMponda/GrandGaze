@@ -3,8 +3,8 @@
  * initial replication and later synchronization. */
 (function () {
   const DB_NAME = 'must_emr_local';
-  const DB_VERSION = 8;
-  const STORES = ['meta', 'patients', 'encounters', 'vitals', 'outbox', 'admissions', 'wards', 'prescriptions', 'ward_rounds', 'mar_entries', 'care_plans', 'fluid_entries', 'procedure_notes', 'nursing_assessments', 'referrals', 'drugs', 'lab_orders', 'lab_results', 'lab_tests', 'imaging_requests', 'imaging_results', 'imaging_modalities', 'triage_encounters', 'dialysis_prescriptions', 'dialysis_sessions', 'invoices', 'payments', 'service_catalog'];
+  const DB_VERSION = 9;
+  const STORES = ['meta', 'patients', 'encounters', 'vitals', 'outbox', 'admissions', 'wards', 'prescriptions', 'ward_rounds', 'mar_entries', 'care_plans', 'fluid_entries', 'procedure_notes', 'nursing_assessments', 'referrals', 'drugs', 'lab_orders', 'lab_results', 'lab_tests', 'imaging_requests', 'imaging_results', 'imaging_modalities', 'triage_encounters', 'dialysis_prescriptions', 'dialysis_sessions', 'invoices', 'payments', 'service_catalog', 'tasks'];
   let database;
   let ownerId = localStorage.getItem('must_emr_offline_owner') || '';
 
@@ -124,6 +124,14 @@
       await Promise.all(snapshot.dialysis_sessions.map((s) => put('dialysis_sessions', {
         ...s, id: `server:${s.server_id}`, owner_id: ownerId, sync_state: 'synced',
       })));
+    }
+    if (snapshot.tasks) {
+      await Promise.all(snapshot.tasks.map((t) => put('tasks', {
+        ...t, id: `server:${t.server_id}`, owner_id: ownerId, sync_state: 'synced',
+      })));
+    }
+    if (snapshot.user_role) {
+      await put('meta', { id: 'user_info', owner_id: ownerId, role: snapshot.user_role, name: snapshot.user_name });
     }
     await put('meta', { id: 'snapshot', owner_id: ownerId, updated_at: snapshot.generated_at });
     return true;
@@ -284,6 +292,20 @@
     await queue('dialysis_session', 'dialysis_sessions', id);
   }
 
+  async function createTask(data) {
+    const id = `local:${uuid()}`;
+    const record = { id, owner_id: ownerId, sync_state: 'pending', ...data, created_at: new Date().toISOString() };
+    await put('tasks', record);
+    await queue('task_assign', 'tasks', id);
+    return record;
+  }
+
+  async function updateTaskStatus(task, status) {
+    const record = { ...task, status, sync_state: 'pending' };
+    await put('tasks', record);
+    await queue('task_update_status', 'tasks', task.id);
+  }
+
   async function createInvoice(patient, lineItems, data) {
     const id = `local:${uuid()}`;
     const record = { id, owner_id: ownerId, patient_local_id: patient.id, line_items: lineItems, sync_state: 'pending', ...data, created_at: new Date().toISOString() };
@@ -423,6 +445,10 @@
       payload.invoice_id = invoice.server_id;
       return payload;
     }
+    if (item.entity === 'tasks') {
+      const { id, owner_id, server_id, sync_state, created_at, ...payload } = record;
+      return payload;
+    }
     return null;
   }
 
@@ -502,6 +528,8 @@
       invoices: await all('invoices'),
       payments: await all('payments'),
       service_catalog: await all('service_catalog'),
+      tasks: await all('tasks'),
+      user_info: await get('meta', 'user_info'),
     };
   }
 
@@ -555,11 +583,33 @@
       const patientDialysisPrescriptions = selected ? data.dialysis_prescriptions.filter((p) => p.patient_local_id === selected.id) : [];
       const activeDialysis = patientDialysisPrescriptions.filter((p) => p.is_active !== false);
       const patientDialysisSessions = selected ? data.dialysis_sessions.filter((s) => patientDialysisPrescriptions.some((p) => p.id === s.prescription_local_id)) : [];
-      root.innerHTML = `<header class="offline-head"><div><p>Local-first clinical workspace</p><p class="offline-reload-warning"><strong>PLEASE RELOAD THE PAGE IF THE TEXT IS NOT DISPLAYING CORRECTLY</strong></p><h1>MUST EMR Offline</h1></div><div><span class="offline-pill ${navigator.onLine ? 'online' : ''}">${navigator.onLine ? 'Connection available' : 'Working offline'}</span><a class="offline-return" href="/accounts/dashboard/">Return online</a><button data-action="sync">Sync now</button></div></header>
+      const role = data.user_info?.role || '';
+      const quickLinks = [];
+      if (['Admin', 'ICT', 'superuser'].includes(role) || role === 'ADMIN' || role === 'ICT') {
+        quickLinks.push({label: 'Control Panel', url: '/accounts/admin/control-panel/', icon: '⚙'});
+        quickLinks.push({label: 'Audit Trail', url: '/accounts/admin/audit/', icon: '📋'});
+      }
+      if (['Clinician', 'Doctor', 'Nurse', 'Admin', 'ICT', 'superuser'].includes(role) || role === 'CLINICIAN' || role === 'NURSE' || role === 'ADMIN' || role === 'ICT') {
+        quickLinks.push({label: 'Analytics', url: '/reporting/analytics/', icon: '📊'});
+      }
+      if (['Billing Officer', 'Admin', 'ICT', 'superuser'].includes(role) || role === 'BILLING_OFFICER' || role === 'ADMIN' || role === 'ICT') {
+        quickLinks.push({label: 'Billing', url: '/billing/', icon: '💰'});
+      }
+      if (['Pharmacist', 'Admin', 'ICT', 'superuser'].includes(role) || role === 'PHARMACIST' || role === 'ADMIN' || role === 'ICT') {
+        quickLinks.push({label: 'Pharmacy', url: '/pharmacy/queue/', icon: '💊'});
+      }
+      if (['Lab Tech', 'Admin', 'ICT', 'superuser'].includes(role) || role === 'LAB_TECH' || role === 'ADMIN' || role === 'ICT') {
+        quickLinks.push({label: 'Lab Workload', url: '/labs/workload/', icon: '🔬'});
+      }
+      if (['Radiographer', 'Admin', 'ICT', 'superuser'].includes(role) || role === 'RADIOGRAPHER' || role === 'ADMIN' || role === 'ICT') {
+        quickLinks.push({label: 'Imaging', url: '/imaging/worklist/', icon: '🩻'});
+      }
+      const quickLinksHtml = quickLinks.length ? `<div class="offline-quicklinks" style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">${quickLinks.map((ql) => `<a href="${ql.url}" style="padding:4px 8px;border:1px solid rgba(255,255,255,.3);border-radius:0;color:#fff;font:700 10px/1 ui-sans-serif,system-ui,sans-serif;text-decoration:none;white-space:nowrap;letter-spacing:.04em;text-transform:uppercase">${ql.icon} ${ql.label}</a>`).join('')}</div>` : '';
+      root.innerHTML = `<header class="offline-head"><div><p>Local-first clinical workspace</p><p class="offline-reload-warning"><strong>PLEASE RELOAD THE PAGE IF THE TEXT IS NOT DISPLAYING CORRECTLY</strong></p><h1>MUST EMR Offline</h1></div><div><span class="offline-pill ${navigator.onLine ? 'online' : ''}">${navigator.onLine ? 'Connection available' : 'Working offline'}</span><a class="offline-return" href="/accounts/dashboard/">Return online</a><button data-action="sync">Sync now</button>${quickLinksHtml}</div></header>
         ${!tipsDismissed() ? `<section class="offline-tip"><div><strong>Offline workspace quick start</strong><button data-action="dismiss-tips" aria-label="Dismiss tips">×</button></div><ol><li>Open this page while online, then click <strong>Refresh directory</strong> to download the patient snapshot.</li><li>Create or select a patient, add an encounter, then record vitals.</li><li>When you next go online, click <strong>Sync now</strong> to send local changes to the server.</li></ol><p>If the workspace appears empty on first load, reload the page once and then refresh the directory again.</p></section>` : ''}
         <p class="offline-status">${data.outbox.length} change${data.outbox.length === 1 ? '' : 's'} waiting. Directory snapshot: ${data.snapshot?.updated_at ? new Date(data.snapshot.updated_at).toLocaleString() : 'not downloaded yet'}. ${escape(syncMessage)}</p>
         ${reviewItems.length ? `<section class="offline-review"><strong>${reviewItems.length} item${reviewItems.length === 1 ? '' : 's'} needs review</strong>${reviewItems.map((item) => `<p>${escape(item.form_type)}: ${escape(item.error || 'The server rejected this change. Create a corrected record before retrying.')}</p>`).join('')}</section>` : ''}
-        <section class="offline-grid"><aside><div class="offline-actions"><button data-action="new-patient">Register patient</button><button data-action="refresh" title="Refresh the local patient directory">Refresh directory</button></div><div class="offline-button-guidance"><span><strong>Refresh</strong> downloads the most recent local patient snapshot.</span><span><strong>Sync</strong> sends your offline edits when you reconnect.</span></div><input id="offline-search" placeholder="Search local patients" autocomplete="off"><div id="offline-patients">${patientRows || '<p class="offline-empty">No local patients. Connect once and refresh the directory.</p>'}</div></aside>
+        <section class="offline-grid"><aside><div class="offline-actions"><button data-action="new-patient">Register patient</button><button data-action="refresh" title="Refresh the local patient directory">Refresh directory</button></div><div class="offline-button-guidance"><span><strong>Refresh</strong> downloads the most recent local patient snapshot.</span><span><strong>Sync</strong> sends your offline edits when you reconnect.</span></div><input id="offline-search" placeholder="Search local patients" autocomplete="off"><div id="offline-patients">${patientRows || '<p class="offline-empty">No local patients. Connect once and refresh the directory.</p>'}</div>${data.tasks.length ? `<div style="border-top:1px solid var(--offline-line);padding:12px"><p style="font:800 11px/1 ui-sans-serif,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.06em;margin:0 0 8px;color:var(--offline-muted)">My Tasks</p>${data.tasks.filter((t) => t.status !== 'completed' && t.status !== 'cancelled').slice(0, 5).map((t) => `<div style="padding:8px 0;border-bottom:1px solid #edf2ef;display:flex;align-items:flex-start;gap:6px"><input type="checkbox" data-action="toggle-task" data-task-id="${t.id}" style="margin-top:3px;accent-color:#0b5144" ${t.status === 'completed' ? 'checked' : ''}><div style="flex:1;min-width:0"><p style="margin:0;font:700 12px/1.3 ui-sans-serif,system-ui,sans-serif">${escape(t.title)}</p><p style="margin:2px 0 0;font:11px/1.3 ui-sans-serif,system-ui,sans-serif;color:var(--offline-muted)">${escape(t.assigned_to_name || '')}${t.patient_name ? ' \u00b7 ' + escape(t.patient_name) : ''}${t.due_date ? ' \u00b7 Due ' + new Date(t.due_date).toLocaleDateString() : ''}</p></div><span style="font:700 9px/1 ui-sans-serif,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.04em;padding:2px 5px;background:${t.priority === 'urgent' ? '#fee2e2' : t.priority === 'high' ? '#fef3c7' : '#f3f4f6'};color:${t.priority === 'urgent' ? '#dc2626' : t.priority === 'high' ? '#d97706' : '#6b7280'}">${t.priority}</span></div>`).join('')}${data.tasks.filter((t) => t.status !== 'completed' && t.status !== 'cancelled').length > 5 ? `<p style="margin:6px 0 0;font:11px/1 ui-sans-serif,system-ui,sans-serif;color:var(--offline-muted)">+ ${data.tasks.filter((t) => t.status !== 'completed' && t.status !== 'cancelled').length - 5} more</p>` : ''}</div>` : ''}<button data-action="assign-task" style="display:block;width:calc(100% - 24px);margin:8px 12px 12px;padding:9px 11px;border:1px solid #a7c5bb;border-radius:0;color:#0c5143;background:#fff;font-weight:800;cursor:pointer;text-align:center">Assign task</button></aside>
         <main>${selected ? `<h2>${escape(selected.first_name)} ${escape(selected.other_names || '')} ${escape(selected.last_name)}</h2><p class="offline-muted">${escape(selected.patient_number || 'Local patient')} · ${escape(selected.sex || 'Unknown')} · ${escape(selected.phone_number || 'No phone')}</p><div class="offline-cards"><article><h3>Encounters</h3><p>${patientEncounters.length} local record(s)</p><button data-action="new-encounter">Add encounter</button></article><article><h3>Vitals</h3><p>${patientVitals.length} local record(s)</p><button data-action="new-vitals" ${patientEncounters.length ? '' : 'disabled'}>Record vitals</button></article><article><h3>Laboratory</h3><p>${data.lab_tests.length} tests in catalog</p><button data-action="new-lab-order">Order test</button></article><article><h3>Imaging</h3><p>${data.imaging_modalities.length} modalities</p><button data-action="new-imaging-request">New request</button></article><article><h3>Emergency</h3><p>${activeTriage.length} active triage(s)</p><button data-action="new-triage">Triage patient</button></article><article><h3>Dialysis</h3><p>${activeDialysis.length} active prescription(s)</p><button data-action="new-dialysis-prescription">New prescription</button></article></div>${pendingOrders.length ? `<div class="offline-cards"><article><h3>Pending Lab Orders</h3><p>${pendingOrders.length} waiting</p>${pendingOrders.slice(0, 5).map((o) => `<p class="offline-rx">${escape(o.test_name)} <small>${o.status}</small></p><div class="offline-rx-actions">${o.status === 'ordered' ? `<button data-action="collect-specimen" data-order-id="${o.id}">Collect</button>` : `<button data-action="enter-result" data-order-id="${o.id}">Enter result</button>`}</div>`).join('')}</article></div>` : ''}${pendingResults.length ? `<div class="offline-cards"><article><h3>Pending Lab Verification</h3><p>${pendingResults.length} result(s)</p>${pendingResults.slice(0, 5).map((r) => `<p class="offline-rx">${escape(r.test_name)}: ${escape(r.value_text || r.value_numeric || '-')} <small>${r.verified ? 'verified' : 'pending'}</small></p>${!r.verified ? `<div class="offline-rx-actions"><button data-action="verify-result" data-result-id="${r.id}">Verify</button></div>` : ''}`).join('')}</article></div>` : ''}${pendingImaging.length ? `<div class="offline-cards"><article><h3>Pending Imaging</h3><p>${pendingImaging.length} request(s)</p>${pendingImaging.slice(0, 5).map((r) => `<p class="offline-rx">${escape(r.modality_name)} — ${escape(r.clinical_indication?.substring(0, 40))} <small>${r.status}</small></p><div class="offline-rx-actions"><button data-action="enter-imaging-report" data-request-id="${r.id}">Enter report</button></div>`).join('')}</article></div>` : ''}${imagingResults.length ? `<div class="offline-cards"><article><h3>Imaging Reports</h3><p>${imagingResults.length} report(s)</p>${imagingResults.slice(0, 5).map((r) => `<p class="offline-rx">${escape(r.modality_name)}: ${escape(r.impression?.substring(0, 40))} ${r.is_critical_finding ? '<strong>CRITICAL</strong>' : ''} <small>${r.sync_state}</small></p>`).join('')}</article></div>` : ''}${activeTriage.length ? `<div class="offline-cards"><article><h3>Waiting Triage</h3><p>${activeTriage.length} patient(s)</p>${activeTriage.slice(0, 5).map((t) => `<p class="offline-rx">${escape(t.triage_category)} — ${escape(t.presenting_condition?.substring(0, 40))} <small>${t.sync_state}</small></p><div class="offline-rx-actions"><button data-action="resolve-triage" data-triage-id="${t.id}">Resolve</button></div>`).join('')}</article></div>` : ''}${activeDialysis.length ? `<div class="offline-cards"><article><h3>Dialysis Sessions</h3><p>${patientDialysisSessions.length} session(s) recorded</p><button data-action="new-dialysis-session">Record session</button></article></div>` : ''}<div class="offline-history">${patientEncounters.map((e) => `<p><strong>Encounter:</strong> ${escape(e.presenting_complaint)} <small>${e.sync_state}</small></p>`).join('')}${patientVitals.map((v) => `<p><strong>Vitals:</strong> pulse ${escape(v.pulse_rate || '-')} · BP ${escape(v.blood_pressure_systolic || '-')}/${escape(v.blood_pressure_diastolic || '-')} <small>${v.sync_state}</small></p>`).join('')}${admissionWardRounds.map((r) => `<p><strong>Ward Round:</strong> ${escape(r.note)} <small>${r.sync_state}</small></p>`).join('')}${admissionCarePlans.map((c) => `<p><strong>Care Plan:</strong> ${escape(c.problem)} — ${escape(c.goal_status || 'ongoing')} <small>${c.sync_state}</small></p>`).join('')}${admissionFluid.map((f) => `<p><strong>Fluid:</strong> ${escape(f.fluid_type)} ${escape(f.volume_ml)}ml <small>${f.sync_state}</small></p>`).join('')}${admissionProcedures.map((p) => `<p><strong>Procedure:</strong> ${escape(p.procedure_name)} <small>${p.sync_state}</small></p>`).join('')}${admissionAssessments.map((a) => `<p><strong>Assessment:</strong> ${escape(a.assessment_note?.substring(0, 80))} <small>${a.sync_state}</small></p>`).join('')}${admissionMAR.map((m) => `<p><strong>MAR:</strong> Rx#${escape(m.prescription_local_id)} ${escape(m.dose_given)} <small>${m.sync_state}</small></p>`).join('')}${patientReferrals.map((r) => `<p><strong>Referral:</strong> ${escape(r.destination)} <small>${r.sync_state}</small></p>`).join('')}</div>` : '<h2>Select or register a patient</h2>'}</main></section>`;
       root.querySelectorAll('[data-patient-id]').forEach((button) => button.addEventListener('click', () => { root.dataset.patientId = button.dataset.patientId; refresh(); }));
       root.querySelector('[data-action="sync"]')?.addEventListener('click', async (event) => {
@@ -596,6 +646,15 @@
       root.querySelector('[data-action="resolve-triage"]')?.addEventListener('click', (event) => { const triageId = event.currentTarget.dataset.triageId; const triage = data.triage_encounters.find((t) => t.id === triageId); if (triage) resolveTriageForm(root, triage, refresh); });
       root.querySelector('[data-action="new-dialysis-prescription"]')?.addEventListener('click', () => dialysisPrescriptionForm(root, selected, refresh));
       root.querySelector('[data-action="new-dialysis-session"]')?.addEventListener('click', () => dialysisSessionForm(root, activeDialysis, refresh));
+      root.querySelector('[data-action="assign-task"]')?.addEventListener('click', () => assignTaskForm(root, data.patients, refresh));
+      root.querySelectorAll('[data-action="toggle-task"]').forEach((cb) => cb.addEventListener('change', async (event) => {
+        const task = data.tasks.find((t) => t.id === event.currentTarget.dataset.taskId);
+        if (task) {
+          const newStatus = event.currentTarget.checked ? 'completed' : 'in_progress';
+          await updateTaskStatus(task, newStatus);
+          await refresh();
+        }
+      }));
       root.querySelector('#offline-search')?.addEventListener('input', (event) => {
         const term = event.target.value.toLowerCase();
         root.querySelectorAll('.offline-patient').forEach((row) => { row.hidden = !row.textContent.toLowerCase().includes(term); });
@@ -637,6 +696,7 @@
   const resolveTriageForm = (root, triage, done) => form(root, `Resolve: ${triage.triage_category || 'Triage'}`, [['outcome', 'Outcome', 'select', true, [['discharged', 'Discharged'], ['admitted', 'Admitted'], ['referred', 'Referred'], ['dead', 'Dead']]], ['disposition_note', 'Disposition note']], async (data) => { await resolveTriage(triage, data); await done(); });
   const dialysisPrescriptionForm = (root, patient, done) => form(root, `Dialysis Prescription for ${patient.first_name} ${patient.last_name}`, [['frequency_per_week', 'Sessions per week', 'number', true], ['vascular_access', 'Vascular access', 'select', true, [['av_fistula', 'AV Fistula'], ['av_graft', 'AV Graft'], ['tunneled_catheter', 'Tunneled Catheter'], ['temporary_catheter', 'Temporary Catheter'], ['peritoneal', 'Peritoneal']]], ['target_fluid_removal_l', 'Target fluid removal (L)', 'number']], async (data) => { data.frequency_per_week = parseInt(data.frequency_per_week); data.target_fluid_removal_l = data.target_fluid_removal_l ? parseFloat(data.target_fluid_removal_l) : null; await createDialysisPrescription(patient, data); await done(); });
   const dialysisSessionForm = (root, prescriptions, done) => form(root, 'Record Dialysis Session', [['prescription_local_id', 'Prescription', 'select', true, prescriptions.map((p) => [p.id, `${p.frequency_per_week}x/week — ${p.vascular_access}`])], ['pre_weight_kg', 'Pre-dialysis weight (kg)', 'number', true], ['post_weight_kg', 'Post-dialysis weight (kg)', 'number', true], ['complications', 'Complications'], ['notes', 'Notes']], async (data) => { data.pre_weight_kg = parseFloat(data.pre_weight_kg); data.post_weight_kg = parseFloat(data.post_weight_kg); const rx = prescriptions.find((p) => p.id === data.prescription_local_id); await recordDialysisSession(rx, data); await done(); });
+  const assignTaskForm = (root, patients, done) => form(root, 'Assign Task', [['title', 'Task title', 'text', true], ['description', 'Description', 'textarea'], ['assigned_to_name', 'Assign to (full name)', 'text', true], ['priority', 'Priority', 'select', true, [['low', 'Low'], ['medium', 'Medium'], ['high', 'High'], ['urgent', 'Urgent']], 'medium'], ['due_date', 'Due date', 'date'], ['patient_local_id', 'Related patient', 'select', false, [['', 'None'], ...patients.map((p) => [p.id, `${p.last_name}, ${p.first_name} (${p.patient_number || ''})`])]]], async (data) => { data.due_date = data.due_date || null; data.patient_local_id = data.patient_local_id || null; data.status = 'pending'; await createTask(data); await done(); });
   const escape = (value) => String(value ?? '').replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
 
   window.MUSTOffline = { configure, bootstrap, sync, state, renderWorkspace };

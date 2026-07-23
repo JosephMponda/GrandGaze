@@ -9,6 +9,7 @@
     <link rel="icon" type="image/x-icon" href="{% static 'img/favicon_io/favicon.ico' %}">
     <link rel="stylesheet" href="{% static 'css/app.css' %}?v=4">
     <link rel="stylesheet" href="{% static 'css/offline-workspace.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tour.css' %}?v=1">
     <script src="{% static 'js/chart.min.js' %}"></script>
     <style>
         .htmx-indicator { opacity: 0; transition: opacity 200ms ease-in; }
@@ -16,7 +17,7 @@
         .htmx-request.htmx-indicator { opacity: 1; }
     </style>
 </head>
-<body data-offline-user="{% if user.is_authenticated %}{{ user.pk }}{% endif %}" class="min-h-screen bg-[#f8fafc] text-ink antialiased font-sans" hx-boost="true" x-data="{ mobileMenuOpen: false }" style="font-family: 'Segoe UI', sans-serif !important;">
+<body data-offline-user="{% if user.is_authenticated %}{{ user.pk }}{% endif %}" data-page="{% if request.resolver_match %}{{ request.resolver_match.view_name }}{% endif %}" class="min-h-screen bg-[#f8fafc] text-ink antialiased font-sans" hx-boost="true" x-data="{ mobileMenuOpen: false }" style="font-family: 'Segoe UI', sans-serif !important;">
     {% if user.is_authenticated %}<div id="offline-session" data-user="{{ user.pk }}" hidden></div>{% endif %}
     {% if user.is_authenticated %}<div class="min-h-screen lg:flex">{% endif %}
 
@@ -75,10 +76,10 @@
                         </a>
                         {% endif %}
                         {% if user.is_superuser or user.profile.role == 'ADMIN' or user.profile.role == 'ICT' %}
-                        <a href="{% url 'accounts:audit_trail' %}" class="group flex items-center gap-3 rounded-none px-3 py-2 text-sm font-semibold transition-colors {% if request.resolver_match.view_name == 'accounts:audit_trail' %}bg-[#1c5c52] text-white shadow-sm{% else %}text-white/80 hover:bg-[#144f46] hover:text-white{% endif %}">
+                        <a href="{% url 'accounts:audit_trail' %}" hx-boost="false" class="group flex items-center gap-3 rounded-none px-3 py-2 text-sm font-semibold transition-colors {% if request.resolver_match.view_name == 'accounts:audit_trail' %}bg-[#1c5c52] text-white shadow-sm{% else %}text-white/80 hover:bg-[#144f46] hover:text-white{% endif %}">
                             Audit Trail
                         </a>
-                        <a href="{% url 'accounts:control_panel' %}" class="group flex items-center gap-3 rounded-none px-3 py-2 text-sm font-semibold transition-colors {% if request.resolver_match.view_name == 'accounts:control_panel' %}bg-[#1c5c52] text-white shadow-sm{% else %}text-white/80 hover:bg-[#144f46] hover:text-white{% endif %}">
+                        <a href="{% url 'accounts:control_panel' %}" hx-boost="false" class="group flex items-center gap-3 rounded-none px-3 py-2 text-sm font-semibold transition-colors {% if request.resolver_match.view_name == 'accounts:control_panel' %}bg-[#1c5c52] text-white shadow-sm{% else %}text-white/80 hover:bg-[#144f46] hover:text-white{% endif %}">
                             Control Panel
                         </a>
                         {% endif %}
@@ -87,6 +88,10 @@
             </div>
 
             <div class="relative border-t border-white/5 p-4 space-y-3">
+                <button type="button" class="st-guide-btn w-full justify-center" onclick="window.SystemTour.start(window.__pageTour)" title="System guide for this page">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                    System Guide
+                </button>
                 <a href="{% url 'accounts:user_detail' user.pk %}" class="flex items-center gap-3 rounded-none bg-[#144f46]/25 px-3 py-3 ring-1 ring-white/5 transition-colors hover:bg-[#144f46]/40">
                     <span class="flex h-9 w-9 items-center justify-center rounded-none bg-[#1c5c52] font-bold text-white select-none">
                         {{ user.username|slice:":1"|upper }}
@@ -199,6 +204,10 @@
                     {% endif %}
                     {% if user.is_superuser or user.profile.role == 'PHARMACIST' or user.profile.role == 'ADMIN' or user.profile.role == 'ICT' %}
                     <a href="{% url 'pharmacy:queue' %}" @click="mobileMenuOpen = false" class="rounded-none border border-gray-200 px-3 py-3 text-sm font-semibold {% if request.resolver_match.view_name == 'pharmacy:queue' %}bg-brand-light text-brand{% else %}text-gray-700 hover:bg-gray-50{% endif %}">Pharmacy</a>
+                    {% endif %}
+                    {% if user.is_superuser or user.profile.role == 'ADMIN' or user.profile.role == 'ICT' %}
+                    <a href="{% url 'accounts:control_panel' %}" hx-boost="false" @click="mobileMenuOpen = false" class="rounded-none border border-gray-200 px-3 py-3 text-sm font-semibold {% if request.resolver_match.view_name == 'accounts:control_panel' %}bg-brand-light text-brand{% else %}text-gray-700 hover:bg-gray-50{% endif %}">Control Panel</a>
+                    <a href="{% url 'accounts:audit_trail' %}" hx-boost="false" @click="mobileMenuOpen = false" class="rounded-none border border-gray-200 px-3 py-3 text-sm font-semibold {% if request.resolver_match.view_name == 'accounts:audit_trail' %}bg-brand-light text-brand{% else %}text-gray-700 hover:bg-gray-50{% endif %}">Audit Trail</a>
                     {% endif %}
                 </div>
                 <div class="mt-4 flex flex-col gap-3 rounded-none border border-gray-200 bg-gray-50 px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
@@ -357,6 +366,7 @@
     <script src="{% static 'js/alpinejs.min.js' %}" defer></script>
     <script src="{% static 'js/htmx.min.js' %}" defer></script>
     <script src="{% static 'js/offline-client.js' %}?v=11"></script>
+    <script src="{% static 'js/tour.js' %}?v=1"></script>
     <script src="{% static 'js/app.js' %}?v=10"></script>
 </body>
 </html>

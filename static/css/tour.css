@@ -1,0 +1,42 @@
+/* System Tour — onboarding tooltips */
+#st-tour-highlight {
+  pointer-events: none;
+  z-index: 99999;
+}
+#st-tour-overlay {
+  pointer-events: auto;
+}
+#st-tour-tooltip button:hover {
+  opacity: 0.85;
+}
+#st-tour-tooltip button:active {
+  transform: translateY(1px);
+}
+/* pulse animation on highlighted element */
+.st-tour-pulse {
+  animation: st-pulse 1.8s ease-in-out infinite;
+}
+@keyframes st-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(11, 81, 68, 0.3); }
+  50% { box-shadow: 0 0 0 8px rgba(11, 81, 68, 0); }
+}
+/* system guide button */
+.st-guide-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 0;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  font: 600 11px/1 ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.st-guide-btn:hover {
+  background: rgba(255,255,255,0.18);
+}
