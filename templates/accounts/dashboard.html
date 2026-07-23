@@ -57,6 +57,63 @@
         </div>
     </section>
 
+    {% if tasks %}
+    <section class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <div class="flex items-center justify-between gap-3">
+            <div>
+                <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Tasks &amp; duties</p>
+                <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900">Assigned to me</h2>
+            </div>
+            <span class="rounded-none bg-brand-light px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-brand">{{ task_count }} active</span>
+        </div>
+        <div class="mt-5 divide-y divide-gray-100 overflow-hidden rounded-none border border-gray-200/80">
+            {% for task in tasks %}
+            <article class="flex items-start gap-4 px-4 py-4 transition-colors hover:bg-slate-50/70">
+                <div class="mt-0.5 flex-shrink-0">
+                    <form method="post" action="{% url 'accounts:update_task_status' task.pk %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="status" value="{% if task.status == 'pending' %}in_progress{% elif task.status == 'in_progress' %}completed{% else %}cancelled{% endif %}">
+                        <button type="submit" class="h-5 w-5 rounded-none border-2 flex items-center justify-center transition-colors
+                            {% if task.status == 'completed' %}bg-green-500 border-green-500 text-white
+                            {% elif task.status == 'in_progress' %}border-amber-400 bg-amber-50
+                            {% else %}border-gray-300 hover:border-brand{% endif %}">
+                            {% if task.status == 'completed' %}
+                            <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                            {% endif %}
+                        </button>
+                    </form>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <p class="text-sm font-semibold text-gray-900">{{ task.title }}</p>
+                        <span class="rounded-none px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em]
+                            {% if task.priority == 'urgent' %}bg-red-50 text-red-700 border border-red-100
+                            {% elif task.priority == 'high' %}bg-amber-50 text-amber-700 border border-amber-100
+                            {% elif task.priority == 'medium' %}bg-blue-50 text-blue-700 border border-blue-100
+                            {% else %}bg-gray-50 text-gray-600 border border-gray-200{% endif %}">
+                            {{ task.get_priority_display }}
+                        </span>
+                        <span class="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-400">
+                            {% if task.status == 'in_progress' %}In progress{% else %}{{ task.get_status_display }}{% endif %}
+                        </span>
+                    </div>
+                    {% if task.description %}
+                    <p class="mt-1 text-sm leading-6 text-gray-600">{{ task.description }}</p>
+                    {% endif %}
+                    <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-400">
+                        {% if task.patient %}
+                        <a href="{% url 'patients:profile' task.patient.pk %}" class="font-medium text-brand hover:text-brand-hover">{{ task.patient.full_name }}</a>
+                        {% endif %}
+                        <span>Due {{ task.due_date|date:"M j, Y" }}</span>
+                        <span>Assigned by {{ task.assigned_by.get_full_name|default:task.assigned_by.username }}</span>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
     <section class="grid grid-cols-1 gap-6 lg:grid-cols-[1.2fr,0.8fr]">
         <div class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
             <div class="flex flex-wrap items-end justify-between gap-3">

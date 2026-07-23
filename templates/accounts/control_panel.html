@@ -139,6 +139,13 @@
                 </div>
             </div>
             <div class="grid gap-3 px-6 py-6 sm:px-8">
+                <a href="{% url 'accounts:assign_task' %}" class="flex items-center justify-between rounded-none border border-gray-200 bg-slate-50/70 px-4 py-4 transition-colors hover:bg-white">
+                    <span>
+                        <span class="block text-sm font-semibold text-gray-900">Assign task</span>
+                        <span class="block text-xs text-gray-500">Allocate a duty or patient task to a staff member.</span>
+                    </span>
+                    <span class="text-brand">→</span>
+                </a>
                 <a href="{% url 'accounts:add_user' %}" class="flex items-center justify-between rounded-none border border-gray-200 bg-slate-50/70 px-4 py-4 transition-colors hover:bg-white">
                     <span>
                         <span class="block text-sm font-semibold text-gray-900">Create staff account</span>

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Assign Task - MUST EMR{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <div class="border-b border-gray-200 pb-5 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="min-w-0 flex-1">
+                <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink-900 truncate">Assign Task</h1>
+                <p class="text-sm text-ink-500 mt-2">Allocate a duty or patient task to a staff member.</p>
+            </div>
+            <div class="flex-shrink-0">
+                <a href="{% url 'accounts:control_panel' %}" class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200 w-full sm:w-auto justify-center">
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" class="space-y-6 sm:space-y-8">
+        {% csrf_token %}
+
+        <div class="bg-white border border-gray-200/60 rounded-none shadow-sm p-6 sm:p-8 space-y-6">
+            <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
+                <span class="w-6 h-6 flex-shrink-0 rounded-none bg-brand-light text-brand flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/10">1</span>
+                <h3 class="text-base font-semibold text-ink-900">Task Details</h3>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label for="id_title" class="block text-sm font-medium text-gray-700">Title *</label>
+                    <input type="text" name="title" id="id_title" required class="mt-1 block w-full rounded-none border border-gray-300 px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none" placeholder="e.g. Review lab results for Patient X">
+                </div>
+                <div>
+                    <label for="id_description" class="block text-sm font-medium text-gray-700">Description</label>
+                    <textarea name="description" id="id_description" rows="3" class="mt-1 block w-full rounded-none border border-gray-300 px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none" placeholder="What needs to be done and any relevant details."></textarea>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="id_priority" class="block text-sm font-medium text-gray-700">Priority</label>
+                        <select name="priority" id="id_priority" class="mt-1 block w-full rounded-none border border-gray-300 px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="id_due_date" class="block text-sm font-medium text-gray-700">Due date *</label>
+                        <input type="date" name="due_date" id="id_due_date" value="{{ today }}" required class="mt-1 block w-full rounded-none border border-gray-300 px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white border border-gray-200/60 rounded-none shadow-sm p-6 sm:p-8 space-y-6">
+            <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
+                <span class="w-6 h-6 flex-shrink-0 rounded-none bg-brand-light text-brand flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/10">2</span>
+                <h3 class="text-base font-semibold text-ink-900">Assignment</h3>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label for="id_assigned_to" class="block text-sm font-medium text-gray-700">Assign to *</label>
+                    <select name="assigned_to" id="id_assigned_to" required class="mt-1 block w-full rounded-none border border-gray-300 px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none">
+                        <option value="">Select a staff member</option>
+                        {% for u in users %}
+                        <option value="{{ u.pk }}">{{ u.get_full_name|default:u.username }} ({{ u.profile.get_role_display }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="id_patient_id" class="block text-sm font-medium text-gray-700">Related patient ID (optional)</label>
+                    <input type="number" name="patient" id="id_patient_id" class="mt-1 block w-full rounded-none border border-gray-300 px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none" placeholder="Patient primary key">
+                    <p class="mt-1 text-xs text-gray-500">Leave blank for general duties not tied to a specific patient.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 pt-6 pb-10">
+            <a href="{% url 'accounts:control_panel' %}" class="btn-secondary text-sm font-semibold py-3 px-6 hover:-translate-y-0.5 transition-all duration-200 text-center order-2 sm:order-1">Cancel</a>
+            <button type="submit" class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 order-1 sm:order-2">
+                Assign Task
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

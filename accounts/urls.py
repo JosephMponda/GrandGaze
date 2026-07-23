@@ -15,6 +15,8 @@ urlpatterns = [
     path("admin/users/add/", views.add_user, name="add_user"),
     path("admin/users/<int:pk>/", views.user_detail, name="user_detail"),
     path("admin/users/<int:pk>/edit/", views.edit_user, name="edit_user"),
+    path("admin/tasks/assign/", views.assign_task, name="assign_task"),
+    path("tasks/<int:pk>/status/", views.update_task_status, name="update_task_status"),
     path("admin/wards/add/", views.add_ward, name="add_ward"),
     path(
         "password-reset/",

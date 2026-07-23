@@ -18,7 +18,7 @@ from reporting.models import AlertEvent
 from .dashboard_widgets import widgets_for_user
 from .permissions import role_required
 from .forms import StaffUserForm, StaffProfileForm
-from .models import Profile, Role
+from .models import Profile, Role, Task, TaskStatus
 
 User = get_user_model()
 
@@ -63,8 +63,12 @@ def dashboard(request):
     alert_4h_warning = alert_severity_breakdown["warning"] or 0
     alert_4h_info = alert_severity_breakdown["info"] or 0
 
+    tasks = Task.objects.filter(assigned_to=request.user).exclude(status__in=["completed", "cancelled"])
+    task_count = tasks.count()
     context = {
         "widgets": widgets_for_user(request.user),
+        "tasks": tasks,
+        "task_count": task_count,
         "patients_today": Patient.objects.filter(created_at__date=today).count(),
         "open_encounters": open_encounters,
         "pending_labs": pending_labs,
@@ -241,3 +245,54 @@ def add_ward(request):
         except ValueError:
             messages.error(request, "Invalid bed count value.")
     return render(request, "accounts/add_ward.html")
+
+
+@role_required("Admin", "ICT")
+def assign_task(request):
+    """Assign a task/duty to a staff user."""
+    users = User.objects.filter(is_active=True).select_related("profile").order_by("username")
+    if request.method == "POST":
+        title = request.POST.get("title")
+        description = request.POST.get("description", "")
+        assigned_to_id = request.POST.get("assigned_to")
+        patient_raw = request.POST.get("patient", "").strip()
+        priority = request.POST.get("priority", "medium")
+        due_date = request.POST.get("due_date")
+        patient = None
+        if patient_raw:
+            try:
+                patient = Patient.objects.get(pk=patient_raw)
+            except (Patient.DoesNotExist, ValueError):
+                try:
+                    patient = Patient.objects.get(patient_number__iexact=patient_raw)
+                except Patient.DoesNotExist:
+                    pass
+        if title and assigned_to_id and due_date:
+            Task.objects.create(
+                title=title,
+                description=description,
+                assigned_to_id=assigned_to_id,
+                assigned_by=request.user,
+                patient=patient,
+                priority=priority,
+                due_date=due_date,
+            )
+            messages.success(request, "Task assigned.")
+            return redirect("accounts:control_panel")
+        messages.error(request, "Title, assignee, and due date are required.")
+    today = timezone.localdate()
+    return render(request, "accounts/assign_task.html", {"users": users, "today": today.isoformat()})
+
+
+@login_required
+def update_task_status(request, pk):
+    task = get_object_or_404(Task, pk=pk)
+    if task.assigned_to != request.user:
+        if not request.user.profile or request.user.profile.role not in ("Admin", "ICT"):
+            return redirect("accounts:dashboard")
+    new_status = request.POST.get("status", "")
+    if new_status in dict(TaskStatus.choices):
+        task.status = new_status
+        task.save()
+        messages.success(request, f"Task marked as {task.get_status_display().lower()}.")
+    return redirect(request.META.get("HTTP_REFERER", "accounts:dashboard"))
