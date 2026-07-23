@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Patient List - MUST EMR{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div>
+            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">Patients</h1>
+            <p class="text-sm text-gray-500 mt-1">{{ patients_today_count }} registered today</p>
+        </div>
+        <a href="{% url 'patients:register' %}" class="inline-flex items-center gap-2 rounded-none bg-brand px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand/20 transition-colors hover:bg-brand-hover shrink-0">
+            Register patient
+        </a>
+    </div>
+
+    <form method="get" class="mb-6">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search by name or patient number..."
+               class="w-full sm:max-w-md rounded-none border border-gray-300 px-4 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none">
+    </form>
+
+    <div class="overflow-x-auto border border-gray-200">
+        <table class="min-w-full divide-y divide-gray-200 text-sm">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600 uppercase tracking-wider">#</th>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600 uppercase tracking-wider">Name</th>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600 uppercase tracking-wider hidden sm:table-cell">Sex</th>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600 uppercase tracking-wider hidden md:table-cell">DOB</th>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600 uppercase tracking-wider hidden lg:table-cell">Category</th>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600 uppercase tracking-wider hidden lg:table-cell">Registered</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 bg-white">
+                {% for patient in patients %}
+                <tr class="hover:bg-gray-50 transition-colors cursor-pointer" onclick="window.location='{% url 'patients:profile' patient.pk %}'">
+                    <td class="px-4 py-3 font-mono text-xs text-gray-500">{{ patient.patient_number }}</td>
+                    <td class="px-4 py-3 font-medium text-gray-900">{{ patient.full_name }}</td>
+                    <td class="px-4 py-3 text-gray-600 hidden sm:table-cell">{{ patient.get_sex_display }}</td>
+                    <td class="px-4 py-3 text-gray-600 hidden md:table-cell">{{ patient.date_of_birth|date:"Y-m-d"|default:"—" }}</td>
+                    <td class="px-4 py-3 text-gray-600 hidden lg:table-cell">{{ patient.get_patient_category_display }}</td>
+                    <td class="px-4 py-3 text-gray-500 hidden lg:table-cell">{{ patient.created_at|date:"Y-m-d H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="px-4 py-12 text-center text-gray-500">No patients found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

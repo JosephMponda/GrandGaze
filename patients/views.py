@@ -1,10 +1,33 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from . import services
 from .forms import PatientRegistrationForm
+from .models import Patient
+
+
+@login_required
+def patient_list(request):
+    today = timezone.now().date()
+    patients_today_count = Patient.objects.filter(created_at__date=today).count()
+    query = request.GET.get("q", "")
+    if query:
+        patients = Patient.objects.filter(
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(patient_number__icontains=query)
+        )
+    else:
+        patients = Patient.objects.all()
+    return render(request, "patients/list.html", {
+        "patients": patients,
+        "patients_today_count": patients_today_count,
+        "query": query,
+    })
 
 
 @login_required
