@@ -3,6 +3,8 @@
 @source "../../templates/**/*.html";
 @source "../../**/*.html";
 @theme {
+  --font-sans: "Verdana", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
   /* Primary Ink - Very dark slate/forest green */
   --color-ink: #0b1e1b;
   

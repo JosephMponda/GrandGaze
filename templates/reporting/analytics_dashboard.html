@@ -18,33 +18,33 @@
         </div>
     </section>
 
-    <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
-        <article class="rounded-3xl border border-gray-200/80 bg-white p-5 shadow-sm xl:col-span-1">
+    <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-6">
+        <article class="rounded-none border border-gray-200/80 bg-white p-5 shadow-sm xl:col-span-1">
             <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Patients today</p>
             <p class="mt-3 text-3xl font-black text-gray-900">{{ patients_today }}</p>
             <p class="mt-1 text-xs text-gray-500">Master Patient Index activity</p>
         </article>
-        <article class="rounded-3xl border border-gray-200/80 bg-white p-5 shadow-sm xl:col-span-1">
+        <article class="rounded-none border border-gray-200/80 bg-white p-5 shadow-sm xl:col-span-1">
             <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Open encounters</p>
             <p class="mt-3 text-3xl font-black text-gray-900">{{ open_encounters }}</p>
             <p class="mt-1 text-xs text-gray-500">Unsigned or active notes</p>
         </article>
-        <article class="rounded-3xl border border-gray-200/80 bg-white p-5 shadow-sm xl:col-span-1">
+        <article class="rounded-none border border-gray-200/80 bg-white p-5 shadow-sm xl:col-span-1">
             <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Pending labs</p>
             <p class="mt-3 text-3xl font-black text-gray-900">{{ pending_labs }}</p>
             <p class="mt-1 text-xs text-gray-500">Ordered and in progress</p>
         </article>
-        <article class="rounded-3xl border border-gray-200/80 bg-white p-5 shadow-sm xl:col-span-1">
+        <article class="rounded-none border border-gray-200/80 bg-white p-5 shadow-sm xl:col-span-1">
             <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Pending imaging</p>
             <p class="mt-3 text-3xl font-black text-gray-900">{{ pending_imaging }}</p>
             <p class="mt-1 text-xs text-gray-500">Requested and scheduled</p>
         </article>
-        <article class="rounded-3xl border border-gray-200/80 bg-white p-5 shadow-sm xl:col-span-1">
+        <article class="rounded-none border border-gray-200/80 bg-white p-5 shadow-sm xl:col-span-1">
             <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Pending prescriptions</p>
             <p class="mt-3 text-3xl font-black text-gray-900">{{ pending_prescriptions }}</p>
             <p class="mt-1 text-xs text-gray-500">Awaiting dispensing</p>
         </article>
-        <article class="rounded-3xl border border-gray-200/80 bg-white p-5 shadow-sm xl:col-span-1">
+        <article class="rounded-none border border-gray-200/80 bg-white p-5 shadow-sm xl:col-span-1">
             <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Unacknowledged alerts</p>
             <p class="mt-3 text-3xl font-black {% if unacknowledged_alerts > 0 %}text-red-600{% else %}text-gray-900{% endif %}">{{ unacknowledged_alerts }}</p>
             <p class="mt-1 text-xs text-gray-500">Requires clinical review</p>
@@ -63,7 +63,7 @@
     </section>
     {% endif %}
 
-    <section class="grid gap-6 xl:grid-cols-[1.25fr,0.75fr]">
+    <section class="grid grid-cols-1 gap-6 xl:grid-cols-[1.25fr,0.75fr]">
         <div class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
             <div class="flex items-start justify-between gap-3">
                 <div>
@@ -77,37 +77,37 @@
             </div>
         </div>
 
-        <div class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
-            <div class="flex items-start justify-between gap-3">
+        <div class="rounded-none border border-gray-200/80 bg-white p-3 shadow-sm">
+            <div class="flex items-center justify-between gap-2">
                 <div>
                     <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Safety signal</p>
-                    <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900">Alert severity</h2>
+                    <h2 class="text-sm font-bold tracking-tight text-gray-900">Alert severity</h2>
                 </div>
-                <a href="{% url 'reporting:recent_alerts' %}" class="text-sm font-semibold text-brand hover:text-brand-hover">Recent feed</a>
+                <a href="{% url 'reporting:recent_alerts' %}" class="text-xs font-semibold text-brand hover:text-brand-hover">Recent feed</a>
             </div>
-            <div class="mt-6 grid gap-5 sm:grid-cols-[1fr,0.95fr] sm:items-center">
-                <div class="mx-auto max-w-[16rem]">
-                    <canvas id="severityChart" height="240"></canvas>
+            <div class="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-[1fr,0.95fr] sm:items-center">
+                <div class="mx-auto w-full max-w-[7rem] sm:max-w-[8rem]">
+                    <canvas id="severityChart" height="80"></canvas>
                 </div>
-                <div class="space-y-3">
-                    <div class="rounded-none border border-red-100 bg-red-50 px-4 py-3">
-                        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-red-700">Critical</p>
-                        <p class="mt-1 text-2xl font-black text-red-700">{{ critical_alerts_4h }}</p>
+                <div class="space-y-1">
+                    <div class="flex items-center justify-between rounded-none border border-red-100 bg-red-50 px-3 py-1.5">
+                        <span class="text-xs font-semibold text-red-800">Critical</span>
+                        <span class="text-sm font-black text-red-700">{{ critical_alerts_4h }}</span>
                     </div>
-                    <div class="rounded-none border border-amber-100 bg-amber-50 px-4 py-3">
-                        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-amber-700">Warning</p>
-                        <p class="mt-1 text-2xl font-black text-amber-700">{{ warning_count|default:0 }}</p>
+                    <div class="flex items-center justify-between rounded-none border border-amber-100 bg-amber-50 px-3 py-1.5">
+                        <span class="text-xs font-semibold text-amber-800">Warning</span>
+                        <span class="text-sm font-black text-amber-700">{{ warning_count|default:0 }}</span>
                     </div>
-                    <div class="rounded-none border border-blue-100 bg-blue-50 px-4 py-3">
-                        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-blue-700">Info</p>
-                        <p class="mt-1 text-2xl font-black text-blue-700">{{ info_count|default:0 }}</p>
+                    <div class="flex items-center justify-between rounded-none border border-blue-100 bg-blue-50 px-3 py-1.5">
+                        <span class="text-xs font-semibold text-blue-800">Info</span>
+                        <span class="text-sm font-black text-blue-700">{{ info_count|default:0 }}</span>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="grid gap-6 lg:grid-cols-[1fr,0.85fr]">
+    <section class="grid grid-cols-1 gap-6 lg:grid-cols-[1fr,0.85fr]">
         <div class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
             <div class="flex items-center justify-between gap-3">
                 <div>

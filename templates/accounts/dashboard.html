@@ -4,7 +4,7 @@
 {% block content %}
 <div class="mx-auto max-w-7xl space-y-6">
     <section class="overflow-hidden rounded-none border border-slate-200/80 bg-white text-gray-900 shadow-lg shadow-slate-950/10">
-        <div class="grid gap-6 px-6 py-6 sm:px-8 lg:grid-cols-[1.35fr,0.85fr] lg:px-10 lg:py-8">
+        <div class="grid grid-cols-1 gap-6 px-6 py-6 sm:px-8 lg:grid-cols-[1.35fr,0.85fr] lg:px-10 lg:py-8">
             <div class="relative">
                 <div class="inline-flex items-center gap-2 rounded-none border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-700 shadow-sm">
                     Clinical command center
@@ -57,7 +57,7 @@
         </div>
     </section>
 
-    <section class="grid gap-6 lg:grid-cols-[1.2fr,0.8fr]">
+    <section class="grid grid-cols-1 gap-6 lg:grid-cols-[1.2fr,0.8fr]">
         <div class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
             <div class="flex flex-wrap items-end justify-between gap-3">
                 <div>
@@ -100,34 +100,36 @@
                     <span class="rounded-none bg-brand-light px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-brand">Today</span>
                 </div>
                 <div class="mt-6">
-                    <canvas id="activityChart" height="220"></canvas>
+                    <div class="min-w-0">
+                        <canvas id="activityChart" height="220" class="w-full"></canvas>
+                    </div>
                 </div>
             </section>
 
-            <section class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
-                <div class="flex items-start justify-between gap-4">
+            <section class="rounded-none border border-gray-200/80 bg-white p-3 shadow-sm">
+                <div class="flex items-center justify-between gap-2">
                     <div>
                         <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Alert severity</p>
-                        <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900">Safety signal mix</h2>
+                        <h2 class="text-sm font-bold tracking-tight text-gray-900">Safety signal mix</h2>
                     </div>
-                    <a href="{% url 'reporting:recent_alerts' %}" class="text-sm font-semibold text-brand hover:text-brand-hover">Open feed</a>
+                    <a href="{% url 'reporting:recent_alerts' %}" class="text-xs font-semibold text-brand hover:text-brand-hover">Open feed</a>
                 </div>
-                <div class="mt-6 grid gap-5 sm:grid-cols-[1fr,0.9fr] sm:items-center">
-                    <div class="mx-auto max-w-[16rem]">
-                        <canvas id="severityChart" height="220"></canvas>
+                <div class="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-[1fr,0.9fr] sm:items-center">
+                    <div class="mx-auto w-full max-w-[7rem] sm:max-w-[8rem]">
+                        <canvas id="severityChart" height="80"></canvas>
                     </div>
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between rounded-none border border-red-100 bg-red-50 px-4 py-3">
-                            <span class="text-sm font-semibold text-red-800">Critical</span>
-                            <span class="text-lg font-black text-red-700">{{ critical_alerts_4h }}</span>
+                    <div class="space-y-1">
+                        <div class="flex items-center justify-between rounded-none border border-red-100 bg-red-50 px-3 py-1.5">
+                            <span class="text-xs font-semibold text-red-800">Critical</span>
+                            <span class="text-sm font-black text-red-700">{{ critical_alerts_4h }}</span>
                         </div>
-                        <div class="flex items-center justify-between rounded-none border border-amber-100 bg-amber-50 px-4 py-3">
-                            <span class="text-sm font-semibold text-amber-800">Warning</span>
-                            <span class="text-lg font-black text-amber-700">{{ warning_count|default:0 }}</span>
+                        <div class="flex items-center justify-between rounded-none border border-amber-100 bg-amber-50 px-3 py-1.5">
+                            <span class="text-xs font-semibold text-amber-800">Warning</span>
+                            <span class="text-sm font-black text-amber-700">{{ warning_count|default:0 }}</span>
                         </div>
-                        <div class="flex items-center justify-between rounded-none border border-blue-100 bg-blue-50 px-4 py-3">
-                            <span class="text-sm font-semibold text-blue-800">Info</span>
-                            <span class="text-lg font-black text-blue-700">{{ info_count|default:0 }}</span>
+                        <div class="flex items-center justify-between rounded-none border border-blue-100 bg-blue-50 px-3 py-1.5">
+                            <span class="text-xs font-semibold text-blue-800">Info</span>
+                            <span class="text-sm font-black text-blue-700">{{ info_count|default:0 }}</span>
                         </div>
                     </div>
                 </div>
@@ -135,7 +137,7 @@
         </div>
     </section>
 
-    <section class="grid gap-6 lg:grid-cols-[1.05fr,0.95fr]">
+    <section class="grid grid-cols-1 gap-6 lg:grid-cols-[1.05fr,0.95fr]">
         <div class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
             <div class="flex items-center justify-between gap-3">
                 <div>
