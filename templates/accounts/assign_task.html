@@ -3,13 +3,16 @@
 {% block content %}
 <div class="max-w-2xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
     <div class="border-b border-gray-200 pb-5 mb-8">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div class="min-w-0 flex-1">
+        <div class="flex items-center gap-4">
+            <a href="javascript:history.back()" class="w-8 h-8 flex items-center justify-center rounded-none bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            </a>
+            <div class="flex-1">
                 <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink-900 truncate">Assign Task</h1>
                 <p class="text-sm text-ink-500 mt-2">Allocate a duty or patient task to a staff member.</p>
             </div>
             <div class="flex-shrink-0">
-                <a href="{% url 'accounts:control_panel' %}" class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200 w-full sm:w-auto justify-center">
+                <a href="javascript:history.back()" class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200 w-full sm:w-auto justify-center">
                     Cancel
                 </a>
             </div>
