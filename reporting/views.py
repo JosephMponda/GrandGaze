@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
@@ -16,13 +14,7 @@ from .services import acknowledge
 
 @login_required
 def recent_alerts(request):
-    """Backs the 'patients with abnormal vitals in the last 4 hours'
-    dashboard widget (Engineer B spec §4). Source-agnostic view over
-    AlertEvent - other modules' alerts (lab, imaging) will show here too
-    once Engineer E builds out the rest of `reporting`.
-    """
-    since = timezone.now() - timedelta(hours=4)
-    alerts = AlertEvent.objects.filter(raised_at__gte=since).select_related("patient", "acknowledged_by")
+    alerts = AlertEvent.objects.filter(acknowledged_by__isnull=True).select_related("patient", "acknowledged_by")
     context = {
         "alerts": alerts,
         "critical_count": alerts.filter(severity="critical").count(),
