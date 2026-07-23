@@ -1,5 +1,5 @@
 {% if diagnosis %}
-    <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 mb-6">
+    <div class="bg-white border border-gray-200/60 rounded-none shadow-sm p-6 mb-6">
         <h3 class="text-sm font-bold text-ink-900 mb-3">CKD Diagnosis</h3>
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
@@ -16,7 +16,7 @@
 {% endif %}
 
 {% if prescriptions %}
-    <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-2xl overflow-hidden bg-white shadow-sm mb-6">
+    <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-none overflow-hidden bg-white shadow-sm mb-6">
         <div class="px-6 py-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
             <p class="text-xs font-bold text-ink-700 uppercase tracking-wider">Active Dialysis Prescriptions</p>
             <a href="{% url 'dialysis:create_prescription' patient.pk %}" class="text-xs font-semibold text-brand hover:text-brand-dark transition-colors">+ New Prescription</a>
@@ -35,15 +35,16 @@
         {% endfor %}
     </div>
 {% else %}
-    <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 text-center mb-6">
+    <div class="bg-white border border-gray-200/60 rounded-none shadow-sm p-6 text-center mb-6">
         <p class="text-sm text-ink-500 mb-3">No dialysis prescriptions.</p>
         <a href="{% url 'dialysis:create_prescription' patient.pk %}" class="btn-primary text-xs font-semibold py-2 px-4">Create Prescription</a>
     </div>
 {% endif %}
 
 {% if not diagnosis and not prescriptions %}
-    <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 text-center">
+    <div class="bg-white border border-gray-200/60 rounded-none shadow-sm p-6 text-center">
         <p class="text-sm text-ink-500 mb-3">No CKD or dialysis records.</p>
         <a href="{% url 'dialysis:create_prescription' patient.pk %}" class="btn-primary text-xs font-semibold py-2 px-4">Create Prescription</a>
     </div>
 {% endif %}
+

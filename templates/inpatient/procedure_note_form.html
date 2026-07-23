@@ -3,51 +3,52 @@
 {% block content %}
 <div class="max-w-2xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <a href="{% url 'inpatient:admission_detail' admission.pk %}" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors" aria-label="Back">
+        <a href="{% url 'inpatient:admission_detail' admission.pk %}" class="w-8 h-8 flex items-center justify-center rounded-none bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors" aria-label="Back">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
         </a>
         <h1 class="text-2xl font-bold text-ink-900">Procedure Note</h1>
     </div>
     <p class="text-sm text-ink-500 mb-4">{{ admission.patient.full_name }}</p>
 
-    <form method="post" class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-6 space-y-4" data-offline-capable="true" data-form-type="procedure_note">
+    <form method="post" class="bg-white border border-gray-200/60 rounded-none shadow-sm p-4 sm:p-6 space-y-4" data-offline-capable="true" data-form-type="procedure_note">
         {% csrf_token %}
         <input type="hidden" name="admission_id" value="{{ admission.pk }}">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label for="procedure_name" class="block text-sm font-semibold text-ink-900 mb-1">Procedure Name</label>
-                <input type="text" name="procedure_name" id="procedure_name" required placeholder="e.g. Central line insertion" class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
+                <input type="text" name="procedure_name" id="procedure_name" required placeholder="e.g. Central line insertion" class="w-full rounded-none border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
             </div>
             <div>
                 <label for="anaesthesia_type" class="block text-sm font-semibold text-ink-900 mb-1">Anaesthesia</label>
-                <input type="text" name="anaesthesia_type" id="anaesthesia_type" placeholder="e.g. Local, GA" class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
+                <input type="text" name="anaesthesia_type" id="anaesthesia_type" placeholder="e.g. Local, GA" class="w-full rounded-none border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
             </div>
         </div>
         <div>
             <label for="indication" class="block text-sm font-semibold text-ink-900 mb-1">Indication</label>
-            <textarea name="indication" id="indication" rows="2" placeholder="Reason for procedure" class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20 resize-y"></textarea>
+            <textarea name="indication" id="indication" rows="2" placeholder="Reason for procedure" class="w-full rounded-none border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20 resize-y"></textarea>
         </div>
         <div>
             <label for="findings" class="block text-sm font-semibold text-ink-900 mb-1">Findings</label>
-            <textarea name="findings" id="findings" rows="3" required placeholder="Intraoperative findings" class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20 resize-y"></textarea>
+            <textarea name="findings" id="findings" rows="3" required placeholder="Intraoperative findings" class="w-full rounded-none border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20 resize-y"></textarea>
         </div>
         <div>
             <label for="complications" class="block text-sm font-semibold text-ink-900 mb-1">Complications</label>
-            <textarea name="complications" id="complications" rows="2" placeholder="None if uneventful" class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20 resize-y"></textarea>
+            <textarea name="complications" id="complications" rows="2" placeholder="None if uneventful" class="w-full rounded-none border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20 resize-y"></textarea>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label for="outcome" class="block text-sm font-semibold text-ink-900 mb-1">Outcome</label>
-                <input type="text" name="outcome" id="outcome" placeholder="e.g. Successful, uncomplicated" class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
+                <input type="text" name="outcome" id="outcome" placeholder="e.g. Successful, uncomplicated" class="w-full rounded-none border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
             </div>
             <div>
                 <label for="notes" class="block text-sm font-semibold text-ink-900 mb-1">Post-procedure Notes</label>
-                <input type="text" name="notes" id="notes" placeholder="e.g. obs 4h, site check q shift" class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
+                <input type="text" name="notes" id="notes" placeholder="e.g. obs 4h, site check q shift" class="w-full rounded-none border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
             </div>
         </div>
-        <button type="submit" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold text-sm py-2.5 px-5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200">
+        <button type="submit" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold text-sm py-2.5 px-5 rounded-none shadow-sm hover:shadow-md transition-all duration-200">
             Save Procedure Note
         </button>
     </form>
 </div>
 {% endblock %}
+

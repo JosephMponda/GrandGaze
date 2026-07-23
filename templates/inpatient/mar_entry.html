@@ -3,7 +3,7 @@
 {% block content %}
 <div class="max-w-2xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <a href="{% url 'inpatient:admission_detail' admission.pk %}" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors" aria-label="Back">
+        <a href="{% url 'inpatient:admission_detail' admission.pk %}" class="w-8 h-8 flex items-center justify-center rounded-none bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors" aria-label="Back">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
         </a>
         <div>
@@ -12,12 +12,12 @@
         </div>
     </div>
 
-    <form method="post" class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-6 space-y-4" data-offline-capable="true" data-form-type="mar_entry">
+    <form method="post" class="bg-white border border-gray-200/60 rounded-none shadow-sm p-4 sm:p-6 space-y-4" data-offline-capable="true" data-form-type="mar_entry">
         {% csrf_token %}
         <input type="hidden" name="admission_id" value="{{ admission.pk }}">
         <div>
             <label for="prescription" class="block text-sm font-semibold text-ink-900 mb-1">Prescription</label>
-            <select name="prescription" id="prescription" required class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
+            <select name="prescription" id="prescription" required class="w-full rounded-none border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
                 <option value="">- Select prescription -</option>
                 {% for rx in prescriptions %}
                     <option value="{{ rx.pk }}">{{ rx.drug }} {{ rx.dose }} {{ rx.route }} {{ rx.frequency }}</option>
@@ -27,11 +27,11 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label for="dose" class="block text-sm font-semibold text-ink-900 mb-1">Dose Given</label>
-                <input type="text" name="dose" id="dose" required placeholder="e.g. 500mg" class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
+                <input type="text" name="dose" id="dose" required placeholder="e.g. 500mg" class="w-full rounded-none border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
             </div>
             <div>
                 <label for="route" class="block text-sm font-semibold text-ink-900 mb-1">Route</label>
-                <select name="route" id="route" required class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
+                <select name="route" id="route" required class="w-full rounded-none border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
                     <option value="">- Select -</option>
                     <option value="oral">Oral</option>
                     <option value="iv">Intravenous</option>
@@ -45,15 +45,16 @@
         </div>
         <div>
             <label for="site" class="block text-sm font-semibold text-ink-900 mb-1">Injection Site (if applicable)</label>
-            <input type="text" name="site" id="site" placeholder="e.g. Left deltoid" class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
+            <input type="text" name="site" id="site" placeholder="e.g. Left deltoid" class="w-full rounded-none border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
         </div>
         <div>
             <label for="notes" class="block text-sm font-semibold text-ink-900 mb-1">Notes</label>
-            <textarea name="notes" id="notes" rows="2" class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20 resize-y"></textarea>
+            <textarea name="notes" id="notes" rows="2" class="w-full rounded-none border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20 resize-y"></textarea>
         </div>
-        <button type="submit" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold text-sm py-2.5 px-5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200">
+        <button type="submit" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold text-sm py-2.5 px-5 rounded-none shadow-sm hover:shadow-md transition-all duration-200">
             Record Administration
         </button>
     </form>
 </div>
 {% endblock %}
+

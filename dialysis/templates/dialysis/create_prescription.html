@@ -17,9 +17,9 @@
     <form method="post" data-offline-capable="true" data-form-type="dialysis_prescription" class="space-y-6">
         {% csrf_token %}
         <input type="hidden" name="patient_id" data-offline-field="patient_id">
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 space-y-6">
+        <div class="bg-white border border-gray-200/60 rounded-none shadow-sm p-8 space-y-6">
             {% if form.non_field_errors %}
-                <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 text-sm">
+                <div class="bg-red-50 border border-red-200 text-red-700 rounded-none p-4 text-sm">
                     {% for error in form.non_field_errors %}
                         <p>{{ error }}</p>
                     {% endfor %}
@@ -31,7 +31,7 @@
                     <label class="block text-xs font-bold text-ink-700 uppercase tracking-wider mb-1">Sessions per Week</label>
                     <input type="number" name="frequency_per_week" min="1" max="7" required
                            value="{{ form.frequency_per_week.value|default:'3' }}"
-                           class="w-full form-input rounded-lg border-gray-900 bg-gray-50 text-sm focus:border-brand focus:ring-brand">
+                           class="w-full form-input rounded-none border-gray-900 bg-gray-50 text-sm focus:border-brand focus:ring-brand">
                     {% if form.frequency_per_week.errors %}
                         <p class="text-red-600 text-xs mt-1">{{ form.frequency_per_week.errors.0 }}</p>
                     {% endif %}
@@ -39,7 +39,7 @@
                 <div>
                     <label class="block text-xs font-bold text-ink-700 uppercase tracking-wider mb-1">Vascular Access</label>
                     <select name="vascular_access" required
-                           class="w-full form-input rounded-lg border-gray-900 bg-gray-50 text-sm focus:border-brand focus:ring-brand">
+                           class="w-full form-input rounded-none border-gray-900 bg-gray-50 text-sm focus:border-brand focus:ring-brand">
                         {% for value, label in form.fields.vascular_access.choices %}
                             <option value="{{ value }}"{% if value == form.vascular_access.value %} selected{% endif %}>{{ label }}</option>
                         {% endfor %}
@@ -54,7 +54,7 @@
                 <label class="block text-xs font-bold text-ink-700 uppercase tracking-wider mb-1">Target Fluid Removal (litres)</label>
                 <input type="number" name="target_fluid_removal_l" step="0.1" min="0"
                        value="{{ form.target_fluid_removal_l.value|default:'' }}"
-                       class="w-full form-input rounded-lg border-gray-900 bg-gray-50 text-sm focus:border-brand focus:ring-brand"
+                       class="w-full form-input rounded-none border-gray-900 bg-gray-50 text-sm focus:border-brand focus:ring-brand"
                        placeholder="e.g. 2.5">
                 {% if form.target_fluid_removal_l.errors %}
                     <p class="text-red-600 text-xs mt-1">{{ form.target_fluid_removal_l.errors.0 }}</p>
@@ -69,3 +69,4 @@
     </form>
 </div>
 {% endblock %}
+

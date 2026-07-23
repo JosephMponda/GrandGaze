@@ -45,9 +45,9 @@
         {% endif %}
 
         <!-- Section 1: Demographics -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+        <div class="bg-white border border-gray-200/60 rounded-none shadow-sm p-6 sm:p-8 space-y-6">
             <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
-                <span class="w-6 h-6 flex-shrink-0 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/10">1</span>
+                <span class="w-6 h-6 flex-shrink-0 rounded-none bg-brand-light text-brand flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/10">1</span>
                 <h3 class="text-base font-semibold text-ink-900">Demographics & Identity</h3>
             </div>
             
@@ -72,9 +72,9 @@
         </div>
 
         <!-- Section 2: Contact & Location -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+        <div class="bg-white border border-gray-200/60 rounded-none shadow-sm p-6 sm:p-8 space-y-6">
             <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
-                <span class="w-6 h-6 flex-shrink-0 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/10">2</span>
+                <span class="w-6 h-6 flex-shrink-0 rounded-none bg-brand-light text-brand flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/10">2</span>
                 <h3 class="text-base font-semibold text-ink-900">Contact & Address</h3>
             </div>
             
@@ -98,9 +98,9 @@
         </div>
 
         <!-- Section 3: Classification & Consents -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+        <div class="bg-white border border-gray-200/60 rounded-none shadow-sm p-6 sm:p-8 space-y-6">
             <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
-                <span class="w-6 h-6 flex-shrink-0 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/10">3</span>
+                <span class="w-6 h-6 flex-shrink-0 rounded-none bg-brand-light text-brand flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/10">3</span>
                 <h3 class="text-base font-semibold text-ink-900">Classification & Clinical Consent</h3>
             </div>
             
@@ -111,16 +111,16 @@
             </div>
 
             <!-- Consents Section -->
-            <div class="bg-paper border border-gray-200/60 rounded-xl p-4 sm:p-6 mt-4">
+            <div class="bg-paper border border-gray-200/60 rounded-none p-4 sm:p-6 mt-4">
                 <h4 class="text-xs font-bold text-ink-700 uppercase tracking-wider mb-4 sm:mb-5">Patient Consents</h4>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-                    <div class="bg-white border border-gray-200/80 rounded-lg p-4 sm:p-5 shadow-sm">
+                    <div class="bg-white border border-gray-200/80 rounded-none p-4 sm:p-5 shadow-sm">
                         {% include "components/_field.html" with field=form.consent_care %}
                     </div>
-                    <div class="bg-white border border-gray-200/80 rounded-lg p-4 sm:p-5 shadow-sm">
+                    <div class="bg-white border border-gray-200/80 rounded-none p-4 sm:p-5 shadow-sm">
                         {% include "components/_field.html" with field=form.consent_teaching %}
                     </div>
-                    <div class="bg-white border border-gray-200/80 rounded-lg p-4 sm:p-5 shadow-sm">
+                    <div class="bg-white border border-gray-200/80 rounded-none p-4 sm:p-5 shadow-sm">
                         {% include "components/_field.html" with field=form.consent_research %}
                     </div>
                 </div>
@@ -144,3 +144,5 @@
     </form>
 </div>
 {% endblock %}
+
+

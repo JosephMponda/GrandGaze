@@ -12,7 +12,7 @@
 
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {% for bed in beds %}
-            <div class="rounded-xl p-4 border {% if bed.is_occupied %}bg-red-50 border-red-200{% else %}bg-green-50 border-green-200{% endif %}">
+            <div class="rounded-none p-4 border {% if bed.is_occupied %}bg-red-50 border-red-200{% else %}bg-green-50 border-green-200{% endif %}">
                 <p class="text-sm font-bold {% if bed.is_occupied %}text-red-700{% else %}text-green-700{% endif %}">{{ bed.label }}</p>
                 <p class="text-xs {% if bed.is_occupied %}text-red-500{% else %}text-green-500{% endif %}">
                     {% if bed.is_occupied %}

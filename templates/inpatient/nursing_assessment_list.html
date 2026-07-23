@@ -4,13 +4,13 @@
 <div class="max-w-3xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex items-center gap-3">
-            <a href="{% url 'inpatient:admission_detail' admission.pk %}" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors" aria-label="Back">
+            <a href="{% url 'inpatient:admission_detail' admission.pk %}" class="w-8 h-8 flex items-center justify-center rounded-none bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors" aria-label="Back">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
             </a>
             <h1 class="text-2xl font-bold text-ink-900">Nursing Assessments</h1>
         </div>
         {% if admission.status == 'active' %}
-        <a href="{% url 'inpatient:nursing_assessment_create' admission.pk %}" class="bg-green-600 hover:bg-green-700 text-white font-semibold text-sm py-2 px-4 rounded-lg shadow-sm transition-all">+ New Assessment</a>
+        <a href="{% url 'inpatient:nursing_assessment_create' admission.pk %}" class="bg-green-600 hover:bg-green-700 text-white font-semibold text-sm py-2 px-4 rounded-none shadow-sm transition-all">+ New Assessment</a>
         {% endif %}
     </div>
     <p class="text-sm text-ink-500 mb-4">{{ admission.patient.full_name }}</p>
@@ -18,7 +18,7 @@
     {% if assessments %}
         <div class="space-y-4">
         {% for assessment in assessments %}
-            <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-6">
+            <div class="bg-white border border-gray-200/60 rounded-none shadow-sm p-4 sm:p-6">
                 <div class="mb-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                     <span class="text-xs text-ink-400">{{ assessment.assessed_by.get_full_name|default:assessment.assessed_by }} &middot; {{ assessment.created_at|date:"d M Y H:i" }}</span>
                 </div>
@@ -29,7 +29,7 @@
                         <div class="space-y-1">
                         {% for problem in assessment.problems %}
                             <div class="flex items-center gap-2 text-sm">
-                                <span class="w-2 h-2 rounded-full {% if problem.status == 'active' %}bg-red-500{% elif problem.status == 'improving' %}bg-yellow-500{% else %}bg-green-500{% endif %}"></span>
+                                <span class="w-2 h-2 rounded-none {% if problem.status == 'active' %}bg-red-500{% elif problem.status == 'improving' %}bg-yellow-500{% else %}bg-green-500{% endif %}"></span>
                                 <span class="text-ink-900">{{ problem.name }}</span>
                                 <span class="text-xs text-ink-400">({{ problem.status }})</span>
                             </div>
@@ -41,9 +41,10 @@
         {% endfor %}
         </div>
     {% else %}
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 text-center">
+        <div class="bg-white border border-gray-200/60 rounded-none shadow-sm p-8 text-center">
             <p class="text-sm text-ink-500">No nursing assessments recorded yet.</p>
         </div>
     {% endif %}
 </div>
 {% endblock %}
+

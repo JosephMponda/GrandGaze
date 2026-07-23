@@ -5,7 +5,7 @@
 <div class="max-w-3xl mx-auto py-6">
     <div class="border-b border-gray-200 pb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex flex-col gap-3 min-w-0 sm:flex-row sm:items-center">
-            <a href="{% url 'patients:profile' invoice.patient.pk %}#billing" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors">
+            <a href="{% url 'patients:profile' invoice.patient.pk %}#billing" class="w-8 h-8 flex items-center justify-center rounded-none bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
             </a>
             <div>
@@ -13,7 +13,7 @@
                 <p class="text-sm text-ink-500 mt-1">{{ invoice.patient.full_name }} · {{ invoice.patient.patient_number }}</p>
             </div>
         </div>
-        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium
             {% if invoice.status == 'paid' %}bg-green-100 text-green-800
             {% elif invoice.status == 'partially_paid' %}bg-amber-100 text-amber-800
             {% elif invoice.status == 'waived' %}bg-gray-100 text-gray-800
@@ -23,7 +23,7 @@
         <a href="{% url 'billing:invoice_print' invoice.pk %}" target="_blank" class="text-sm text-brand hover:text-brand-dark font-semibold underline sm:ml-4">Print Invoice</a>
     </div>
 
-    <div class="mt-6 bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
+    <div class="mt-6 bg-white border border-gray-200/60 rounded-none shadow-sm p-6">
         <h2 class="text-lg font-semibold text-ink mb-4">Line Items</h2>
         <div class="overflow-x-auto">
             <table class="w-full min-w-[28rem] text-sm">
@@ -55,7 +55,7 @@
     </div>
 
     {% if invoice.payments.all %}
-    <div class="mt-6 bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
+    <div class="mt-6 bg-white border border-gray-200/60 rounded-none shadow-sm p-6">
         <h2 class="text-lg font-semibold text-ink mb-4">Payments</h2>
         <div class="overflow-x-auto">
             <table class="w-full min-w-[32rem] text-sm">
@@ -82,7 +82,7 @@
     </div>
     {% endif %}
 
-    <div class="mt-6 bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6">
+    <div class="mt-6 bg-white border border-gray-200/60 rounded-none shadow-sm p-6">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
                 <p class="text-sm text-ink-500">Outstanding Balance</p>
@@ -94,7 +94,7 @@
         </div>
     </div>
 
-    <form method="post" id="payment-form" class="mt-6 bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 {% if balance <= 0 %}hidden{% endif %}">
+    <form method="post" id="payment-form" class="mt-6 bg-white border border-gray-200/60 rounded-none shadow-sm p-6 {% if balance <= 0 %}hidden{% endif %}">
         {% csrf_token %}
         <h2 class="text-lg font-semibold text-ink mb-4">Record Payment</h2>
         <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -108,3 +108,5 @@
     </form>
 </div>
 {% endblock %}
+
+

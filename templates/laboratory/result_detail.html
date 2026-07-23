@@ -25,7 +25,7 @@
     </div>
 
     <!-- Result Detail Card -->
-    <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+    <div class="bg-white border border-gray-200/60 rounded-none shadow-sm p-6 sm:p-8 space-y-6">
         <!-- Result Info Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
             <!-- Result Value -->
@@ -38,7 +38,7 @@
             <div>
                 <p class="text-xs font-bold text-ink-700 uppercase tracking-wider">Status</p>
                 <div class="mt-1">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium
                         {% if result.order.status == 'resulted' or result.order.status == 'verified' %}
                             bg-green-100 text-green-800
                         {% elif result.order.status == 'specimen_collected' %}
@@ -56,11 +56,11 @@
                 <p class="text-xs font-bold text-ink-700 uppercase tracking-wider">Flags</p>
                 <div class="flex flex-wrap gap-2 mt-1">
                     {% if result.is_critical %}
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Critical</span>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-red-100 text-red-800">Critical</span>
                     {% elif result.is_abnormal %}
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">Abnormal</span>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-orange-100 text-orange-800">Abnormal</span>
                     {% else %}
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Normal</span>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-green-100 text-green-800">Normal</span>
                     {% endif %}
                 </div>
             </div>
@@ -68,7 +68,7 @@
 
         <!-- Verification Section -->
         {% if result.verified_by %}
-            <div class="bg-paper border border-gray-200/60 rounded-xl p-4 text-sm text-ink-600">
+            <div class="bg-paper border border-gray-200/60 rounded-none p-4 text-sm text-ink-600">
                 <p class="break-words">
                     Verified by <strong>{{ result.verified_by }}</strong> at <strong>{{ result.verified_at }}</strong>
                 </p>
@@ -86,3 +86,5 @@
     </div>
 </div>
 {% endblock %}
+
+

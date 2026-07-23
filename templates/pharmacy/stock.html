@@ -27,7 +27,7 @@
     <!-- Main Content Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
         <!-- Add Stock Form -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8">
+        <div class="bg-white border border-gray-200/60 rounded-none shadow-sm p-6 sm:p-8">
             <h2 class="text-lg font-semibold text-ink-900 mb-6">Add Stock</h2>
             <form method="post" class="space-y-6">
                 {% csrf_token %}
@@ -42,7 +42,7 @@
         </div>
 
         <!-- Current Stock Levels -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8">
+        <div class="bg-white border border-gray-200/60 rounded-none shadow-sm p-6 sm:p-8">
             <h2 class="text-lg font-semibold text-ink-900 mb-6">Current Levels</h2>
             {% if stock_levels %}
                 <div class="divide-y divide-gray-100 -mx-2 sm:mx-0">
@@ -57,7 +57,7 @@
                                     {{ level.quantity }}
                                 </span>
                                 {% if level.is_low %}
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 whitespace-nowrap">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-none text-xs font-medium bg-red-100 text-red-800 whitespace-nowrap">
                                         Low
                                     </span>
                                 {% endif %}
@@ -74,3 +74,4 @@
     </div>
 </div>
 {% endblock %}
+

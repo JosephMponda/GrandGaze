@@ -2,14 +2,14 @@
 {% block title %}Billing Dashboard - MUST EMR{% endblock %}
 {% block content %}
 <div class="mx-auto max-w-7xl space-y-6">
-    <section class="rounded-[2rem] border border-slate-200/80 bg-white/90 p-6 shadow-sm backdrop-blur sm:p-8">
+    <section class="rounded-none border border-slate-200/80 bg-white/90 p-6 shadow-sm backdrop-blur sm:p-8">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
                 <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Revenue workspace</p>
                 <h1 class="mt-1 text-3xl font-black tracking-tight text-gray-900">Billing dashboard</h1>
                 <p class="mt-2 max-w-2xl text-sm leading-6 text-gray-600">Monitor invoice volume, payment flow, and outstanding balance from one screen.</p>
             </div>
-            <a href="{% url 'accounts:dashboard' %}" class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
+            <a href="{% url 'accounts:dashboard' %}" class="inline-flex items-center gap-2 rounded-none border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 Back to dashboard
             </a>
@@ -36,20 +36,20 @@
     </section>
 
     <section class="grid gap-6 xl:grid-cols-[1.2fr,0.8fr]">
-        <div class="rounded-[2rem] border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <div class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                     <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Billing trend</p>
                     <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900">Invoice and payment movement</h2>
                 </div>
-                <span class="rounded-full bg-brand-light px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-brand">Last 7 active days</span>
+                <span class="rounded-none bg-brand-light px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-brand">Last 7 active days</span>
             </div>
             <div class="mt-6 h-[20rem]">
                 <canvas id="billingTrendChart"></canvas>
             </div>
         </div>
 
-        <div class="rounded-[2rem] border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <div class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                     <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Status mix</p>
@@ -57,15 +57,15 @@
                 </div>
             </div>
             <div class="mt-6 space-y-3">
-                <div class="rounded-2xl border border-green-100 bg-green-50 px-4 py-4">
+                <div class="rounded-none border border-green-100 bg-green-50 px-4 py-4">
                     <p class="text-xs font-semibold uppercase tracking-[0.22em] text-green-700">Paid</p>
                     <p class="mt-1 text-2xl font-black text-green-700">{{ counts.paid }}</p>
                 </div>
-                <div class="rounded-2xl border border-amber-100 bg-amber-50 px-4 py-4">
+                <div class="rounded-none border border-amber-100 bg-amber-50 px-4 py-4">
                     <p class="text-xs font-semibold uppercase tracking-[0.22em] text-amber-700">Unpaid</p>
                     <p class="mt-1 text-2xl font-black text-amber-700">{{ counts.unpaid }}</p>
                 </div>
-                <div class="rounded-2xl border border-gray-200 bg-slate-50 px-4 py-4">
+                <div class="rounded-none border border-gray-200 bg-slate-50 px-4 py-4">
                     <p class="text-xs font-semibold uppercase tracking-[0.22em] text-gray-600">Invoices</p>
                     <p class="mt-1 text-2xl font-black text-gray-900">{{ counts.total }}</p>
                 </div>
@@ -73,7 +73,7 @@
         </div>
     </section>
 
-    <section class="rounded-[2rem] border border-gray-200/80 bg-white shadow-sm">
+    <section class="rounded-none border border-gray-200/80 bg-white shadow-sm">
         <div class="flex flex-col gap-3 px-6 pt-6 sm:flex-row sm:items-center sm:justify-between sm:px-8">
             <div>
                 <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Recent invoices</p>
@@ -187,3 +187,5 @@
     })();
 </script>
 {% endblock %}
+
+

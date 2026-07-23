@@ -3,12 +3,12 @@
 {% block title %}Dashboard - MUST EMR{% endblock %}
 {% block content %}
 <div class="mx-auto max-w-7xl space-y-6">
-    <section class="overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white text-gray-900 shadow-lg shadow-slate-950/10">
+    <section class="overflow-hidden rounded-none border border-slate-200/80 bg-white text-gray-900 shadow-lg shadow-slate-950/10">
         <div class="grid gap-6 px-6 py-6 sm:px-8 lg:grid-cols-[1.35fr,0.85fr] lg:px-10 lg:py-8">
             <div class="relative">
-                <div class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-700 shadow-sm">
+                <div class="inline-flex items-center gap-2 rounded-none border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-700 shadow-sm">
                     Clinical command center
-                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                    <span class="h-1.5 w-1.5 rounded-none bg-emerald-500"></span>
                     Live
                 </div>
                 <h1 class="mt-4 max-w-3xl text-3xl font-black tracking-tight text-gray-900 sm:text-4xl">
@@ -19,36 +19,36 @@
                 </p>
 
                 <div class="mt-6 flex flex-wrap gap-3">
-                    <a href="{% url 'patients:register' %}" class="inline-flex items-center gap-2 rounded-full bg-brand px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand/20 transition-colors hover:bg-brand-hover">
+                    <a href="{% url 'patients:register' %}" class="inline-flex items-center gap-2 rounded-none bg-brand px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand/20 transition-colors hover:bg-brand-hover">
                         Register patient
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
                     </a>
-                    <a href="{% url 'reporting:analytics_dashboard' %}" class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 hover:text-gray-900">
+                    <a href="{% url 'reporting:analytics_dashboard' %}" class="inline-flex items-center gap-2 rounded-none border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 hover:text-gray-900">
                         View analytics
                     </a>
-                    <a href="{% url 'reporting:recent_alerts' %}" class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 hover:text-gray-900">
+                    <a href="{% url 'reporting:recent_alerts' %}" class="inline-flex items-center gap-2 rounded-none border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 hover:text-gray-900">
                         Review alerts
                     </a>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-                <div class="rounded-2xl border border-white bg-white p-4 shadow-lg shadow-slate-950/10">
+                <div class="rounded-none border border-white bg-white p-4 shadow-lg shadow-slate-950/10">
                     <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Patients today</p>
                     <p class="mt-2 text-3xl font-black text-gray-900">{{ patients_today }}</p>
                     <p class="mt-1 text-xs text-gray-600">New registrations captured today</p>
                 </div>
-                <div class="rounded-2xl border border-white bg-white p-4 shadow-lg shadow-slate-950/10">
+                <div class="rounded-none border border-white bg-white p-4 shadow-lg shadow-slate-950/10">
                     <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Open encounters</p>
                     <p class="mt-2 text-3xl font-black text-gray-900">{{ open_encounters }}</p>
                     <p class="mt-1 text-xs text-gray-600">Unsigned clinical notes</p>
                 </div>
-                <div class="rounded-2xl border border-white bg-white p-4 shadow-lg shadow-slate-950/10">
+                <div class="rounded-none border border-white bg-white p-4 shadow-lg shadow-slate-950/10">
                     <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Critical alerts</p>
                     <p class="mt-2 text-3xl font-black text-red-700">{{ critical_alerts_4h }}</p>
                     <p class="mt-1 text-xs text-gray-600">Raised in the last 4 hours</p>
                 </div>
-                <div class="rounded-2xl border border-white bg-white p-4 shadow-lg shadow-slate-950/10">
+                <div class="rounded-none border border-white bg-white p-4 shadow-lg shadow-slate-950/10">
                     <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Pending work</p>
                     <p class="mt-2 text-3xl font-black text-gray-900">{{ pending_labs|add:pending_imaging|add:pending_prescriptions }}</p>
                     <p class="mt-1 text-xs text-gray-600">Labs, imaging, and prescriptions</p>
@@ -58,7 +58,7 @@
     </section>
 
     <section class="grid gap-6 lg:grid-cols-[1.2fr,0.8fr]">
-        <div class="rounded-[2rem] border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <div class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
             <div class="flex flex-wrap items-end justify-between gap-3">
                 <div>
                     <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Patient search</p>
@@ -71,7 +71,7 @@
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
                 <input type="search" name="q"
-                       class="block w-full rounded-2xl border border-gray-200 bg-slate-50 py-3.5 pl-12 pr-4 text-base text-gray-900 placeholder-gray-400 shadow-inner transition focus:border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand"
+                       class="block w-full rounded-none border border-gray-200 bg-slate-50 py-3.5 pl-12 pr-4 text-base text-gray-900 placeholder-gray-400 shadow-inner transition focus:border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand"
                        placeholder="Search by name, patient number, or phone"
                        hx-get="{% url 'patients:search' %}"
                        hx-trigger="keyup changed delay:300ms"
@@ -91,20 +91,20 @@
         </div>
 
         <div class="space-y-6">
-            <section class="rounded-[2rem] border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+            <section class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
                 <div class="flex items-start justify-between gap-4">
                     <div>
                         <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Workload mix</p>
                         <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900">Live module pressure</h2>
                     </div>
-                    <span class="rounded-full bg-brand-light px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-brand">Today</span>
+                    <span class="rounded-none bg-brand-light px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-brand">Today</span>
                 </div>
                 <div class="mt-6">
                     <canvas id="activityChart" height="220"></canvas>
                 </div>
             </section>
 
-            <section class="rounded-[2rem] border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+            <section class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
                 <div class="flex items-start justify-between gap-4">
                     <div>
                         <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Alert severity</p>
@@ -117,15 +117,15 @@
                         <canvas id="severityChart" height="220"></canvas>
                     </div>
                     <div class="space-y-3">
-                        <div class="flex items-center justify-between rounded-2xl border border-red-100 bg-red-50 px-4 py-3">
+                        <div class="flex items-center justify-between rounded-none border border-red-100 bg-red-50 px-4 py-3">
                             <span class="text-sm font-semibold text-red-800">Critical</span>
                             <span class="text-lg font-black text-red-700">{{ critical_alerts_4h }}</span>
                         </div>
-                        <div class="flex items-center justify-between rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3">
+                        <div class="flex items-center justify-between rounded-none border border-amber-100 bg-amber-50 px-4 py-3">
                             <span class="text-sm font-semibold text-amber-800">Warning</span>
                             <span class="text-lg font-black text-amber-700">{{ warning_count|default:0 }}</span>
                         </div>
-                        <div class="flex items-center justify-between rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3">
+                        <div class="flex items-center justify-between rounded-none border border-blue-100 bg-blue-50 px-4 py-3">
                             <span class="text-sm font-semibold text-blue-800">Info</span>
                             <span class="text-lg font-black text-blue-700">{{ info_count|default:0 }}</span>
                         </div>
@@ -136,7 +136,7 @@
     </section>
 
     <section class="grid gap-6 lg:grid-cols-[1.05fr,0.95fr]">
-        <div class="rounded-[2rem] border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <div class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
             <div class="flex items-center justify-between gap-3">
                 <div>
                     <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Recent alerts</p>
@@ -145,11 +145,11 @@
                 <a href="{% url 'reporting:recent_alerts' %}" class="text-sm font-semibold text-brand hover:text-brand-hover">View all</a>
             </div>
 
-            <div class="mt-5 divide-y divide-gray-100 overflow-hidden rounded-2xl border border-gray-200/80">
+            <div class="mt-5 divide-y divide-gray-100 overflow-hidden rounded-none border border-gray-200/80">
                 {% for alert in recent_alerts %}
                 <article class="flex gap-4 px-4 py-4 transition-colors hover:bg-slate-50/70">
                     <div class="mt-1 flex-shrink-0">
-                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl
+                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-none
                             {% if alert.severity == 'critical' %}bg-red-100 text-red-700
                             {% elif alert.severity == 'warning' %}bg-amber-100 text-amber-700
                             {% else %}bg-blue-100 text-blue-700{% endif %}">
@@ -165,7 +165,7 @@
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-wrap items-center gap-2">
                             <a href="{% url 'patients:profile' alert.patient.pk %}" class="text-sm font-semibold text-gray-900 hover:text-brand">{{ alert.patient.full_name }}</a>
-                            <span class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.22em]
+                            <span class="rounded-none px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.22em]
                                 {% if alert.severity == 'critical' %}bg-red-50 text-red-700
                                 {% elif alert.severity == 'warning' %}bg-amber-50 text-amber-700
                                 {% else %}bg-blue-50 text-blue-700{% endif %}">
@@ -184,20 +184,20 @@
             </div>
         </div>
 
-        <div class="rounded-[2rem] border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <div class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
             <div class="flex items-center justify-between gap-3">
                 <div>
                     <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Quick links</p>
                     <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900">Role-specific actions</h2>
                 </div>
-                <span class="rounded-full bg-gray-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-gray-600">{{ widgets|length }} items</span>
+                <span class="rounded-none bg-gray-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-gray-600">{{ widgets|length }} items</span>
             </div>
 
             {% if widgets %}
             <div class="mt-5 grid gap-3">
                 {% for w in widgets %}
-                <a href="{% url w.url_name %}" class="group flex items-center gap-4 rounded-2xl border border-gray-200/80 bg-slate-50/60 px-4 py-4 transition-all hover:-translate-y-0.5 hover:border-brand/30 hover:bg-white hover:shadow-md">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-light text-brand transition-colors group-hover:bg-brand group-hover:text-white">
+                <a href="{% url w.url_name %}" class="group flex items-center gap-4 rounded-none border border-gray-200/80 bg-slate-50/60 px-4 py-4 transition-all hover:-translate-y-0.5 hover:border-brand/30 hover:bg-white hover:shadow-md">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-none bg-brand-light text-brand transition-colors group-hover:bg-brand group-hover:text-white">
                         {% if w.icon == 'chart' %}
                             <img class="h-6 w-6 object-contain" src="{% static 'img/analytics.png' %}" alt="{{ w.title }}" />
                         {% elif w.icon == 'bill' %}
@@ -333,3 +333,4 @@
     })();
 </script>
 {% endblock %}
+

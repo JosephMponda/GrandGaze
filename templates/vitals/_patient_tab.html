@@ -8,14 +8,14 @@
     </div>
 
     {% if trend %}
-    <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-2xl overflow-hidden">
+    <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-none overflow-hidden">
         {% for v in trend %}
         <div class="bg-white hover:bg-paper transition-colors duration-150 px-5 py-4">
             <div class="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div class="flex min-w-0 flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
                     <p class="text-xs font-bold text-ink-400 uppercase tracking-wider">{{ v.recorded_at|date:"d M Y, H:i" }}</p>
                     {% if v.ews %}
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-bold
                             {% if v.ews.risk_level == 'high' or v.ews.risk_level == 'critical' %}bg-red-100 text-red-700
                             {% elif v.ews.risk_level == 'medium' %}bg-amber-100 text-amber-700
                             {% else %}bg-green-100 text-green-700{% endif %}">
@@ -27,37 +27,37 @@
             </div>
             <dl class="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                 {% if v.temperature_c %}
-                <div class="rounded-xl bg-slate-50/80 px-3 py-2">
+                <div class="rounded-none bg-slate-50/80 px-3 py-2">
                     <dt class="text-[10px] font-bold text-ink-400 uppercase tracking-wider">Temp</dt>
                     <dd class="font-semibold text-ink-900">{{ v.temperature_c }}°C</dd>
                 </div>
                 {% endif %}
                 {% if v.blood_pressure_systolic %}
-                <div class="rounded-xl bg-slate-50/80 px-3 py-2">
+                <div class="rounded-none bg-slate-50/80 px-3 py-2">
                     <dt class="text-[10px] font-bold text-ink-400 uppercase tracking-wider">BP</dt>
                     <dd class="font-semibold text-ink-900">{{ v.blood_pressure_systolic }}/{{ v.blood_pressure_diastolic|default:"-" }}</dd>
                 </div>
                 {% endif %}
                 {% if v.pulse_rate %}
-                <div class="rounded-xl bg-slate-50/80 px-3 py-2">
+                <div class="rounded-none bg-slate-50/80 px-3 py-2">
                     <dt class="text-[10px] font-bold text-ink-400 uppercase tracking-wider">Pulse</dt>
                     <dd class="font-semibold text-ink-900">{{ v.pulse_rate }} bpm</dd>
                 </div>
                 {% endif %}
                 {% if v.respiratory_rate %}
-                <div class="rounded-xl bg-slate-50/80 px-3 py-2">
+                <div class="rounded-none bg-slate-50/80 px-3 py-2">
                     <dt class="text-[10px] font-bold text-ink-400 uppercase tracking-wider">Resp Rate</dt>
                     <dd class="font-semibold text-ink-900">{{ v.respiratory_rate }} br/min</dd>
                 </div>
                 {% endif %}
                 {% if v.oxygen_saturation %}
-                <div class="rounded-xl bg-slate-50/80 px-3 py-2">
+                <div class="rounded-none bg-slate-50/80 px-3 py-2">
                     <dt class="text-[10px] font-bold text-ink-400 uppercase tracking-wider">SpO2</dt>
                     <dd class="font-semibold text-ink-900">{{ v.oxygen_saturation }}%</dd>
                 </div>
                 {% endif %}
                 {% if v.bmi %}
-                <div class="rounded-xl bg-slate-50/80 px-3 py-2">
+                <div class="rounded-none bg-slate-50/80 px-3 py-2">
                     <dt class="text-[10px] font-bold text-ink-400 uppercase tracking-wider">BMI</dt>
                     <dd class="font-semibold text-ink-900">{{ v.bmi }}</dd>
                 </div>
@@ -67,9 +67,11 @@
         {% endfor %}
     </div>
     {% else %}
-    <div class="text-sm text-ink-500 bg-paper border border-gray-200/60 rounded-2xl px-5 py-6 flex items-start gap-3 sm:items-center">
+    <div class="text-sm text-ink-500 bg-paper border border-gray-200/60 rounded-none px-5 py-6 flex items-start gap-3 sm:items-center">
         <svg class="w-5 h-5 text-ink-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
         No vitals recorded yet. Click <strong>&ldquo;Record Vitals&rdquo;</strong> to add the first set.
     </div>
     {% endif %}
 </div>
+
+

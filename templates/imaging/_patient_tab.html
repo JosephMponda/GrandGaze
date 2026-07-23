@@ -7,7 +7,7 @@
     <div>
         <h3 class="text-sm font-bold text-ink-700 uppercase tracking-wider mb-3">Pending Requests</h3>
         {% if pending_requests %}
-            <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-xl overflow-hidden">
+            <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-none overflow-hidden">
                 {% for request in pending_requests %}
                     <div class="flex flex-col gap-2 px-4 py-3 bg-white transition-colors duration-150 hover:bg-paper sm:flex-row sm:items-center sm:justify-between">
                         <div class="min-w-0">
@@ -19,14 +19,14 @@
                 {% endfor %}
             </div>
         {% else %}
-            <p class="text-sm text-ink-500 bg-paper border border-gray-200/60 rounded-xl px-4 py-3">No pending imaging requests.</p>
+            <p class="text-sm text-ink-500 bg-paper border border-gray-200/60 rounded-none px-4 py-3">No pending imaging requests.</p>
         {% endif %}
     </div>
 
     <div>
         <h3 class="text-sm font-bold text-ink-700 uppercase tracking-wider mb-3">Recent Reports</h3>
         {% if recent_reports %}
-            <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-xl overflow-hidden">
+            <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-none overflow-hidden">
                 {% for report in recent_reports %}
                     <div class="flex flex-col gap-2 px-4 py-3 bg-white transition-colors duration-150 hover:bg-paper sm:flex-row sm:items-center sm:justify-between">
                         <div class="min-w-0">
@@ -37,13 +37,15 @@
                             {% endif %}
                         </div>
                         {% if report.is_critical_finding %}
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Critical</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-none text-xs font-medium bg-red-100 text-red-800">Critical</span>
                         {% endif %}
                     </div>
                 {% endfor %}
             </div>
         {% else %}
-            <p class="text-sm text-ink-500 bg-paper border border-gray-200/60 rounded-xl px-4 py-3">No imaging reports yet.</p>
+            <p class="text-sm text-ink-500 bg-paper border border-gray-200/60 rounded-none px-4 py-3">No imaging reports yet.</p>
         {% endif %}
     </div>
 </div>
+
+

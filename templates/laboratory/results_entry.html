@@ -25,7 +25,7 @@
         <nav class="-mb-px flex space-x-8" aria-label="Tabs">
             <button @click="activeTab = 'pending'" :class="{ 'border-brand text-brand': activeTab === 'pending', 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300': activeTab !== 'pending' }" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center">
                 Pending Orders
-                <span :class="{ 'bg-brand/10 text-brand': activeTab === 'pending', 'bg-slate-100 text-slate-900': activeTab !== 'pending' }" class="hidden ml-2 py-0.5 px-2.5 rounded-full text-xs font-medium md:inline-block">{{ summary.pending|default:"0" }}</span>
+                <span :class="{ 'bg-brand/10 text-brand': activeTab === 'pending', 'bg-slate-100 text-slate-900': activeTab !== 'pending' }" class="hidden ml-2 py-0.5 px-2.5 rounded-none text-xs font-medium md:inline-block">{{ summary.pending|default:"0" }}</span>
             </button>
             <button @click="activeTab = 'completed'" :class="{ 'border-brand text-brand': activeTab === 'completed', 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300': activeTab !== 'completed' }" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                 Recently Completed
@@ -39,20 +39,20 @@
         <!-- Order Queue Sidebar -->
         <div class="lg:col-span-1 border-r border-slate-200 pr-0 lg:pr-8" x-show="activeTab === 'pending'">
             <div class="mb-4">
-                <div class="relative rounded-md shadow-sm">
+                <div class="relative rounded-none shadow-sm">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <svg class="h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
                         </svg>
                     </div>
-                    <input type="text" name="search" id="id_search" class="focus:ring-brand focus:border-brand block w-full pl-10 sm:text-sm border-slate-300 rounded-md" placeholder="Search Patient ID or Name">
+                    <input type="text" name="search" id="id_search" class="focus:ring-brand focus:border-brand block w-full pl-10 sm:text-sm border-slate-300 rounded-none" placeholder="Search Patient ID or Name">
                 </div>
             </div>
 
             <ul role="list" class="divide-y divide-slate-200 border-t border-slate-200">
                 {% if pending_orders %}
                     {% for order in pending_orders %}
-                    <li class="py-4 cursor-pointer hover:bg-slate-50 px-3 -mx-3 rounded-md transition-colors border-l-4 border-l-transparent">
+                    <li class="py-4 cursor-pointer hover:bg-slate-50 px-3 -mx-3 rounded-none transition-colors border-l-4 border-l-transparent">
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-sm font-medium text-slate-900">{{ order.patient.full_name }}</p>
@@ -74,7 +74,7 @@
         <!-- Results Entry Workspace -->
         <div class="lg:col-span-2" x-show="activeTab === 'pending'">
             {% if selected_order %}
-            <div class="bg-white shadow rounded-lg border border-slate-200 overflow-hidden">
+            <div class="bg-white shadow rounded-none border border-slate-200 overflow-hidden">
                 <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
                     <div>
                         <h3 class="text-lg font-bold text-slate-900">{{ selected_order.patient.full_name }}</h3>
@@ -92,7 +92,7 @@
             </div>
             {% else %}
             <!-- Empty State -->
-            <div class="bg-white shadow rounded-lg border border-slate-200 p-12 text-center">
+            <div class="bg-white shadow rounded-none border border-slate-200 p-12 text-center">
                 <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
@@ -114,3 +114,5 @@
     </div>
 </div>
 {% endblock %}
+
+

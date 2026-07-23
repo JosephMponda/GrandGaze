@@ -9,7 +9,7 @@
     {# ── New Invoice Responsive Header ───────────────────────────────────── #}
     <div class="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4 shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div class="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0">
-            <a href="{% url 'patients:profile' patient.pk %}#billing" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors mt-0.5 sm:mt-0 shrink-0">
+            <a href="{% url 'patients:profile' patient.pk %}#billing" class="w-8 h-8 flex items-center justify-center rounded-none bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors mt-0.5 sm:mt-0 shrink-0">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                 </svg>
@@ -38,7 +38,7 @@
             {% csrf_token %}
             
             {# Section 1: Invoice Details #}
-            <div class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8 space-y-4">
+            <div class="bg-white border border-gray-200/80 rounded-none shadow-sm p-6 sm:p-8 space-y-4">
                 <h2 class="text-base font-bold text-gray-900 border-b border-gray-100 pb-3">Invoice Details</h2>
                 <div class="max-w-md">
                     {% include "components/_field.html" with field=form.payer_type %}
@@ -46,13 +46,13 @@
             </div>
 
             {# Section 2: Dynamic Line Items #}
-            <div class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8 space-y-4">
+            <div class="bg-white border border-gray-200/80 rounded-none shadow-sm p-6 sm:p-8 space-y-4">
                 <h2 class="text-base font-bold text-gray-900 border-b border-gray-100 pb-3">Line Items</h2>
                 {{ formset.management_form }}
                 
                 <div class="space-y-4" id="line-items">
                     {% for line_form in formset %}
-                        <fieldset class="line-item grid grid-cols-1 md:grid-cols-2 gap-6 p-5 bg-gray-50 border border-gray-200/50 rounded-xl">
+                        <fieldset class="line-item grid grid-cols-1 md:grid-cols-2 gap-6 p-5 bg-gray-50 border border-gray-200/50 rounded-none">
                             <legend class="sr-only">Item #{{ forloop.counter }}</legend>
                             {% include "components/_field.html" with field=line_form.service_item %}
                             {% include "components/_field.html" with field=line_form.quantity %}
@@ -72,3 +72,4 @@
     </div>
 </div>
 {% endblock %}
+

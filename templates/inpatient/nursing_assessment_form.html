@@ -3,19 +3,19 @@
 {% block content %}
 <div class="max-w-2xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <a href="{% url 'inpatient:nursing_assessment_list' admission.pk %}" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors" aria-label="Back">
+        <a href="{% url 'inpatient:nursing_assessment_list' admission.pk %}" class="w-8 h-8 flex items-center justify-center rounded-none bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors" aria-label="Back">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
         </a>
         <h1 class="text-2xl font-bold text-ink-900">New Nursing Assessment</h1>
     </div>
     <p class="text-sm text-ink-500 mb-4">{{ admission.patient.full_name }}</p>
 
-    <form method="post" class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-4 sm:p-6 space-y-4" x-data="assessmentForm()" data-offline-capable="true" data-form-type="nursing_assessment">
+    <form method="post" class="bg-white border border-gray-200/60 rounded-none shadow-sm p-4 sm:p-6 space-y-4" x-data="assessmentForm()" data-offline-capable="true" data-form-type="nursing_assessment">
         {% csrf_token %}
         <input type="hidden" name="admission_id" value="{{ admission.pk }}">
         <div>
             <label for="assessment_note" class="block text-sm font-semibold text-ink-900 mb-1">Assessment Note</label>
-            <textarea name="assessment_note" id="assessment_note" rows="4" required placeholder="General condition, skin integrity, mobility, pain, nutritional status, psychosocial..." class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20 resize-y"></textarea>
+            <textarea name="assessment_note" id="assessment_note" rows="4" required placeholder="General condition, skin integrity, mobility, pain, nutritional status, psychosocial..." class="w-full rounded-none border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20 resize-y"></textarea>
         </div>
 
         <div>
@@ -25,8 +25,8 @@
             </div>
             <template x-for="(p, i) in problems" :key="i">
                 <div class="mb-2 flex flex-col gap-2 sm:flex-row">
-                    <input type="text" :name="'problem_name[]'" x-model="p.name" placeholder="Problem description" class="flex-1 rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
-                    <select :name="'problem_status[]'" x-model="p.status" class="w-full rounded-lg border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand sm:w-32">
+                    <input type="text" :name="'problem_name[]'" x-model="p.name" placeholder="Problem description" class="flex-1 rounded-none border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand focus:ring-2 focus:ring-brand/20">
+                    <select :name="'problem_status[]'" x-model="p.status" class="w-full rounded-none border border-gray-300 bg-white text-sm py-2 px-3 focus:border-brand sm:w-32">
                         <option value="active">Active</option>
                         <option value="improving">Improving</option>
                         <option value="resolved">Resolved</option>
@@ -36,7 +36,7 @@
             </template>
         </div>
 
-        <button type="submit" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold text-sm py-2.5 px-5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200">
+        <button type="submit" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold text-sm py-2.5 px-5 rounded-none shadow-sm hover:shadow-md transition-all duration-200">
             Save Assessment
         </button>
     </form>
@@ -50,3 +50,4 @@ function assessmentForm() {
 }
 </script>
 {% endblock %}
+

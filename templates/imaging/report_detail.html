@@ -25,7 +25,7 @@
     </div>
 
     <!-- Report Content -->
-    <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+    <div class="bg-white border border-gray-200/60 rounded-none shadow-sm p-6 sm:p-8 space-y-6">
         <!-- Findings & Impression Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -40,9 +40,9 @@
 
         <!-- Critical Finding Alert -->
         {% if report.is_critical_finding %}
-            <div class="bg-red-50 border border-red-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+            <div class="bg-red-50 border border-red-200 rounded-none p-4 flex flex-col sm:flex-row sm:items-center gap-3">
                 <div class="flex items-center gap-3">
-                    <span class="w-8 h-8 flex-shrink-0 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-lg font-bold">!</span>
+                    <span class="w-8 h-8 flex-shrink-0 rounded-none bg-red-100 text-red-600 flex items-center justify-center text-lg font-bold">!</span>
                     <p class="text-sm font-semibold text-red-800 flex-1">Critical Finding - Urgent review required</p>
                 </div>
             </div>
@@ -50,7 +50,7 @@
 
         <!-- Image Reference -->
         {% if report.image_reference %}
-            <div class="bg-paper border border-gray-200/60 rounded-xl p-4">
+            <div class="bg-paper border border-gray-200/60 rounded-none p-4">
                 <p class="text-sm text-ink-600 break-all">
                     Image reference: <strong>{{ report.image_reference }}</strong>
                 </p>
@@ -59,3 +59,5 @@
     </div>
 </div>
 {% endblock %}
+
+

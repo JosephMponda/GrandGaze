@@ -38,9 +38,9 @@
         {% endif %}
 
         <!-- Result Entry Section -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+        <div class="bg-white border border-gray-200/60 rounded-none shadow-sm p-6 sm:p-8 space-y-6">
             <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
-                <span class="w-6 h-6 flex-shrink-0 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/10">1</span>
+                <span class="w-6 h-6 flex-shrink-0 rounded-none bg-brand-light text-brand flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/10">1</span>
                 <h3 class="text-base font-semibold text-ink-900">Result Entry</h3>
             </div>
             
@@ -58,7 +58,7 @@
                 <textarea name="{{ form.notes.name }}" 
                           id="{{ form.notes.id_for_label }}"
                           rows="2"
-                          class="block w-full rounded-xl border border-gray-300 bg-white shadow-sm focus:border-brand focus:ring-2 focus:ring-brand/20 text-sm py-2.5 px-3.5 transition-colors resize-y"
+                          class="block w-full rounded-none border border-gray-300 bg-white shadow-sm focus:border-brand focus:ring-2 focus:ring-brand/20 text-sm py-2.5 px-3.5 transition-colors resize-y"
                           placeholder="Enter any relevant notes...">{{ form.notes.value|default:'' }}</textarea>
                 {% if form.notes.errors %}
                     <p class="mt-1 text-xs text-red-600">{{ form.notes.errors|join:", " }}</p>
@@ -86,3 +86,4 @@
     </form>
 </div>
 {% endblock %}
+

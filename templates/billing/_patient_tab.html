@@ -5,7 +5,7 @@
     </div>
 
     {% if invoices %}
-        <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-xl overflow-hidden">
+        <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-none overflow-hidden">
             {% for inv in invoices %}
                 <a href="{% url 'billing:invoice_detail' inv.pk %}" class="flex flex-col gap-2 px-4 py-3 bg-white transition-colors duration-150 hover:bg-paper sm:flex-row sm:items-center sm:justify-between">
                     <div class="min-w-0">
@@ -14,7 +14,7 @@
                     </div>
                     <div class="flex items-start gap-3 text-left sm:items-center sm:justify-end sm:text-right">
                         <span class="text-xs text-ink-500">MWK {{ inv.balance|floatformat:2 }}</span>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium
                             {% if inv.status == 'paid' %}bg-green-100 text-green-800
                             {% elif inv.status == 'partially_paid' %}bg-amber-100 text-amber-800
                             {% elif inv.status == 'waived' %}bg-gray-100 text-gray-800
@@ -26,6 +26,8 @@
             {% endfor %}
         </div>
     {% else %}
-        <p class="text-sm text-ink-500 bg-paper border border-gray-200/60 rounded-xl px-4 py-3">No invoices yet.</p>
+        <p class="text-sm text-ink-500 bg-paper border border-gray-200/60 rounded-none px-4 py-3">No invoices yet.</p>
     {% endif %}
 </div>
+
+

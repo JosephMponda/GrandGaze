@@ -1,5 +1,5 @@
 {% if admissions %}
-    <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-2xl overflow-hidden bg-white shadow-sm">
+    <div class="divide-y divide-gray-100 border border-gray-200/60 rounded-none overflow-hidden bg-white shadow-sm">
         <div class="px-4 py-3 bg-gray-50 border-b border-gray-100 sm:px-6">
             <p class="text-xs font-bold text-ink-700 uppercase tracking-wider">Admission History</p>
         </div>
@@ -11,7 +11,7 @@
                         {{ admission.admitted_at|date:"d M Y" }}
                         {% if admission.discharged_at %}- {{ admission.discharged_at|date:"d M Y" }}{% endif %}
                         &middot; {{ admission.bed.ward.name|default:"-" }}
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ml-2
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-none text-xs font-medium ml-2
                             {% if admission.status == 'active' %}bg-green-100 text-green-800
                             {% elif admission.status == 'discharged' %}bg-gray-100 text-gray-800
                             {% else %}bg-yellow-100 text-yellow-800{% endif %}">
@@ -24,7 +24,8 @@
         {% endfor %}
     </div>
 {% else %}
-    <div class="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-6 text-center">
+    <div class="bg-white border border-gray-200/60 rounded-none shadow-sm p-6 text-center">
         <p class="text-sm text-ink-500">No admissions.</p>
     </div>
 {% endif %}
+

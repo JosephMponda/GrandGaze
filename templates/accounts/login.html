@@ -7,7 +7,7 @@
     <div class="max-w-md w-full relative">
         <!-- Logo and Heading -->
         <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center gap-2 sm:gap-3 rounded-2xl bg-white border border-gray-200/80 px-3 sm:px-4 py-2.5 sm:py-3 shadow-lg shadow-ink/5 mb-6" style="max-width: 100%; flex-wrap: wrap;">
+            <div class="inline-flex items-center justify-center gap-2 sm:gap-3 rounded-none bg-white border border-gray-200/80 px-3 sm:px-4 py-2.5 sm:py-3 shadow-lg shadow-ink/5 mb-6" style="max-width: 100%; flex-wrap: wrap;">
                 <img src="{% static 'img/must-logo.png' %}" alt="MUST logo" class="object-contain" style="width: clamp(2rem, 6vw, 3.5rem); height: clamp(2rem, 6vw, 3.5rem);">
                 <span class="h-10 w-px bg-gray-200" aria-hidden="true"></span>
                 <img src="{% static 'img/logos/GSL-Official-Logo.png' %}" alt="GSL logo" class="object-contain" style="width: clamp(2rem, 6vw, 3.5rem); height: clamp(2rem, 6vw, 3.5rem);">
@@ -17,7 +17,7 @@
         </div>
 
         <!-- Login Card -->
-        <div class="bg-white border border-gray-200/60 rounded-2xl shadow-xl shadow-ink/5 p-8 sm:p-10 mb-8">
+        <div class="bg-white border border-gray-200/60 rounded-none shadow-xl shadow-ink/5 p-8 sm:p-10 mb-8">
             {% if form.non_field_errors %}
                 <div class="space-y-2 mb-6">
                     {% for error in form.non_field_errors %}
@@ -48,7 +48,7 @@
         </div>
 
         <!-- Security Disclaimer Card -->
-        <div class="rounded-xl border border-gray-200/80 bg-slate-50 p-5 text-sm text-gray-700 shadow-sm">
+        <div class="rounded-none border border-gray-200/80 bg-slate-50 p-5 text-sm text-gray-700 shadow-sm">
             <div class="flex items-start gap-3">
                 <svg class="mt-0.5 h-5 w-5 shrink-0 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
@@ -62,3 +62,5 @@
     </div>
 </div>
 {% endblock %}
+
+

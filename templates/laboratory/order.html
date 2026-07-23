@@ -9,7 +9,7 @@
     {# ── Order Lab Header ─────────────────────────────────────────────────── #}
     <div class="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4 shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div class="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0">
-            <a href="{% url 'patients:profile' patient.pk %}#labs" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors mt-0.5 sm:mt-0 shrink-0">
+            <a href="{% url 'patients:profile' patient.pk %}#labs" class="w-8 h-8 flex items-center justify-center rounded-none bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors mt-0.5 sm:mt-0 shrink-0">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                 </svg>
@@ -47,9 +47,9 @@
                 </div>
             {% endif %}
 
-            <div class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+            <div class="bg-white border border-gray-200/80 rounded-none shadow-sm p-6 sm:p-8 space-y-6">
                 <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
-                    <span class="w-6 h-6 rounded-full bg-brand/10 text-brand flex items-center justify-center text-xs font-bold shadow-sm">1</span>
+                    <span class="w-6 h-6 rounded-none bg-brand/10 text-brand flex items-center justify-center text-xs font-bold shadow-sm">1</span>
                     <h3 class="text-base font-bold text-gray-900">Test Selection</h3>
                 </div>
                 
@@ -73,3 +73,4 @@
     </div>
 </div>
 {% endblock %}
+

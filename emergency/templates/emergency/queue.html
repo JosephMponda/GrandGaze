@@ -2,23 +2,23 @@
 {% block title %}Triage Queue - MUST EMR{% endblock %}
 {% block content %}
 <div class="space-y-6">
-    <section class="rounded-[2rem] bg-gradient-to-br from-slate-950 via-slate-900 to-rose-900 text-white shadow-2xl shadow-slate-950/20">
+    <section class="rounded-none bg-gradient-to-br from-slate-950 via-slate-900 to-rose-900 text-white shadow-2xl shadow-slate-950/20">
         <div class="grid gap-6 px-6 py-8 lg:grid-cols-[1.5fr_1fr] lg:px-8 lg:py-10">
             <div class="space-y-4">
                 <p class="text-[11px] font-semibold uppercase tracking-[0.28em] text-rose-200/80">Emergency command center</p>
                 <h1 class="text-3xl font-black tracking-tight sm:text-4xl">Live triage queue</h1>
                 <p class="max-w-2xl text-sm leading-6 text-slate-300">Priority queue by triage level with quick access to rapid registration and resolution.</p>
                 <div class="flex flex-wrap gap-3">
-                    <a href="{% url 'accounts:dashboard' %}" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10">Back to dashboard</a>
-                    <a href="{% url 'emergency:rapid_register' %}" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10">Rapid registration</a>
+                    <a href="{% url 'accounts:dashboard' %}" class="inline-flex items-center gap-2 rounded-none border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10">Back to dashboard</a>
+                    <a href="{% url 'emergency:rapid_register' %}" class="inline-flex items-center gap-2 rounded-none border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10">Rapid registration</a>
                 </div>
             </div>
             <div class="grid gap-3 sm:grid-cols-2">
-                <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div class="rounded-none border border-white/10 bg-white/5 p-4">
                     <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Waiting</p>
                     <p class="mt-3 text-3xl font-black">{{ waiting_count }}</p>
                 </div>
-                <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div class="rounded-none border border-white/10 bg-white/5 p-4">
                     <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Immediate / emergency</p>
                     <p class="mt-3 text-3xl font-black">{{ urgent_count }}</p>
                 </div>
@@ -27,24 +27,24 @@
     </section>
 
     <section class="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <div class="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="rounded-none border border-slate-200 bg-white p-6 shadow-sm">
             <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Queue mix</p>
             <h2 class="mt-1 text-xl font-black text-slate-900">Triage severity</h2>
             <div class="mt-5 h-80">
                 <canvas id="triageChart"></canvas>
             </div>
         </div>
-        <div class="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="rounded-none border border-slate-200 bg-white p-6 shadow-sm">
             <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Patients</p>
             <div class="mt-4 space-y-3">
                 {% for t in triages %}
-                    <div class="rounded-2xl border border-slate-200 px-4 py-3">
+                    <div class="rounded-none border border-slate-200 px-4 py-3">
                         <div class="flex items-start justify-between gap-4">
                             <div class="min-w-0">
                                 <p class="text-sm font-semibold text-slate-900 truncate"><a class="hover:underline" href="{% url 'patients:profile' t.patient.pk %}">{{ t.patient.first_name }} {{ t.patient.last_name }}</a></p>
                                 <p class="text-xs text-slate-500 truncate">{{ t.patient.patient_number }} · {{ t.created_at|timesince }} ago</p>
                             </div>
-                            <span class="rounded-full px-3 py-1 text-xs font-semibold
+                            <span class="rounded-none px-3 py-1 text-xs font-semibold
                                 {% if t.triage_category == 'immediate' %}bg-rose-50 text-rose-700
                                 {% elif t.triage_category == 'emergency' %}bg-orange-50 text-orange-700
                                 {% elif t.triage_category == 'urgent' %}bg-amber-50 text-amber-700
@@ -58,7 +58,7 @@
                         </div>
                     </div>
                 {% empty %}
-                    <div class="rounded-2xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">No patients in triage queue.</div>
+                    <div class="rounded-none border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">No patients in triage queue.</div>
                 {% endfor %}
             </div>
         </div>
@@ -83,3 +83,4 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 {% endblock %}
+

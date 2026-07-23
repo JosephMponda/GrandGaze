@@ -41,19 +41,19 @@
 
 @layer components {
   .btn-primary {
-    @apply block w-full sm:inline-flex sm:w-auto items-center justify-center gap-2 min-w-0 px-4 py-2.5 bg-brand text-white rounded-xl font-semibold shadow-sm hover:bg-brand-hover hover:shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer;
+    @apply block w-full sm:inline-flex sm:w-auto items-center justify-center gap-2 min-w-0 px-4 py-2.5 bg-brand text-white rounded-none font-semibold shadow-sm hover:bg-brand-hover hover:shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer;
   }
 
   .btn-secondary {
-    @apply block w-full sm:inline-flex sm:w-auto items-center justify-center gap-2 min-w-0 px-4 py-2.5 border-2 border-gray-200 bg-white text-ink rounded-xl font-medium hover:border-brand hover:text-brand hover:bg-brand-light/50 active:scale-[0.98] transition-all duration-200 cursor-pointer;
+    @apply block w-full sm:inline-flex sm:w-auto items-center justify-center gap-2 min-w-0 px-4 py-2.5 border-2 border-gray-200 bg-white text-ink rounded-none font-medium hover:border-brand hover:text-brand hover:bg-brand-light/50 active:scale-[0.98] transition-all duration-200 cursor-pointer;
   }
 
   .btn-destructive {
-    @apply block w-full sm:inline-flex sm:w-auto items-center justify-center gap-2 min-w-0 px-4 py-2.5 bg-clinical-critical text-white rounded-xl font-semibold shadow-sm hover:bg-red-700 hover:shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer;
+    @apply block w-full sm:inline-flex sm:w-auto items-center justify-center gap-2 min-w-0 px-4 py-2.5 bg-clinical-critical text-white rounded-none font-semibold shadow-sm hover:bg-red-700 hover:shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer;
   }
 
   .btn-accent {
-    @apply block w-full sm:inline-flex sm:w-auto items-center justify-center gap-2 min-w-0 px-4 py-2.5 bg-brand-accent text-white rounded-xl font-semibold shadow-sm hover:bg-brand-accent-hover hover:shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer;
+    @apply block w-full sm:inline-flex sm:w-auto items-center justify-center gap-2 min-w-0 px-4 py-2.5 bg-brand-accent text-white rounded-none font-semibold shadow-sm hover:bg-brand-accent-hover hover:shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer;
   }
 
   .stack-sm {
@@ -63,7 +63,7 @@
   .form-field input:not([type="checkbox"]):not([type="radio"]),
   .form-field textarea,
   .form-field select {
-    @apply w-full px-3.5 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand bg-white text-ink placeholder:text-gray-400 transition-all duration-200;
+    @apply w-full px-3.5 py-2.5 border-2 border-gray-200 rounded-none focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand bg-white text-ink placeholder:text-gray-400 transition-all duration-200;
   }
 
   .form-field input:not([type="checkbox"]):not([type="radio"]):hover,
@@ -72,9 +72,9 @@
     @apply border-gray-300;
   }
 
-  .form-field input[type="checkbox"],
+.form-field input[type="checkbox"],
   .form-field input[type="radio"] {
-    @apply h-4 w-4 rounded border-2 border-gray-300 text-brand focus:ring-brand/30 cursor-pointer bg-white transition-colors;
+    @apply h-4 w-4 rounded-none border-2 border-gray-300 text-brand focus:ring-brand/30 cursor-pointer bg-white transition-colors;
   }
 
   .form-field label {
@@ -90,7 +90,7 @@
   }
 
   .badge {
-    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border;
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-none text-xs font-semibold border;
   }
 
   .badge-success { @apply bg-emerald-50 text-emerald-700 border-emerald-200; }
@@ -100,7 +100,7 @@
   .badge-teal { @apply bg-teal-50 text-teal-700 border-teal-200; }
 
   .alert {
-    @apply px-4 py-3.5 rounded-xl border-2 text-sm font-medium;
+    @apply px-4 py-3.5 rounded-none border-2 text-sm font-medium;
   }
 
   .alert-success { @apply bg-emerald-50 border-emerald-200 text-emerald-800; }
@@ -145,11 +145,11 @@
   }
 
   .card {
-    @apply bg-white border border-gray-200/80 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200;
+    @apply bg-white border border-gray-200/80 rounded-none shadow-sm hover:shadow-md transition-shadow duration-200;
   }
 
   .card-header {
-    @apply px-6 py-4 border-b border-gray-100 bg-gray-50/50 rounded-t-2xl;
+    @apply px-6 py-4 border-b border-gray-100 bg-gray-50/50 rounded-none;
   }
 
   .card-body {
@@ -165,7 +165,7 @@
   }
 
   .stat-card {
-    @apply bg-white border border-gray-200/80 rounded-2xl p-6 text-center hover:border-brand/30 hover:shadow-md transition-all duration-200;
+    @apply bg-white border border-gray-200/80 rounded-none p-6 text-center hover:border-brand/30 hover:shadow-md transition-all duration-200;
   }
 
   .stat-value {
