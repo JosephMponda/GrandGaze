@@ -2,116 +2,97 @@
 {% load static %}
 {% block title %}Edit {{ staff_user.get_full_name|default:staff_user.username }} - Staff Profile{% endblock %}
 {% block content %}
-<div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-6">
-    <div class="flex items-center gap-4 mb-6">
-        <a href="{% url 'accounts:user_detail' staff_user.pk %}" class="w-8 h-8 flex items-center justify-center rounded-none bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors shrink-0">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-        </a>
-        <div>
-            <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Staff profile</p>
-            <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-gray-900">Edit {{ staff_user.get_full_name|default:staff_user.username }}</h1>
+<div class="max-w-3xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <div class="border-b border-gray-200 pb-5 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="min-w-0 flex-1">
+                <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink-900 truncate">Edit Staff Profile</h1>
+                <p class="text-sm text-ink-500 mt-2">{{ staff_user.get_full_name|default:staff_user.username }}</p>
+            </div>
+            <div class="flex-shrink-0">
+                <a href="{% url 'accounts:user_detail' staff_user.pk %}" 
+                   class="btn-secondary text-sm font-semibold flex items-center gap-2 hover:-translate-y-0.5 transition-all duration-200 w-full sm:w-auto justify-center">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Cancel
+                </a>
+            </div>
         </div>
     </div>
 
-    <form method="post" enctype="multipart/form-data" class="space-y-6">
+    <form method="post" enctype="multipart/form-data" class="space-y-6 sm:space-y-8">
         {% csrf_token %}
-        {% for error in form.non_field_errors %}
-        <div class="rounded-none border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ error }}</div>
-        {% endfor %}
 
-        <div class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
-            <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wider">Account</h2>
-            <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wide text-gray-500">Username</label>
-                    <p class="mt-1 text-sm font-medium text-gray-900">{{ staff_user.username }}</p>
-                </div>
-                <div>
-                    <label for="id_first_name" class="block text-xs font-semibold uppercase tracking-wide text-gray-500">First name</label>
-                    <input type="text" name="first_name" id="id_first_name" value="{{ form.first_name.value|default:'' }}" class="mt-1 w-full rounded-none border border-gray-300 px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none">
-                </div>
-                <div>
-                    <label for="id_last_name" class="block text-xs font-semibold uppercase tracking-wide text-gray-500">Last name</label>
-                    <input type="text" name="last_name" id="id_last_name" value="{{ form.last_name.value|default:'' }}" class="mt-1 w-full rounded-none border border-gray-300 px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none">
-                </div>
-                <div>
-                    <label for="id_email" class="block text-xs font-semibold uppercase tracking-wide text-gray-500">Email</label>
-                    <input type="email" name="email" id="id_email" value="{{ form.email.value|default:'' }}" class="mt-1 w-full rounded-none border border-gray-300 px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none">
-                </div>
-            </div>
+        {% if form.non_field_errors %}
+        <div class="space-y-2 mb-6">
+            {% for error in form.non_field_errors %}
+                {% include "components/_alert_banner.html" with message=error type="critical" %}
+            {% endfor %}
         </div>
+        {% endif %}
 
-        <div class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
-            <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wider">Personal details</h2>
-            <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+        <div class="bg-white border border-gray-200/60 rounded-none shadow-sm p-6 sm:p-8 space-y-6">
+            <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
+                <span class="w-6 h-6 flex-shrink-0 rounded-none bg-brand-light text-brand flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/10">1</span>
+                <h3 class="text-base font-semibold text-ink-900">Account &amp; Photo</h3>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                {% include "components/_field.html" with field=form.first_name %}
+                {% include "components/_field.html" with field=form.last_name %}
+                {% include "components/_field.html" with field=form.email %}
                 <div>
-                    <label for="id_photo" class="block text-xs font-semibold uppercase tracking-wide text-gray-500">Profile photo</label>
-                    <input type="file" name="photo" id="id_photo" accept="image/*" class="mt-1 w-full text-sm file:mr-3 file:rounded-none file:border-0 file:bg-brand file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white">
+                    <label for="id_photo" class="block text-sm font-medium text-gray-700">Profile photo</label>
+                    <input type="file" name="photo" id="id_photo" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-none file:border-0 file:text-sm file:font-semibold file:bg-brand file:text-white hover:file:bg-brand-hover">
                     {% if form.instance.photo %}
                     <p class="mt-1 text-xs text-gray-500">Current: <a href="{{ form.instance.photo.url }}" class="text-brand underline" target="_blank">{{ form.instance.photo.name }}</a></p>
                     {% endif %}
                 </div>
-                <div>
-                    <label for="id_gender" class="block text-xs font-semibold uppercase tracking-wide text-gray-500">Gender</label>
-                    <select name="gender" id="id_gender" class="mt-1 w-full rounded-none border border-gray-300 px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none">
-                        <option value="">—</option>
-                        {% for value, label in form.fields.gender.choices %}
-                        <option value="{{ value }}" {% if form.gender.value == value %}selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div>
-                    <label for="id_date_of_birth" class="block text-xs font-semibold uppercase tracking-wide text-gray-500">Date of birth</label>
-                    <input type="date" name="date_of_birth" id="id_date_of_birth" value="{{ form.date_of_birth.value|date:'Y-m-d'|default:'' }}" class="mt-1 w-full rounded-none border border-gray-300 px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none">
-                </div>
-                <div>
-                    <label for="id_phone_number" class="block text-xs font-semibold uppercase tracking-wide text-gray-500">Phone number</label>
-                    <input type="text" name="phone_number" id="id_phone_number" value="{{ form.phone_number.value|default:'' }}" class="mt-1 w-full rounded-none border border-gray-300 px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none">
-                </div>
-                <div>
-                    <label for="id_emergency_contact" class="block text-xs font-semibold uppercase tracking-wide text-gray-500">Emergency contact</label>
-                    <input type="text" name="emergency_contact" id="id_emergency_contact" value="{{ form.emergency_contact.value|default:'' }}" class="mt-1 w-full rounded-none border border-gray-300 px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none">
-                </div>
             </div>
         </div>
 
-        <div class="rounded-none border border-gray-200/80 bg-white p-6 shadow-sm sm:p-8">
-            <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wider">Professional</h2>
-            <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
-                <div>
-                    <label for="id_role" class="block text-xs font-semibold uppercase tracking-wide text-gray-500">Role</label>
-                    <select name="role" id="id_role" class="mt-1 w-full rounded-none border border-gray-300 px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none">
-                        {% for value, label in form.fields.role.choices %}
-                        <option value="{{ value }}" {% if form.role.value == value %}selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div>
-                    <label for="id_department" class="block text-xs font-semibold uppercase tracking-wide text-gray-500">Department</label>
-                    <input type="text" name="department" id="id_department" value="{{ form.department.value|default:'' }}" class="mt-1 w-full rounded-none border border-gray-300 px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none">
-                </div>
-                <div>
-                    <label for="id_specialty" class="block text-xs font-semibold uppercase tracking-wide text-gray-500">Specialty</label>
-                    <input type="text" name="specialty" id="id_specialty" value="{{ form.specialty.value|default:'' }}" class="mt-1 w-full rounded-none border border-gray-300 px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none">
-                </div>
-                <div>
-                    <label for="id_employee_id" class="block text-xs font-semibold uppercase tracking-wide text-gray-500">Employee ID</label>
-                    <input type="text" name="employee_id" id="id_employee_id" value="{{ form.employee_id.value|default:'' }}" class="mt-1 w-full rounded-none border border-gray-300 px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none">
-                </div>
-                <div class="sm:col-span-2">
-                    <label for="id_qualifications" class="block text-xs font-semibold uppercase tracking-wide text-gray-500">Qualifications</label>
-                    <textarea name="qualifications" id="id_qualifications" rows="3" class="mt-1 w-full rounded-none border border-gray-300 px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none">{{ form.qualifications.value|default:'' }}</textarea>
-                </div>
-                <div class="sm:col-span-2">
-                    <label for="id_bio" class="block text-xs font-semibold uppercase tracking-wide text-gray-500">Bio</label>
-                    <textarea name="bio" id="id_bio" rows="4" class="mt-1 w-full rounded-none border border-gray-300 px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none">{{ form.bio.value|default:'' }}</textarea>
-                </div>
+        <div class="bg-white border border-gray-200/60 rounded-none shadow-sm p-6 sm:p-8 space-y-6">
+            <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
+                <span class="w-6 h-6 flex-shrink-0 rounded-none bg-brand-light text-brand flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/10">2</span>
+                <h3 class="text-base font-semibold text-ink-900">Personal Details</h3>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                {% include "components/_field.html" with field=form.gender %}
+                {% include "components/_field.html" with field=form.date_of_birth %}
+                {% include "components/_field.html" with field=form.phone_number %}
+                {% include "components/_field.html" with field=form.emergency_contact %}
             </div>
         </div>
 
-        <div class="flex items-center justify-end gap-3">
-            <a href="{% url 'accounts:user_detail' staff_user.pk %}" class="rounded-none border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">Cancel</a>
-            <button type="submit" class="rounded-none bg-brand px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand/20 transition-colors hover:bg-brand-hover">Save changes</button>
+        <div class="bg-white border border-gray-200/60 rounded-none shadow-sm p-6 sm:p-8 space-y-6">
+            <div class="border-b border-gray-100 pb-4 flex items-center gap-3">
+                <span class="w-6 h-6 flex-shrink-0 rounded-none bg-brand-light text-brand flex items-center justify-center text-xs font-bold shadow-sm shadow-brand/10">3</span>
+                <h3 class="text-base font-semibold text-ink-900">Professional</h3>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                {% include "components/_field.html" with field=form.role %}
+                {% include "components/_field.html" with field=form.department %}
+                {% include "components/_field.html" with field=form.specialty %}
+                {% include "components/_field.html" with field=form.employee_id %}
+            </div>
+            <div class="space-y-4">
+                {% include "components/_field.html" with field=form.qualifications %}
+                {% include "components/_field.html" with field=form.bio %}
+            </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 pt-6 pb-10">
+            <a href="{% url 'accounts:user_detail' staff_user.pk %}" 
+               class="btn-secondary text-sm font-semibold py-3 px-6 hover:-translate-y-0.5 transition-all duration-200 text-center order-2 sm:order-1">
+                Cancel
+            </a>
+            <button type="submit" 
+                    class="btn-primary text-sm font-semibold py-3 px-8 shadow-md shadow-brand/20 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 order-1 sm:order-2">
+                Save changes
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                </svg>
+            </button>
         </div>
     </form>
 </div>
