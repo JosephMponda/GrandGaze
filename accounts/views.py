@@ -18,7 +18,7 @@ from reporting.models import AlertEvent
 from .dashboard_widgets import widgets_for_user
 from .permissions import role_required
 from .forms import StaffUserForm, StaffProfileForm
-from .models import Profile, Role, Task, TaskStatus
+from .models import Profile, Role, Task, TaskPriority, TaskStatus
 
 User = get_user_model()
 
@@ -110,28 +110,85 @@ def landing_page(request):
 
 @role_required("Admin", "ICT")
 def audit_trail(request):
-    """Read-only audit viewer over django-simple-history records.
-    Satisfies brief §19.4 as a visible feature, not just a DB table.
-    """
-    patient_history = Patient.history.all().order_by("-history_date")[:200]
+    """Read-only audit viewer over django-simple-history records."""
+    from patients.models import Patient
+
+    model_filter = request.GET.get("model", "patient")
     
-    # Calculate counts using database aggregation
-    total_count = patient_history.count()
-    
-    # Count by history type
-    history_counts = patient_history.aggregate(
-        created_count=Count('pk', filter=Q(history_type='+')),
-        modified_count=Count('pk', filter=Q(history_type='~')),
-        deleted_count=Count('pk', filter=Q(history_type='-')),
-    )
-    
-    context = {
-        "patient_history": patient_history,
-        "total_count": total_count,
-        "created_count": history_counts['created_count'],
-        "modified_count": history_counts['modified_count'],
-        "deleted_count": history_counts['deleted_count'],
-    }
+    if model_filter == "task":
+        raw_history = Task.history.all().select_related("assigned_to", "assigned_by").order_by("-history_date")[:200]
+        history_entries = []
+        for h in raw_history:
+            assigned_to_name = h.assigned_to.get_full_name() or h.assigned_to.username if h.assigned_to else "—"
+            assigned_by_name = h.assigned_by.get_full_name() or h.assigned_by.username if h.assigned_by else "—"
+            history_entries.append({
+                "date": h.history_date,
+                "type": h.history_type,
+                "title": h.title,
+                "detail": f"Assigned to {assigned_to_name} by {assigned_by_name}",
+                "actor": h.history_user.get_full_name() or h.history_user.username if h.history_user else "—",
+            })
+        total = len(history_entries)
+        created = sum(1 for e in history_entries if e["type"] == "+")
+        modified = sum(1 for e in history_entries if e["type"] == "~")
+        deleted = sum(1 for e in history_entries if e["type"] == "-")
+        context = {
+            "history_entries": history_entries,
+            "total_count": total,
+            "created_count": created,
+            "modified_count": modified,
+            "deleted_count": deleted,
+            "model_filter": model_filter,
+            "model_label": "Task",
+        }
+    elif model_filter == "profile":
+        raw_history = Profile.history.all().select_related("user").order_by("-history_date")[:200]
+        history_entries = []
+        for h in raw_history:
+            history_entries.append({
+                "date": h.history_date,
+                "type": h.history_type,
+                "title": h.user.username if h.user else "—",
+                "detail": f"Role: {h.role}, Department: {h.department or '—'}",
+                "actor": h.history_user.get_full_name() or h.history_user.username if h.history_user else "—",
+            })
+        total = len(history_entries)
+        created = sum(1 for e in history_entries if e["type"] == "+")
+        modified = sum(1 for e in history_entries if e["type"] == "~")
+        deleted = sum(1 for e in history_entries if e["type"] == "-")
+        context = {
+            "history_entries": history_entries,
+            "total_count": total,
+            "created_count": created,
+            "modified_count": modified,
+            "deleted_count": deleted,
+            "model_filter": model_filter,
+            "model_label": "Staff Profile",
+        }
+    else:
+        patient_history = Patient.history.all().order_by("-history_date")[:200]
+        history_entries = []
+        for h in patient_history:
+            history_entries.append({
+                "date": h.history_date,
+                "type": h.history_type,
+                "title": getattr(h, "full_name", h.patient_number if hasattr(h, "patient_number") else "—"),
+                "detail": f"Patient #{getattr(h, 'patient_number', '—')}",
+                "actor": h.history_user.get_full_name() or h.history_user.username if h.history_user else "—",
+            })
+        total = len(history_entries)
+        created = sum(1 for e in history_entries if e["type"] == "+")
+        modified = sum(1 for e in history_entries if e["type"] == "~")
+        deleted = sum(1 for e in history_entries if e["type"] == "-")
+        context = {
+            "history_entries": history_entries,
+            "total_count": total,
+            "created_count": created,
+            "modified_count": modified,
+            "deleted_count": deleted,
+            "model_filter": model_filter,
+            "model_label": "Patient",
+        }
     
     return render(request, "accounts/audit_trail.html", context)
 
