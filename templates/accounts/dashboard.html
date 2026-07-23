@@ -33,26 +33,26 @@
             </div>
 
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-                <div class="rounded-none border border-white bg-white p-4 shadow-lg shadow-slate-950/10">
+                <a href="{% url 'patients:register' %}" class="block rounded-none border border-white bg-white p-4 shadow-lg shadow-slate-950/10 transition-opacity hover:opacity-80">
                     <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Patients today</p>
                     <p class="mt-2 text-3xl font-black text-gray-900">{{ patients_today }}</p>
                     <p class="mt-1 text-xs text-gray-600">New registrations captured today</p>
-                </div>
-                <div class="rounded-none border border-white bg-white p-4 shadow-lg shadow-slate-950/10">
+                </a>
+                <a href="{% url 'encounters:open' %}" class="block rounded-none border border-white bg-white p-4 shadow-lg shadow-slate-950/10 transition-opacity hover:opacity-80">
                     <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Open encounters</p>
                     <p class="mt-2 text-3xl font-black text-gray-900">{{ open_encounters }}</p>
                     <p class="mt-1 text-xs text-gray-600">Unsigned clinical notes</p>
-                </div>
-                <div class="rounded-none border border-white bg-white p-4 shadow-lg shadow-slate-950/10">
+                </a>
+                <a href="{% url 'reporting:recent_alerts' %}" class="block rounded-none border border-white bg-white p-4 shadow-lg shadow-slate-950/10 transition-opacity hover:opacity-80">
                     <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Critical alerts</p>
                     <p class="mt-2 text-3xl font-black text-red-700">{{ critical_alerts_4h }}</p>
                     <p class="mt-1 text-xs text-gray-600">Raised in the last 4 hours</p>
-                </div>
-                <div class="rounded-none border border-white bg-white p-4 shadow-lg shadow-slate-950/10">
+                </a>
+                <a href="{% url 'reporting:analytics_dashboard' %}" class="block rounded-none border border-white bg-white p-4 shadow-lg shadow-slate-950/10 transition-opacity hover:opacity-80">
                     <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Pending work</p>
                     <p class="mt-2 text-3xl font-black text-gray-900">{{ pending_labs|add:pending_imaging|add:pending_prescriptions }}</p>
                     <p class="mt-1 text-xs text-gray-600">Labs, imaging, and prescriptions</p>
-                </div>
+                </a>
             </div>
         </div>
     </section>
