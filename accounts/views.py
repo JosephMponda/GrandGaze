@@ -80,7 +80,7 @@ def dashboard(request):
             "values": activity_values,
             "max": activity_max,
             "urls": [
-                reverse("accounts:dashboard"),
+                reverse("patients:register"),
                 reverse("laboratory:workload"),
                 reverse("imaging:worklist"),
                 reverse("pharmacy:queue"),
