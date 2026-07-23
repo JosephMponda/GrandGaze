@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Open Encounters - MUST EMR{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-5xl space-y-6">
+    <section class="rounded-none border border-slate-200/80 bg-white/90 p-6 shadow-sm backdrop-blur sm:p-8">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+                <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Clinical encounters</p>
+                <h1 class="mt-1 text-3xl font-black tracking-tight text-gray-900">Open encounters</h1>
+                <p class="mt-2 text-sm leading-6 text-gray-600">Unsigned clinical notes requiring attention.</p>
+            </div>
+            <a href="{% url 'accounts:dashboard' %}" class="inline-flex items-center gap-2 rounded-none border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                Back to dashboard
+            </a>
+        </div>
+        <div class="mt-6 grid gap-3 sm:grid-cols-3">
+            <div class="rounded-none border border-gray-200 bg-slate-50/60 px-4 py-3">
+                <p class="text-xs font-semibold uppercase tracking-[0.22em] text-gray-500">Total open</p>
+                <p class="mt-1 text-2xl font-black text-gray-900">{{ encounters|length }}</p>
+            </div>
+        </div>
+    </section>
+
+    {% if encounters %}
+    <div class="overflow-hidden rounded-none border border-gray-200/80 bg-white shadow-sm">
+        <div class="divide-y divide-gray-100">
+            {% for e in encounters %}
+            <a href="{% url 'encounters:detail' e.pk %}" class="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-slate-50/70">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-none bg-brand-light text-sm font-black text-brand">
+                    {{ e.patient.first_name|slice:":1"|upper }}{{ e.patient.last_name|slice:":1"|upper }}
+                </div>
+                <div class="min-w-0 flex-1">
+                    <p class="text-sm font-semibold text-gray-900">{{ e.patient.full_name }}</p>
+                    <p class="text-xs text-gray-500">{{ e.patient.patient_number }} &middot; {{ e.get_encounter_type_display }}</p>
+                    <p class="mt-1 text-sm text-gray-600 line-clamp-1">{{ e.presenting_complaint|truncatechars:80 }}</p>
+                </div>
+                <div class="flex flex-col items-end gap-1 shrink-0">
+                    <span class="rounded-none px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.22em] bg-amber-50 text-amber-700">Open</span>
+                    <span class="text-xs text-gray-400">{{ e.created_at|date:"M j, H:i" }}</span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="rounded-none border border-gray-200/80 bg-white p-12 text-center shadow-sm">
+        <p class="text-lg font-bold text-gray-900">All caught up</p>
+        <p class="mt-1 text-sm text-gray-500">No open encounters at this time.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

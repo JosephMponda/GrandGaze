@@ -57,7 +57,7 @@ def analytics_dashboard(request):
         ],
         "urls": [
             reverse("patients:register"),
-            reverse("patients:register"),
+            reverse("encounters:open"),
             reverse("laboratory:workload"),
             reverse("imaging:worklist"),
             reverse("pharmacy:queue"),

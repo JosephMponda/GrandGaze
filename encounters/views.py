@@ -86,6 +86,12 @@ def edit_encounter(request, pk):
 
 
 @login_required
+def open_encounters(request):
+    encounters = Encounter.objects.filter(signed_at__isnull=True).select_related("patient", "clinician").order_by("-created_at")
+    return render(request, "encounters/open_list.html", {"encounters": encounters})
+
+
+@login_required
 def patient_encounters_tab(request, patient_id):
     """HTMX partial plugged into Engineer A's patient profile template."""
     patient = get_patient_or_404(patient_id)
