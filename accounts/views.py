@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.db import transaction
 from django.db.models import Count, Q
 from django.utils import timezone
@@ -44,7 +44,7 @@ def dashboard(request):
         raised_at__gte=now - timedelta(hours=4),
     ).count()
 
-    activity_labels = ["Encounters", "Labs", "Imaging", "Rx", "Alerts"]
+    activity_labels = ["Encounters", "Labs", "Imaging", "Meds", "Alerts"]
     activity_values = [
         open_encounters,
         pending_labs,
@@ -79,6 +79,13 @@ def dashboard(request):
             "labels": activity_labels,
             "values": activity_values,
             "max": activity_max,
+            "urls": [
+                reverse("accounts:dashboard"),
+                reverse("laboratory:workload"),
+                reverse("imaging:worklist"),
+                reverse("pharmacy:queue"),
+                reverse("reporting:recent_alerts"),
+            ],
         },
         "severity_chart": {
             "labels": ["Critical", "Warning", "Info"],

@@ -73,7 +73,7 @@
                 <span class="rounded-none bg-brand-light px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-brand">Current state</span>
             </div>
             <div class="mt-6 h-[20rem]">
-                <canvas id="moduleChart"></canvas>
+                <canvas id="moduleChart" style="cursor: pointer;"></canvas>
             </div>
         </div>
 
@@ -218,11 +218,18 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     animation: { duration: 250 },
+                    onClick: (e, elements) => {
+                        if (elements.length > 0) {
+                            const idx = elements[0].index;
+                            const urls = moduleData.urls || [];
+                            if (urls[idx]) window.location.href = urls[idx];
+                        }
+                    },
                     plugins: { legend: { display: false } },
                     scales: {
                         x: {
                             grid: { display: false },
-                            ticks: { color: '#475569', font: { weight: '600' } },
+                            ticks: { color: '#475569', font: { weight: '600' }, cursor: 'pointer' },
                         },
                         y: {
                             beginAtZero: true,

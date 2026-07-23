@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 
 from encounters.models import Encounter
@@ -45,7 +46,7 @@ def analytics_dashboard(request):
         info=Count("pk", filter=Q(severity="info")),
     )
     module_breakdown = {
-        "labels": ["Patients", "Encounters", "Labs", "Imaging", "Prescriptions", "Alerts"],
+        "labels": ["Patients", "Encounters", "Labs", "Imaging", "Meds", "Alerts"],
         "values": [
             Patient.objects.filter(created_at__date=today).count(),
             Encounter.objects.filter(signed_at__isnull=True).count(),
@@ -53,6 +54,14 @@ def analytics_dashboard(request):
             ImagingRequest.objects.filter(status__in=["requested", "scheduled"]).count(),
             Prescription.objects.filter(status="prescribed").count(),
             AlertEvent.objects.filter(acknowledged_by__isnull=True).count(),
+        ],
+        "urls": [
+            reverse("patients:register"),
+            reverse("accounts:dashboard"),
+            reverse("laboratory:workload"),
+            reverse("imaging:worklist"),
+            reverse("pharmacy:queue"),
+            reverse("reporting:recent_alerts"),
         ],
     }
 

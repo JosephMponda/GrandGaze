@@ -101,7 +101,7 @@
                 </div>
                 <div class="mt-6">
                     <div class="min-w-0">
-                        <canvas id="activityChart" height="220" class="w-full"></canvas>
+                        <canvas id="activityChart" height="220" class="w-full" style="cursor: pointer;"></canvas>
                     </div>
                 </div>
             </section>
@@ -284,6 +284,13 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     animation: { duration: 250 },
+                    onClick: (e, elements) => {
+                        if (elements.length > 0) {
+                            const idx = elements[0].index;
+                            const urls = activity.urls || [];
+                            if (urls[idx]) window.location.href = urls[idx];
+                        }
+                    },
                     plugins: {
                         legend: { display: false },
                         tooltip: { intersect: false, mode: 'index' },
@@ -291,7 +298,7 @@
                     scales: {
                         x: {
                             grid: { display: false },
-                            ticks: { color: '#475569', font: { weight: '600' } },
+                            ticks: { color: '#475569', font: { weight: '600' }, cursor: 'pointer' },
                         },
                         y: {
                             beginAtZero: true,
