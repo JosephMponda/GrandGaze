@@ -10,6 +10,11 @@
 
   const uuid = () => crypto.randomUUID();
 
+  function readCsrfCookie() {
+    const match = document.cookie.match(/(?:^|; )csrftoken=([^;]*)/);
+    return match ? decodeURIComponent(match[1]) : '';
+  }
+
   function open() {
     if (database) return Promise.resolve(database);
     return new Promise((resolve, reject) => {
@@ -440,7 +445,7 @@
         const response = await fetch('/api/sync/submit/', {
           method: 'POST', credentials: 'same-origin', headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': localStorage.getItem('must_emr_offline_csrf') || '',
+            'X-CSRFToken': readCsrfCookie() || localStorage.getItem('must_emr_offline_csrf') || '',
           },
           body: JSON.stringify({ client_uuid: item.client_uuid, form_type: item.form_type, payload_json }),
         });
@@ -451,7 +456,10 @@
           await remove('outbox', item.id);
           applied += 1;
         } else if (response.status < 500) {
-          await put('outbox', { ...item, state: 'needs_review', error: result.error || result.conflict_note || 'Validation failed.' });
+          const message = result.error || result.conflict_note || result.detail
+            || (result && typeof result === 'object' && Object.keys(result).length ? JSON.stringify(result) : null)
+            || `Server returned ${response.status}.`;
+          await put('outbox', { ...item, state: 'needs_review', error: message });
           await put(item.entity, { ...record, sync_state: 'needs_review' });
           review += 1;
         } else break;
