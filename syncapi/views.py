@@ -1,3 +1,4 @@
+from django.db import models
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -12,6 +13,7 @@ from imaging.models import ImagingModality
 from billing.models import ServiceCatalogItem
 from emergency.models import TriageEncounter
 from dialysis.models import DialysisPrescription, DialysisSession
+from accounts.models import Task
 
 from .dispatch import dispatch
 from .models import SyncConflict, SyncSubmission
@@ -172,6 +174,28 @@ def offline_bootstrap(request):
         for m in ImagingModality.objects.all()
     ]
 
+    # Tasks for the offline user
+    tasks = [
+        {
+            "server_id": t.pk,
+            "title": t.title,
+            "description": t.description,
+            "assigned_to_id": t.assigned_to_id,
+            "assigned_by_id": t.assigned_by_id,
+            "assigned_to_name": t.assigned_to.get_full_name() or t.assigned_to.username,
+            "assigned_by_name": t.assigned_by.get_full_name() or t.assigned_by.username,
+            "patient_id": t.patient_id,
+            "patient_name": str(t.patient) if t.patient else "",
+            "priority": t.priority,
+            "status": t.status,
+            "due_date": t.due_date.isoformat(),
+            "created_at": t.created_at.isoformat(),
+        }
+        for t in Task.objects.filter(
+            models.Q(assigned_to=request.user) | models.Q(assigned_by=request.user)
+        ).select_related("assigned_to", "assigned_by", "patient")
+    ]
+
     # Service catalog for offline billing
     service_catalog = [
         {
@@ -223,9 +247,14 @@ def offline_bootstrap(request):
         for s in DialysisSession.objects.select_related("prescription").all()
     ]
 
+    role = "superuser" if request.user.is_superuser else (request.user.profile.role if hasattr(request.user, "profile") and request.user.profile else "")
+
     return Response(
         {
             "generated_at": timezone.now().isoformat(),
+            "user_role": role,
+            "user_name": request.user.get_full_name() or request.user.username,
+            "tasks": tasks,
             "patients": [
                 {
                     "server_id": patient.pk,

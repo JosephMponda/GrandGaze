@@ -427,6 +427,34 @@ def _handle_payment(payload, submitted_by):
     return payment, None
 
 
+def _handle_task_assign(payload, submitted_by):
+    from accounts.models import Task
+    from patients.models import Patient
+    from django.contrib.auth import get_user_model
+
+    User = get_user_model()
+    task = Task.objects.create(
+        title=payload["title"],
+        description=payload.get("description", ""),
+        assigned_to=User.objects.get(pk=payload["assigned_to_id"]),
+        assigned_by=submitted_by,
+        patient=Patient.objects.get(pk=payload["patient_id"]) if payload.get("patient_id") else None,
+        priority=payload.get("priority", "medium"),
+        status="pending",
+        due_date=payload.get("due_date"),
+    )
+    return task, None
+
+
+def _handle_task_update_status(payload, submitted_by):
+    from accounts.models import Task
+
+    task = Task.objects.get(pk=payload["task_id"])
+    task.status = payload["status"]
+    task.save(update_fields=["status"])
+    return task, None
+
+
 HANDLERS = {
     "patient_registration": _handle_patient_registration,
     "encounter_note": _handle_encounter_note,
@@ -454,6 +482,8 @@ HANDLERS = {
     "dialysis_session": _handle_dialysis_session,
     "invoice_create": _handle_invoice_create,
     "payment": _handle_payment,
+    "task_assign": _handle_task_assign,
+    "task_update_status": _handle_task_update_status,
 }
 
 

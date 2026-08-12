@@ -78,7 +78,7 @@ def dashboard(request):
         "critical_alerts_4h": critical_alerts_4h,
         "warning_count": alert_4h_warning,
         "info_count": alert_4h_info,
-        "recent_alerts": AlertEvent.objects.select_related("patient").order_by("-raised_at")[:5],
+        "recent_alerts": AlertEvent.objects.filter(acknowledged_by__isnull=True).select_related("patient").order_by("-raised_at")[:5],
         "activity_chart": {
             "labels": activity_labels,
             "values": activity_values,
@@ -111,6 +111,7 @@ def landing_page(request):
 @role_required("Admin", "ICT")
 def audit_trail(request):
     """Read-only audit viewer over django-simple-history records for all clinical models."""
+    from collections import OrderedDict
     from patients.models import Patient
     from encounters.models import Encounter, AllergyRecord
     from vitals.models import VitalSignSet
@@ -135,51 +136,51 @@ def audit_trail(request):
     def patient_name(obj):
         if obj is None:
             return "—"
-        return getattr(obj, "full_name", str(obj))
+        first = getattr(obj, "first_name", "")
+        last = getattr(obj, "last_name", "")
+        if first or last:
+            return f"{first} {last}".strip()
+        return getattr(obj, "patient_number", "—")
 
     def patient_number(obj):
         if obj is None:
             return ""
         return getattr(obj, "patient_number", "")
 
+    def make_entry(h, title, detail, actor, object_id):
+        return dict(date=h.history_date, type=h.history_type,
+                    title=title, detail=detail, actor=actor, object_id=object_id)
+
     # ── Patients ──────────────────────────────────────────────────────────
     if model_filter == "patient":
         label = "Patient"
         for h in Patient.history.all().order_by("-history_date")[:limit]:
-            entries.append(dict(date=h.history_date, type=h.history_type,
-                title=patient_name(h),
-                detail=f"Patient #{patient_number(h)}",
-                actor=actor_name(h)))
+            pid = patient_number(h) or f"pk_{h.pk}"
+            entries.append(make_entry(h, patient_name(h), f"Patient #{patient_number(h)}", actor_name(h), pid))
 
     # ── Encounters ─────────────────────────────────────────────────────────
     elif model_filter == "encounter":
         label = "Encounter"
         for h in Encounter.history.select_related("patient", "clinician").order_by("-history_date")[:limit]:
             clinician = h.clinician.get_full_name() or h.clinician.username if h.clinician else "—"
-            entries.append(dict(date=h.history_date, type=h.history_type,
-                title=patient_name(h.patient),
-                detail=f"{h.get_encounter_type_display()} — Clinician: {clinician}",
-                actor=actor_name(h)))
+            pid = f"p{h.patient.pk}" if h.patient else f"e{h.pk}"
+            entries.append(make_entry(h, patient_name(h.patient), f"{h.get_encounter_type_display()} \u2014 Clinician: {clinician}", actor_name(h), pid))
 
     # ── Vitals ─────────────────────────────────────────────────────────────
     elif model_filter == "vitals":
         label = "Vitals"
         for h in VitalSignSet.history.select_related("patient", "recorded_by").order_by("-history_date")[:limit]:
             recorded = h.recorded_by.get_full_name() or h.recorded_by.username if h.recorded_by else "—"
-            entries.append(dict(date=h.history_date, type=h.history_type,
-                title=patient_name(h.patient),
-                detail=f"Recorded by {recorded}",
-                actor=actor_name(h)))
+            pid = f"p{h.patient.pk}" if h.patient else f"v{h.pk}"
+            entries.append(make_entry(h, patient_name(h.patient), f"Recorded by {recorded}", actor_name(h), pid))
 
     # ── Lab Orders ─────────────────────────────────────────────────────────
     elif model_filter == "lab":
         label = "Lab"
         for h in LabOrder.history.select_related("patient", "ordered_by").order_by("-history_date")[:limit]:
             ordered = h.ordered_by.get_full_name() or h.ordered_by.username if h.ordered_by else "—"
-            entries.append(dict(date=h.history_date, type=h.history_type,
-                title=patient_name(h.patient),
-                detail=f"Ordered by {ordered} — {h.status or '—'}",
-                actor=actor_name(h)))
+            pid = f"p{h.patient.pk}" if h.patient else f"l{h.pk}"
+            entries.append(make_entry(h, patient_name(h.patient), f"Ordered by {ordered} \u2014 {h.status or '\u2014'}", actor_name(h), pid))
 
     # ── Lab Results ────────────────────────────────────────────────────────
     elif model_filter == "lab_result":
@@ -187,30 +188,24 @@ def audit_trail(request):
         for h in LabResult.history.select_related("order__patient", "entered_by").order_by("-history_date")[:limit]:
             entered = h.entered_by.get_full_name() or h.entered_by.username if h.entered_by else "—"
             patient = h.order.patient if h.order and hasattr(h.order, "patient") else None
-            entries.append(dict(date=h.history_date, type=h.history_type,
-                title=patient_name(patient),
-                detail=f"Entered by {entered} — {getattr(h, 'value', '')}",
-                actor=actor_name(h)))
+            pid = f"p{patient.pk}" if patient else f"lr{h.pk}"
+            entries.append(make_entry(h, patient_name(patient), f"Entered by {entered} \u2014 {getattr(h, 'value', '')}", actor_name(h), pid))
 
     # ── Imaging ────────────────────────────────────────────────────────────
     elif model_filter == "imaging":
         label = "Imaging"
         for h in ImagingRequest.history.select_related("patient", "requested_by").order_by("-history_date")[:limit]:
             requested = h.requested_by.get_full_name() or h.requested_by.username if h.requested_by else "—"
-            entries.append(dict(date=h.history_date, type=h.history_type,
-                title=patient_name(h.patient),
-                detail=f"Requested by {requested} — {getattr(h, 'modality', '') or ''}",
-                actor=actor_name(h)))
+            pid = f"p{h.patient.pk}" if h.patient else f"im{h.pk}"
+            entries.append(make_entry(h, patient_name(h.patient), f"Requested by {requested} \u2014 {getattr(h, 'modality', '') or ''}", actor_name(h), pid))
 
     # ── Prescriptions ──────────────────────────────────────────────────────
     elif model_filter == "prescription":
         label = "Prescription"
         for h in Prescription.history.select_related("patient", "prescribed_by").order_by("-history_date")[:limit]:
             prescriber = h.prescribed_by.get_full_name() or h.prescribed_by.username if h.prescribed_by else "—"
-            entries.append(dict(date=h.history_date, type=h.history_type,
-                title=patient_name(h.patient),
-                detail=f"Prescribed by {prescriber}",
-                actor=actor_name(h)))
+            pid = f"p{h.patient.pk}" if h.patient else f"rx{h.pk}"
+            entries.append(make_entry(h, patient_name(h.patient), f"Prescribed by {prescriber}", actor_name(h), pid))
 
     # ── Dispensing ─────────────────────────────────────────────────────────
     elif model_filter == "dispensing":
@@ -218,30 +213,24 @@ def audit_trail(request):
         for h in DispensingRecord.history.select_related("prescription__patient", "dispensed_by").order_by("-history_date")[:limit]:
             dispensed = h.dispensed_by.get_full_name() or h.dispensed_by.username if h.dispensed_by else "—"
             patient = h.prescription.patient if h.prescription else None
-            entries.append(dict(date=h.history_date, type=h.history_type,
-                title=patient_name(patient),
-                detail=f"Dispensed by {dispensed}",
-                actor=actor_name(h)))
+            pid = f"p{patient.pk}" if patient else f"dp{h.pk}"
+            entries.append(make_entry(h, patient_name(patient), f"Dispensed by {dispensed}", actor_name(h), pid))
 
     # ── Billing / Invoices ─────────────────────────────────────────────────
     elif model_filter == "billing":
         label = "Billing"
         for h in Invoice.history.select_related("patient", "created_by").order_by("-history_date")[:limit]:
             creator = h.created_by.get_full_name() or h.created_by.username if h.created_by else "—"
-            entries.append(dict(date=h.history_date, type=h.history_type,
-                title=patient_name(h.patient),
-                detail=f"Created by {creator} — {getattr(h, 'status', '') or ''}",
-                actor=actor_name(h)))
+            pid = f"p{h.patient.pk}" if h.patient else f"inv{h.pk}"
+            entries.append(make_entry(h, patient_name(h.patient), f"Created by {creator} \u2014 {getattr(h, 'status', '') or ''}", actor_name(h), pid))
 
     # ── Triage ─────────────────────────────────────────────────────────────
     elif model_filter == "triage":
         label = "Triage"
         for h in TriageEncounter.history.select_related("patient", "triaged_by").order_by("-history_date")[:limit]:
             triaged = h.triaged_by.get_full_name() or h.triaged_by.username if h.triaged_by else "—"
-            entries.append(dict(date=h.history_date, type=h.history_type,
-                title=patient_name(h.patient),
-                detail=f"Triaged by {triaged}",
-                actor=actor_name(h)))
+            pid = f"p{h.patient.pk}" if h.patient else f"tr{h.pk}"
+            entries.append(make_entry(h, patient_name(h.patient), f"Triaged by {triaged}", actor_name(h), pid))
 
     # ── Dialysis ───────────────────────────────────────────────────────────
     elif model_filter == "dialysis":
@@ -249,29 +238,23 @@ def audit_trail(request):
         for h in DialysisSession.history.select_related("prescription__patient", "conducted_by").order_by("-history_date")[:limit]:
             conducted = h.conducted_by.get_full_name() or h.conducted_by.username if h.conducted_by else "—"
             patient = h.prescription.patient if h.prescription else None
-            entries.append(dict(date=h.history_date, type=h.history_type,
-                title=patient_name(patient),
-                detail=f"Conducted by {conducted}",
-                actor=actor_name(h)))
+            pid = f"p{patient.pk}" if patient else f"d{h.pk}"
+            entries.append(make_entry(h, patient_name(patient), f"Conducted by {conducted}", actor_name(h), pid))
 
     # ── Inpatient / Admissions ─────────────────────────────────────────────
     elif model_filter == "admission":
         label = "Admission"
         for h in Admission.history.select_related("patient", "admitting_clinician").order_by("-history_date")[:limit]:
             clinician = h.admitting_clinician.get_full_name() or h.admitting_clinician.username if h.admitting_clinician else "—"
-            entries.append(dict(date=h.history_date, type=h.history_type,
-                title=patient_name(h.patient),
-                detail=f"Admitted by {clinician} — {getattr(h, 'status', '') or ''}",
-                actor=actor_name(h)))
+            pid = f"p{h.patient.pk}" if h.patient else f"ad{h.pk}"
+            entries.append(make_entry(h, patient_name(h.patient), f"Admitted by {clinician} \u2014 {getattr(h, 'status', '') or ''}", actor_name(h), pid))
 
     # ── Staff Profiles ─────────────────────────────────────────────────────
     elif model_filter == "profile":
         label = "Staff Profile"
         for h in Profile.history.select_related("user").order_by("-history_date")[:limit]:
-            entries.append(dict(date=h.history_date, type=h.history_type,
-                title=h.user.username if h.user else "—",
-                detail=f"Role: {h.role}, Dept: {h.department or '—'}",
-                actor=actor_name(h)))
+            uid = f"u{h.user.pk}" if h.user else f"pr{h.pk}"
+            entries.append(make_entry(h, h.user.username if h.user else "\u2014", f"Role: {h.role}, Dept: {h.department or '\u2014'}", actor_name(h), uid))
 
     # ── Tasks ──────────────────────────────────────────────────────────────
     elif model_filter == "task":
@@ -279,18 +262,33 @@ def audit_trail(request):
         for h in Task.history.select_related("assigned_to", "assigned_by").order_by("-history_date")[:limit]:
             to_name = h.assigned_to.get_full_name() or h.assigned_to.username if h.assigned_to else "—"
             by_name = h.assigned_by.get_full_name() or h.assigned_by.username if h.assigned_by else "—"
-            entries.append(dict(date=h.history_date, type=h.history_type,
-                title=h.title,
-                detail=f"Assigned to {to_name} by {by_name}",
-                actor=actor_name(h)))
+            tid = f"t{h.pk}"
+            entries.append(make_entry(h, h.title, f"Assigned to {to_name} by {by_name}", actor_name(h), tid))
 
     total = len(entries)
-    created = sum(1 for e in entries if e["type"] == "+")
-    modified = sum(1 for e in entries if e["type"] == "~")
-    deleted = sum(1 for e in entries if e["type"] == "-")
+
+    groups = OrderedDict()
+    for e in entries:
+        key = e["object_id"]
+        if key not in groups:
+            groups[key] = {
+                "title": e["title"],
+                "object_id": key,
+                "latest_date": e["date"],
+                "subtitle": e["detail"],
+                "entries": [],
+            }
+        groups[key]["entries"].append(e)
+        if e["date"] > groups[key]["latest_date"]:
+            groups[key]["latest_date"] = e["date"]
+
+    grouped = sorted(groups.values(), key=lambda g: g["latest_date"], reverse=True)
+    created = sum(1 for g in grouped for e in g["entries"] if e["type"] == "+")
+    modified = sum(1 for g in grouped for e in g["entries"] if e["type"] == "~")
+    deleted = sum(1 for g in grouped for e in g["entries"] if e["type"] == "-")
 
     return render(request, "accounts/audit_trail.html", {
-        "history_entries": entries,
+        "grouped_entries": grouped,
         "total_count": total,
         "created_count": created,
         "modified_count": modified,
@@ -343,7 +341,7 @@ def control_panel(request):
             for ward in wards
         ],
     }
-    if request.headers.get("HX-Request") == "true":
+    if request.headers.get("HX-Request") == "true" and request.headers.get("HX-Target") == "staff-directory":
         return render(request, "accounts/_staff_directory.html", context)
     return render(request, "accounts/control_panel.html", context)
 
