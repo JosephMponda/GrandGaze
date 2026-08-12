@@ -152,7 +152,7 @@
                         const bars = this.getElementsAtEventForMode(e, 'index', { intersect: true });
                         if (bars.length && payload.roles && payload.roles[bars[0].index]) {
                             const role = payload.roles[bars[0].index];
-                            const pill = document.querySelector('a[hx-get="?role=' + role + '"]');
+                            const pill = document.querySelector('a[data-role="' + role + '"]');
                             if (pill) {
                                 pill.click();
                                 setTimeout(function () {

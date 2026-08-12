@@ -341,7 +341,11 @@ def control_panel(request):
             for ward in wards
         ],
     }
-    if request.headers.get("HX-Request") == "true" and request.headers.get("HX-Target") == "staff-directory":
+    if (
+        request.headers.get("HX-Request") == "true"
+        and request.headers.get("HX-Target") == "staff-directory"
+        and request.GET.get("directory") == "1"
+    ):
         return render(request, "accounts/_staff_directory.html", context)
     return render(request, "accounts/control_panel.html", context)
 

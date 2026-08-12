@@ -7,10 +7,10 @@
     </div>
     <div class="mt-5 overflow-hidden border-t border-gray-100">
         <div class="flex flex-wrap gap-2 px-6 pt-4 pb-2">
-            <a href="{% url 'accounts:control_panel' %}" hx-get="{% url 'accounts:control_panel' %}" hx-target="#staff-directory" hx-swap="outerHTML" hx-push-url="true"
+            <a href="{% url 'accounts:control_panel' %}" hx-get="{% url 'accounts:control_panel' %}?directory=1" hx-target="#staff-directory" hx-swap="outerHTML" hx-push-url="true"
                class="rounded-none px-3 py-1 text-xs font-semibold transition-colors {% if not role_filter %}bg-brand text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">All</a>
             {% for item in role_distribution.roles %}
-            <a href="?role={{ item }}" hx-get="?role={{ item }}" hx-target="#staff-directory" hx-swap="outerHTML" hx-push-url="true"
+            <a href="?role={{ item }}" hx-get="?role={{ item }}&directory=1" data-role="{{ item }}" hx-target="#staff-directory" hx-swap="outerHTML" hx-push-url="true"
                class="rounded-none px-3 py-1 text-xs font-semibold transition-colors {% if role_filter == item %}bg-brand text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">{{ item|title }}</a>
             {% endfor %}
         </div>

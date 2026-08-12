@@ -89,6 +89,27 @@ def test_control_panel_renders_without_crash(client, nurse_user):
     assert "Control Panel" in response.content.decode()
 
 
+def test_control_panel_only_returns_directory_for_explicit_directory_request(client, nurse_user):
+    Group.objects.get_or_create(name="Admin")
+    nurse_user.groups.add(Group.objects.get(name="Admin"))
+    client.force_login(nurse_user)
+
+    full_response = client.get(
+        reverse("accounts:control_panel"),
+        HTTP_HX_REQUEST="true",
+        HTTP_HX_TARGET="staff-directory",
+    )
+    assert "Control Panel" in full_response.content.decode()
+
+    directory_response = client.get(
+        reverse("accounts:control_panel") + "?directory=1",
+        HTTP_HX_REQUEST="true",
+        HTTP_HX_TARGET="staff-directory",
+    )
+    assert "Control Panel" not in directory_response.content.decode()
+    assert "staff-directory" in directory_response.content.decode()
+
+
 def test_staff_user_form_assigns_matching_group_for_every_role():
     expected_groups = {
         Role.NURSE: "Nurse",
