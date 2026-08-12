@@ -4,4 +4,6 @@ target-version = "py312"
 line-length = 120
 
 [lint]
+# Keep CI focused on syntax and import/name correctness until the broader style backlog is adopted.
+select = ["E4", "E7", "E9", "F"]
 ignore = ["F401", "F841"]
