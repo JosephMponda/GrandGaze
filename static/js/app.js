@@ -213,9 +213,26 @@
       const items = (await queuedSubmissions()).filter((item) => item.owner_id === offlineUser);
       const pending = items.filter((item) => item.state !== 'needs_review').length;
       const review = items.length - pending;
+      const workspaceState = await window.MUSTOffline?.state?.();
+      const workspacePending = workspaceState?.outbox?.filter((item) => item.state !== 'needs_review').length || 0;
+      const totalPending = pending + workspacePending;
       const label = document.getElementById('offline-queue-count');
-      if (label) label.textContent = review ? `${pending} waiting, ${review} needs review` : `${pending} waiting to sync`;
+      if (label) label.textContent = review ? pending + ' waiting, ' + review + ' needs review' : pending + ' waiting to sync';
       document.getElementById('offline-queue-status')?.classList.toggle('hidden', !items.length);
+
+      const offline = !navigator.onLine || !serverReachable;
+      const badge = document.getElementById('offline-sync-badge');
+      const badgeLabel = document.getElementById('offline-sync-badge-label');
+      if (badge && badgeLabel) {
+        badge.classList.toggle('hidden', !offline && !totalPending);
+        badge.classList.toggle('border-amber-200', !offline && totalPending > 0);
+        badge.classList.toggle('bg-amber-50', !offline && totalPending > 0);
+        badge.classList.toggle('text-amber-800', !offline && totalPending > 0);
+        badge.classList.toggle('border-amber-300', offline);
+        badge.classList.toggle('bg-amber-100', offline);
+        badge.classList.toggle('text-amber-900', offline);
+        badgeLabel.textContent = offline ? 'Offline — ' + totalPending + ' queued' : totalPending + ' pending';
+      }
     } catch (_) { /* IndexedDB may be unavailable in a private browser session. */ }
   }
 
@@ -270,12 +287,14 @@
   window.addEventListener('offline', () => {
     updateConnectionStatus();
     const now = Date.now();
+    updateQueueIndicator();
     if (now - lastOfflineToast > 8000) {
       window.showToast('Connection lost. Supported clinical forms will save on this device.', 'warning');
       lastOfflineToast = now;
     }
   });
   window.addEventListener('online', () => {
+    updateQueueIndicator();
     probeServer().then((reachable) => {
       if (!reachable) return;
       syncQueuedItems();
@@ -314,6 +333,7 @@
       window.MUSTOffline?.sync();
     });
     setInterval(() => probeServer().then((reachable) => {
+      updateQueueIndicator();
       if (!reachable) return;
       syncQueuedItems();
       window.MUSTOffline?.sync();
