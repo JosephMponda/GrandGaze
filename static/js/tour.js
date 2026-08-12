@@ -106,6 +106,11 @@
         if (tx + tipW > vw) { placement = 'left'; tx = rect.left - tipW - pad - 12; }
       }
 
+      // A highlighted section may be taller than the viewport. Keep the
+      // guide itself visible even when neither preferred side has room.
+      tx = Math.max(16, Math.min(tx, vw - tipW - 16));
+      ty = Math.max(16, Math.min(ty, vh - tipH - 16));
+
       var arrowDir = placement;
       var arrowStyles = {
         bottom: 'top:-8px;left:50%;transform:translateX(-50%);border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:8px solid #fff',
@@ -156,11 +161,20 @@
 
   function startTour(tour) {
     if (!tour || !tour.steps || !tour.steps.length) return;
-    activeTour = tour;
+
+    // Dashboard sections can be conditional on the signed-in user's role or
+    // data. Exclude unavailable targets so one missing section cannot hide
+    // the remainder of the guide.
+    var availableSteps = tour.steps.filter(function (step) {
+      try { return !!getElement(step.element); } catch (_) { return false; }
+    });
+    if (!availableSteps.length) return;
+
+    activeTour = Object.assign({}, tour, { steps: availableSteps });
     currentStep = 0;
     createOverlay();
     overlayEl.style.opacity = '1';
-    showStep(tour.steps[0]);
+    showStep(activeTour.steps[0]);
   }
 
   function endTour() {
