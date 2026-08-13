@@ -10,9 +10,11 @@
             <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">Patients</h1>
             <p class="text-sm text-gray-500 mt-1">{{ patients_today_count }} registered today</p>
         </div>
+        {% if user.is_superuser or user.profile.role == 'NURSE' or user.profile.role == 'ADMIN' %}
         <a href="{% url 'patients:register' %}" class="inline-flex items-center gap-2 rounded-none bg-brand px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand/20 transition-colors hover:bg-brand-hover shrink-0">
             Register patient
         </a>
+        {% endif %}
     </div>
 
     <form method="get" class="flex flex-col sm:flex-row gap-3 mb-6">

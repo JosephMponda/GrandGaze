@@ -79,7 +79,9 @@
                 <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">Recent invoices</p>
                 <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900">Latest activity</h2>
             </div>
+            {% if user.is_superuser or user.profile.role == 'NURSE' or user.profile.role == 'ADMIN' %}
             <a href="{% url 'patients:register' %}" class="text-sm font-semibold text-brand hover:text-brand-hover sm:self-start">Register patient</a>
+            {% endif %}
         </div>
         {% if recent %}
         <div class="mt-5 overflow-hidden rounded-b-[2rem] border-t border-gray-100">

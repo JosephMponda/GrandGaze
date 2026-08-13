@@ -231,7 +231,7 @@
         badge.classList.toggle('border-amber-300', offline);
         badge.classList.toggle('bg-amber-100', offline);
         badge.classList.toggle('text-amber-900', offline);
-        badgeLabel.textContent = offline ? 'Offline � ' + totalPending + ' queued' : totalPending + ' pending';
+        badgeLabel.textContent = offline ? 'Offline � ' + totalPending + ' queued' : totalPending + ' pending';
       }
     } catch (_) { /* IndexedDB may be unavailable in a private browser session. */ }
   }
@@ -344,8 +344,6 @@
 
 /* ── Onboarding Tours ─────────────────────────────────────────────────── */
 (function () {
-  var page = document.body.dataset.page;
-
   var tours = {
 
     /* ── Dashboard ── */
@@ -488,9 +486,17 @@
     },
   };
 
-  var tour = tours[page];
-  if (tour) {
+  function registerPageTour() {
+    // hx-boost swaps in the new page content without updating the <body>
+    // data-page attribute, and this IIFE re-runs on every navigation. Read the
+    // current view name from the swapped-in <main> marker instead so the guide
+    // button always starts the tour for the page actually on screen.
+    var main = document.querySelector('main');
+    var name = (main && main.dataset.pageTour) || document.body.dataset.page;
+    var tour = tours[name];
     window.__pageTour = tour;
-    window.SystemTour.autoStart(tour);
+    if (tour) window.SystemTour.autoStart(tour);
   }
+
+  registerPageTour();
 })();

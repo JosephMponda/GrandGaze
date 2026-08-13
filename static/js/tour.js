@@ -162,6 +162,18 @@
   function startTour(tour) {
     if (!tour || !tour.steps || !tour.steps.length) return;
 
+    if (activeTour) {
+      // A boosted page navigation replaces body content, which can wipe the
+      // overlay elements mid-tour. If the DOM markers are gone, treat the
+      // previous tour as finished so a new one can start.
+      if (!overlayEl || !overlayEl.isConnected) {
+        activeTour = null;
+        currentStep = 0;
+      } else {
+        return;
+      }
+    }
+
     // Dashboard sections can be conditional on the signed-in user's role or
     // data. Exclude unavailable targets so one missing section cannot hide
     // the remainder of the guide.

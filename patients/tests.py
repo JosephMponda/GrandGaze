@@ -134,6 +134,32 @@ def test_audit_trail_denied_for_nurse(client, nurse_user):
     assert response.status_code == 403
 
 
+def test_patient_registration_denied_for_clinician(client):
+    Group.objects.get_or_create(name="Clinician")
+    u = User.objects.create_user("clinician1", password="TestPass123!")
+    Profile.objects.create(user=u, role=Role.CLINICIAN)
+    u.groups.add(Group.objects.get(name="Clinician"))
+    client.force_login(u)
+    response = client.get(reverse("patients:register"))
+    assert response.status_code == 403
+
+
+def test_patient_registration_allowed_for_nurse(client, nurse_user):
+    client.force_login(nurse_user)
+    response = client.get(reverse("patients:register"))
+    assert response.status_code == 200
+
+
+def test_patient_registration_allowed_for_admin(client):
+    Group.objects.get_or_create(name="Admin")
+    u = User.objects.create_user("admin1", password="TestPass123!")
+    Profile.objects.create(user=u, role=Role.ADMIN)
+    u.groups.add(Group.objects.get(name="Admin"))
+    client.force_login(u)
+    response = client.get(reverse("patients:register"))
+    assert response.status_code == 200
+
+
 def test_has_role_false_for_wrong_group(nurse_user):
     assert has_role(nurse_user, "Admin") is False
     assert has_role(nurse_user, "Nurse") is True

@@ -56,10 +56,12 @@
         </div>
         <p class="text-sm font-semibold text-gray-700">No patients found</p>
         <p class="text-xs text-gray-400 mt-1">No results for &ldquo;{{ query }}&rdquo;. Try a different name or patient number.</p>
+        {% if user.is_superuser or user.profile.role == 'NURSE' or user.profile.role == 'ADMIN' %}
         <a href="{% url 'patients:register' %}" class="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-brand hover:underline">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             Register as new patient
         </a>
+        {% endif %}
     </div>
 
 {% else %}

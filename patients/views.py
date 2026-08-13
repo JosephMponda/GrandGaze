@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from accounts.permissions import role_required
 from . import services
 from .forms import PatientRegistrationForm
 from .models import Patient
@@ -39,7 +40,7 @@ def patient_list(request):
     })
 
 
-@login_required
+@role_required("Nurse", "Admin")
 def register_patient(request):
     if request.method == "POST":
         form = PatientRegistrationForm(request.POST)
